@@ -1,4 +1,4 @@
-PDA Maze
+PDA Maze Qt_WebAssembly
 =============
 
 PDA Maze is rewrite Bill Kendrick's and Robert Ernst maze game to modern Qt library (4.x.x, 5.x.x versions).
