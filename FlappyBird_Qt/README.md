@@ -6,5 +6,5 @@ Flappy Bird is a mobile game developed by Vietnamese video game artist and progr
 ![Image](https://user-images.githubusercontent.com/28188300/181496062-e75b7cee-2760-48a3-babb-feddf6e11dc6.png)
 ![Image](https://user-images.githubusercontent.com/28188300/181496063-2d3a2e09-80b7-4530-ae9f-7016e67a482a.png)
 
-#Playing
-To paly the game just execute tje .html as a local server
+# Playing
+To plqy the game just execute the .html as a local server
