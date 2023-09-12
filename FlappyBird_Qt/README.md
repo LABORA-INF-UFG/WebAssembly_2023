@@ -1,4 +1,4 @@
-# FlappyBird Qt/C++
+# FlappyBird Qt_WebAssembly/C++
 Flappy Bird is a mobile game developed by Vietnamese video game artist and programmer __*Dong Nguyen*__. The game is a side-scroller where the player controls a bird, attempting to fly between columns of red pipes without hitting them.
 
 ## Screenshots
@@ -7,4 +7,7 @@ Flappy Bird is a mobile game developed by Vietnamese video game artist and progr
 ![Image](https://user-images.githubusercontent.com/28188300/181496063-2d3a2e09-80b7-4530-ae9f-7016e67a482a.png)
 
 # Playing
-To plqy the game just execute the .html as a local server
+To play the game just execute the .html as a local server
+
+# References 
+https://github.com/Przemekkkth/FlappyBird_Qt-Cpp (source code and author)
