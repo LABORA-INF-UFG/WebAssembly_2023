@@ -1,6 +1,9 @@
 # PDA Maze Qt_WebAssembly
 =============
 
+# Running
+To run the game just execute .html file as server
+
 PDA Maze is rewrite Bill Kendrick's and Robert Ernst maze game to modern Qt library (4.x.x, 5.x.x versions).
 
 Added:
