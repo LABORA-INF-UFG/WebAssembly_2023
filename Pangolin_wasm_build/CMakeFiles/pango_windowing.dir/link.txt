@@ -1,2 +1,0 @@
-/home/gnery/Documents/emsdk/upstream/emscripten/emar qc libpango_windowing.a CMakeFiles/pango_windowing.dir/components/pango_windowing/src/display_emscripten.cpp.o CMakeFiles/pango_windowing.dir/components/pango_windowing/src/window.cpp.o
-/home/gnery/Documents/emsdk/upstream/emscripten/emranlib libpango_windowing.a

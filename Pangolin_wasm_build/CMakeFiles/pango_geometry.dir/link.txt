@@ -1,2 +1,0 @@
-/home/gnery/Documents/emsdk/upstream/emscripten/emar qc libpango_geometry.a CMakeFiles/pango_geometry.dir/components/pango_geometry/src/geometry.cpp.o CMakeFiles/pango_geometry.dir/components/pango_geometry/src/geometry_obj.cpp.o CMakeFiles/pango_geometry.dir/components/pango_geometry/src/geometry_ply.cpp.o
-/home/gnery/Documents/emsdk/upstream/emscripten/emranlib libpango_geometry.a

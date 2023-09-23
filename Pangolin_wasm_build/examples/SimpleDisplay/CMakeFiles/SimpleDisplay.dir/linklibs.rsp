@@ -1,1 +1,0 @@
- ../../libpango_display.a ../../libpango_python.a ../../libpango_windowing.a ../../libpango_opengl.a ../../libpango_image.a ../../libpango_vars.a ../../libpango_core.a -lrt 

@@ -1,2 +1,0 @@
-/home/gnery/Documents/emsdk/upstream/emscripten/emar qc libpango_glgeometry.a CMakeFiles/pango_glgeometry.dir/components/pango_glgeometry/src/glgeometry.cpp.o
-/home/gnery/Documents/emsdk/upstream/emscripten/emranlib libpango_glgeometry.a

@@ -1,2 +1,0 @@
-/home/gnery/Documents/emsdk/upstream/emscripten/emar qc libpango_tools.a CMakeFiles/pango_tools.dir/components/pango_tools/src/video_viewer.cpp.o
-/home/gnery/Documents/emsdk/upstream/emscripten/emranlib libpango_tools.a

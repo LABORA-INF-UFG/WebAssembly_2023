@@ -1,2 +1,0 @@
-/home/gnery/Documents/emsdk/upstream/emscripten/emar qc libpango_scene.a CMakeFiles/pango_scene.dir/components/pango_scene/src/renderable.cpp.o
-/home/gnery/Documents/emsdk/upstream/emscripten/emranlib libpango_scene.a

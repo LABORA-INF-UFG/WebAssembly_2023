@@ -1,2 +1,0 @@
-/home/gnery/Documents/emsdk/upstream/emscripten/emar qc libpango_python.a CMakeFiles/pango_python.dir/components/pango_core/src/dummy.cpp.o
-/home/gnery/Documents/emsdk/upstream/emscripten/emranlib libpango_python.a
