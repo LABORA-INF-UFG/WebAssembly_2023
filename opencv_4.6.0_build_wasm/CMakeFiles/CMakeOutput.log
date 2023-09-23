@@ -1,0 +1,525 @@
+The target system is: Emscripten - 1 - x86
+The host system is: Linux - 6.2.0-32-generic - x86_64
+Determining if the include file pthread.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_730b6/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_730b6.dir/build.make CMakeFiles/cmTC_730b6.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_730b6.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_730b6.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_730b6.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_730b6.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_730b6.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_730b6.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_730b6.dir/objects1.rsp -o cmTC_730b6.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the posix_memalign exist passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_c6984/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_c6984.dir/build.make CMakeFiles/cmTC_c6984.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c6984.dir/CheckSymbolExists.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_c6984.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_c6984.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_c6984.dir/CheckSymbolExists.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_c6984.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c6984.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_c6984.dir/objects1.rsp -o cmTC_c6984.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+File /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <stdlib.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef posix_memalign
+  return ((int*)(&posix_memalign))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the include file malloc.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_57e9d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_57e9d.dir/build.make CMakeFiles/cmTC_57e9d.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_57e9d.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_57e9d.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_57e9d.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_57e9d.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_57e9d.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_57e9d.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_57e9d.dir/objects1.rsp -o cmTC_57e9d.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the memalign exist passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_aea90/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_aea90.dir/build.make CMakeFiles/cmTC_aea90.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_aea90.dir/CheckSymbolExists.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_aea90.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_aea90.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_aea90.dir/CheckSymbolExists.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_aea90.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aea90.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_aea90.dir/objects1.rsp -o cmTC_aea90.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+File /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <malloc.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef memalign
+  return ((int*)(&memalign))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the function fseeko exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_430fe/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_430fe.dir/build.make CMakeFiles/cmTC_430fe.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_430fe.dir/CheckFunctionExists.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -DCHECK_FUNCTION_EXISTS=fseeko -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_430fe.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_430fe.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_430fe.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_430fe.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_430fe.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -DCHECK_FUNCTION_EXISTS=fseeko -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_430fe.dir/objects1.rsp -o cmTC_430fe.js 
+wasm-ld: warning: function signature mismatch: fseeko
+>>> defined as () -> i32 in CMakeFiles/cmTC_430fe.dir/CheckFunctionExists.c.o
+>>> defined as (i32, i64, i32) -> i32 in /home/gnery/Documents/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/libc.a(fseek.o)
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file unistd.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_521ff/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_521ff.dir/build.make CMakeFiles/cmTC_521ff.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_521ff.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_521ff.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_521ff.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_521ff.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_521ff.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_521ff.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_521ff.dir/objects1.rsp -o cmTC_521ff.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file sys/types.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_3a27d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_3a27d.dir/build.make CMakeFiles/cmTC_3a27d.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3a27d.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_3a27d.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_3a27d.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_3a27d.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_3a27d.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3a27d.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_3a27d.dir/objects1.rsp -o cmTC_3a27d.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file stdint.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_36faa/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_36faa.dir/build.make CMakeFiles/cmTC_36faa.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_36faa.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_36faa.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_36faa.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_36faa.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_36faa.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_36faa.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_36faa.dir/objects1.rsp -o cmTC_36faa.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file stddef.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_8b17c/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_8b17c.dir/build.make CMakeFiles/cmTC_8b17c.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8b17c.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_8b17c.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_8b17c.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_8b17c.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_8b17c.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8b17c.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_8b17c.dir/objects1.rsp -o cmTC_8b17c.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file string.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f1140/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f1140.dir/build.make CMakeFiles/cmTC_f1140.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f1140.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_f1140.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_f1140.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_f1140.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_f1140.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f1140.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_f1140.dir/objects1.rsp -o cmTC_f1140.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file memory.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_867f0/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_867f0.dir/build.make CMakeFiles/cmTC_867f0.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_867f0.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_867f0.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_867f0.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_867f0.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_867f0.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_867f0.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_867f0.dir/objects1.rsp -o cmTC_867f0.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file stdlib.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_85c4a/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_85c4a.dir/build.make CMakeFiles/cmTC_85c4a.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_85c4a.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_85c4a.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_85c4a.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_85c4a.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_85c4a.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_85c4a.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_85c4a.dir/objects1.rsp -o cmTC_85c4a.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file stdio.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_e5d34/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_e5d34.dir/build.make CMakeFiles/cmTC_e5d34.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e5d34.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_e5d34.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_e5d34.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_e5d34.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_e5d34.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e5d34.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_e5d34.dir/objects1.rsp -o cmTC_e5d34.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file math.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_07886/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_07886.dir/build.make CMakeFiles/cmTC_07886.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_07886.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_07886.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_07886.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_07886.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_07886.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_07886.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_07886.dir/objects1.rsp -o cmTC_07886.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file float.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_3bd10/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_3bd10.dir/build.make CMakeFiles/cmTC_3bd10.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3bd10.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_3bd10.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_3bd10.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_3bd10.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_3bd10.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3bd10.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_3bd10.dir/objects1.rsp -o cmTC_3bd10.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file time.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d4d85/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d4d85.dir/build.make CMakeFiles/cmTC_d4d85.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d4d85.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_d4d85.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_d4d85.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_d4d85.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_d4d85.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d4d85.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_d4d85.dir/objects1.rsp -o cmTC_d4d85.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file stdarg.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_db813/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_db813.dir/build.make CMakeFiles/cmTC_db813.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_db813.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_db813.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_db813.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_db813.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_db813.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_db813.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_db813.dir/objects1.rsp -o cmTC_db813.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file ctype.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_4e70f/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4e70f.dir/build.make CMakeFiles/cmTC_4e70f.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4e70f.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_4e70f.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_4e70f.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_4e70f.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_4e70f.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4e70f.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_4e70f.dir/objects1.rsp -o cmTC_4e70f.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file assert.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_457de/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_457de.dir/build.make CMakeFiles/cmTC_457de.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_457de.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_457de.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_457de.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_457de.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_457de.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_457de.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_457de.dir/objects1.rsp -o cmTC_457de.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file stdint.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_8f41a/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_8f41a.dir/build.make CMakeFiles/cmTC_8f41a.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8f41a.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_8f41a.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_8f41a.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_8f41a.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_8f41a.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8f41a.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_8f41a.dir/objects1.rsp -o cmTC_8f41a.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file inttypes.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_12e4e/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_12e4e.dir/build.make CMakeFiles/cmTC_12e4e.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_12e4e.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_12e4e.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_12e4e.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_12e4e.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_12e4e.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_12e4e.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_12e4e.dir/objects1.rsp -o cmTC_12e4e.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file strings.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_c0a65/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_c0a65.dir/build.make CMakeFiles/cmTC_c0a65.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c0a65.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_c0a65.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_c0a65.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_c0a65.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_c0a65.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c0a65.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_c0a65.dir/objects1.rsp -o cmTC_c0a65.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file sys/stat.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_1f30d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_1f30d.dir/build.make CMakeFiles/cmTC_1f30d.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1f30d.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_1f30d.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_1f30d.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_1f30d.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_1f30d.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1f30d.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_1f30d.dir/objects1.rsp -o cmTC_1f30d.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file unistd.h exists passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_be55d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_be55d.dir/build.make CMakeFiles/cmTC_be55d.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_be55d.dir/CheckIncludeFile.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_be55d.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_be55d.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_be55d.dir/CheckIncludeFile.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_be55d.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_be55d.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_be55d.dir/objects1.rsp -o cmTC_be55d.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if files malloc.h exist passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_10232/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_10232.dir/build.make CMakeFiles/cmTC_10232.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_10232.dir/OPJ_HAVE_MALLOC_H.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_10232.dir/OPJ_HAVE_MALLOC_H.c.o -MF CMakeFiles/cmTC_10232.dir/OPJ_HAVE_MALLOC_H.c.o.d -o CMakeFiles/cmTC_10232.dir/OPJ_HAVE_MALLOC_H.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CheckIncludeFiles/OPJ_HAVE_MALLOC_H.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_10232.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_10232.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_10232.dir/objects1.rsp -o cmTC_10232.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the posix_memalign exist passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_c2ff6/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_c2ff6.dir/build.make CMakeFiles/cmTC_c2ff6.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c2ff6.dir/CheckSymbolExists.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -D_POSIX_C_SOURCE=200112L  -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_c2ff6.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_c2ff6.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_c2ff6.dir/CheckSymbolExists.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_c2ff6.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c2ff6.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_c2ff6.dir/objects1.rsp -o cmTC_c2ff6.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+File /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <stdlib.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef posix_memalign
+  return ((int*)(&posix_memalign))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the memalign exist passed with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_87810/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_87810.dir/build.make CMakeFiles/cmTC_87810.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_87810.dir/CheckSymbolExists.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc   -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_87810.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_87810.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_87810.dir/CheckSymbolExists.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_87810.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_87810.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_87810.dir/objects1.rsp -o cmTC_87810.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+File /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <malloc.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef memalign
+  return ((int*)(&memalign))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD succeeded with the following output:
+Change Dir: /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_6edb3/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_6edb3.dir/build.make CMakeFiles/cmTC_6edb3.dir/build
+gmake[1]: Entering directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_6edb3.dir/src.c.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -DCMAKE_HAVE_LIBC_PTHREAD  -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Winit-self -Wpointer-arith -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations -Wno-undef -Wno-strict-prototypes -Wno-cast-function-type -Wno-shadow -Wno-unused-function  -O3 -DNDEBUG  -DNDEBUG -MD -MT CMakeFiles/cmTC_6edb3.dir/src.c.o -MF CMakeFiles/cmTC_6edb3.dir/src.c.o.d -o CMakeFiles/cmTC_6edb3.dir/src.c.o -c /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp/src.c
+emcc: warning: linker setting ignored during compilation: 'WASM' [-Wunused-command-line-argument]
+emcc: warning: linker setting ignored during compilation: 'SINGLE_FILE' [-Wunused-command-line-argument]
+Linking C executable cmTC_6edb3.js
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6edb3.dir/link.txt --verbose=1
+/home/gnery/Documents/emsdk/upstream/emscripten/emcc -s WASM=1 -s SINGLE_FILE=1 -s USE_PTHREADS=0    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Winit-self -Wpointer-arith -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments -ffunction-sections -fdata-sections  -fvisibility=hidden -fvisibility-inlines-hidden -Wno-implicit-const-int-float-conversion -Wno-unused-but-set-variable -Wno-missing-prototypes -Wno-missing-declarations -Wno-undef -Wno-strict-prototypes -Wno-cast-function-type -Wno-shadow -Wno-unused-function  -O3 -DNDEBUG  -DNDEBUG   -Wl,--gc-sections  @CMakeFiles/cmTC_6edb3.dir/objects1.rsp -o cmTC_6edb3.js 
+gmake[1]: Leaving directory '/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <pthread.h>
+
+static void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_cancel(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+

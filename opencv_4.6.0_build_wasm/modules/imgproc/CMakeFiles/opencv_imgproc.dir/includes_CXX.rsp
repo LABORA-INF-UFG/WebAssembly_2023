@@ -1,0 +1,1 @@
+-I/home/gnery/Desktop/OpenCV_4.6.0_build/opencv/modules/imgproc/include -I/home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm/modules/imgproc -I/home/gnery/Desktop/OpenCV_4.6.0_build/opencv/modules/core/include -isystem /home/gnery/Desktop/OpenCV_4.6.0_build/build_wasm

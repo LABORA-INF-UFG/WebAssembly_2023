@@ -1,0 +1,2 @@
+/home/gnery/Documents/emsdk/upstream/emscripten/emar qc libpango_plot.a CMakeFiles/pango_plot.dir/components/pango_plot/src/datalog.cpp.o CMakeFiles/pango_plot.dir/components/pango_plot/src/plotter.cpp.o CMakeFiles/pango_plot.dir/components/pango_plot/src/loaders/csv_table_loader.cpp.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emranlib libpango_plot.a

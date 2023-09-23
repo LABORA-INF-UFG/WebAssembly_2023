@@ -291,6 +291,7 @@ DIST          = ../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/spec_pre
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/common/wasm/wasm.conf \
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/wasm-emscripten/qmake.conf \
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/exclusive_builds.prf \
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/toolchain.prf \
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/default_pre.prf \
@@ -545,6 +546,7 @@ Makefile: FlappyBird.pro ../../../../Qt/6.5.2/wasm_singlethread/mkspecs/wasm-ems
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/common/wasm/wasm.conf \
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/wasm-emscripten/qmake.conf \
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/exclusive_builds.prf \
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/toolchain.prf \
 		../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/default_pre.prf \
@@ -795,6 +797,7 @@ Makefile: FlappyBird.pro ../../../../Qt/6.5.2/wasm_singlethread/mkspecs/wasm-ems
 ../../../../Qt/6.5.2/wasm_singlethread/mkspecs/common/wasm/wasm.conf:
 ../../../../Qt/6.5.2/wasm_singlethread/mkspecs/wasm-emscripten/qmake.conf:
 ../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/spec_post.prf:
+.qmake.stash:
 ../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/exclusive_builds.prf:
 ../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/toolchain.prf:
 ../../../../Qt/6.5.2/wasm_singlethread/mkspecs/features/default_pre.prf:

@@ -1,0 +1,1 @@
+/home/gnery/Documents/emsdk/upstream/emscripten/em++ -O3 -DNDEBUG -sMAX_WEBGL_VERSION=2 -sASYNCIFY=1 -sDISABLE_EXCEPTION_CATCHING=0 -sGL_ASSERTIONS=1 -sFULL_ES2=1 -sFULL_ES3=1 --bind @CMakeFiles/tutorial_2_gl_intro_pango_triangle_vbo.dir/objects1.rsp -o tutorial_2_gl_intro_pango_triangle_vbo.js @CMakeFiles/tutorial_2_gl_intro_pango_triangle_vbo.dir/linklibs.rsp

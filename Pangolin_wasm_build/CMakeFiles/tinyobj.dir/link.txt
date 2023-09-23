@@ -1,0 +1,2 @@
+/home/gnery/Documents/emsdk/upstream/emscripten/emar qc libtinyobj.a CMakeFiles/tinyobj.dir/components/tinyobj/src/tinyobj.cpp.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emranlib libtinyobj.a

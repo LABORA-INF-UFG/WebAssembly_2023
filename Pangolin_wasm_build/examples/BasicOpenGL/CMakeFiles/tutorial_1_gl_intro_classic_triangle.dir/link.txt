@@ -1,0 +1,1 @@
+/home/gnery/Documents/emsdk/upstream/emscripten/em++ -O3 -DNDEBUG -sMAX_WEBGL_VERSION=2 -sASYNCIFY=1 -sDISABLE_EXCEPTION_CATCHING=0 -sGL_ASSERTIONS=1 -sFULL_ES2=1 -sFULL_ES3=1 --bind @CMakeFiles/tutorial_1_gl_intro_classic_triangle.dir/objects1.rsp -o tutorial_1_gl_intro_classic_triangle.js @CMakeFiles/tutorial_1_gl_intro_classic_triangle.dir/linklibs.rsp

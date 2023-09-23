@@ -1,0 +1,7 @@
+# Hashes of file build rules.
+c769abc1b0c896ffa379f9fa139440c9 CMakeFiles/uninstall
+61d3a8f1cb80de4ca49120ef951c5679 fonts.cpp
+d431040acce4f4d37863262cf7f5fcc5 include/pangolin/factory/RegisterFactoriesVideoInterface.h
+9b52a362ee6fe2a98f3c81a04b426ed5 include/pangolin/factory/RegisterFactoriesVideoOutputInterface.h
+dc8a3929bb20d842170a9b3d0f81cc34 include/pangolin/factory/RegisterFactoriesWindowInterface.h
+f028e07f33b3346b5dfa600b73df4086 shaders.cpp

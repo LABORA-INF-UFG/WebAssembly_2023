@@ -1,0 +1,2 @@
+/home/gnery/Documents/emsdk/upstream/emscripten/emar qc libpango_vars.a CMakeFiles/pango_vars.dir/components/pango_vars/src/vars.cpp.o CMakeFiles/pango_vars.dir/components/pango_vars/src/varstate.cpp.o
+/home/gnery/Documents/emsdk/upstream/emscripten/emranlib libpango_vars.a
