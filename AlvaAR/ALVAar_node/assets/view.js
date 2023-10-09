@@ -1,10 +1,10 @@
-import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/build/three.module.js';
-import { OrbitControls } from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { AlvaARConnectorTHREE } from './alva_ar_three.js'
 
 class ARCamView
 {
-    constructor( container, width, height, x = 0, y = 0, z = -10, scale = 1.0)
+    constructor( container, width, heARSimpleViewight, x = 0, y = 0, z = -10, scale = 1.0)
     {
         this.applyPose = AlvaARConnectorTHREE.Initialize( THREE );
 
