@@ -1,11 +1,11 @@
-
-import { AlvaAR } from './assets/alva_ar.js';
+// @ts-ignore
+import { AlvaAR } from '../libraries/alva_ar.js';
 import express from 'express'
 import fs from 'fs'
 
 const app = express()
 const port = 3000
-const videoPath = './assets/video.mp4';
+const videoPath = 'assets/video.mp4';
 
 app.get('/', async (req, res) => {
   const stat = fs.statSync(videoPath);
@@ -21,6 +21,6 @@ app.get('/', async (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`App listening on port ${port}`)
 })
 
