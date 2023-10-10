@@ -11,7 +11,7 @@ app.get('/', async (req, res) => {
   const stat = fs.statSync(videoPath);
   const alva = await AlvaAR.Initialize( 300, 300 );
 
-  console.log(alva)
+  // console.log(alva)
 
   const responseObject = {
     stat

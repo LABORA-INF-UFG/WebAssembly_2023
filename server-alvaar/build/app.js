@@ -17,12 +17,12 @@ const videoPath = 'assets/video.mp4';
 app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const stat = fs.statSync(videoPath);
     const alva = yield AlvaAR.Initialize(300, 300);
-    console.log(alva);
+    // console.log(alva)
     const responseObject = {
         stat
     };
     res.send(JSON.stringify(responseObject));
 }));
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+    console.log(`App listening on port ${port}`);
 });
