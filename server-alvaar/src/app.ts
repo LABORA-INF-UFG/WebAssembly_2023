@@ -9,9 +9,14 @@ const videoPath = 'assets/video.mp4';
 
 app.get('/', async (req, res) => {
   const stat = fs.statSync(videoPath);
-  const alva = await AlvaAR.Initialize( 300, 300 );
 
-  // console.log(alva)
+  // TODO: Get dimensions dynamically
+  const width = 364;
+  const height = 674;
+
+  const alva: AlvaAR = await AlvaAR.Initialize( width, height );
+
+  console.log(alva)
 
   const responseObject = {
     stat
