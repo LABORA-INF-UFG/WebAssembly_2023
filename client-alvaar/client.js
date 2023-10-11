@@ -1,4 +1,6 @@
 import { Stats } from "./stats.js";
+import { AlvaAR } from './alva_ar.js';
+import { ARCamView } from "./view.js";
 import { Camera, onFrame, resize2cover } from "./utils.js";
 
 function main()
@@ -25,7 +27,6 @@ function main()
     
     async function demo( media )
     {
-        console.log(media);
         const $video = media.el;
 
         const size = resize2cover( $video.videoWidth, $video.videoHeight, $container.clientWidth, $container.clientHeight );
@@ -37,20 +38,20 @@ function main()
 
         const ctx = $canvas.getContext( '2d', { alpha: false, desynchronized: true } );
 
-        //const alva = await AlvaAR.Initialize( $canvas.width, $canvas.height );
-        //const view = new ARCamView( $view, $canvas.width, $canvas.height );
+        const alva = await AlvaAR.Initialize( $canvas.width, $canvas.height );
+        const view = new ARCamView( $view, $canvas.width, $canvas.height );
 
         Stats.add( 'total' );
         Stats.add( 'video' );
         Stats.add( 'slam' );
 
         $container.appendChild( $canvas );
-        //$container.appendChild( $view );
+        $container.appendChild( $view );
 
         document.body.appendChild( Stats.el );
         document.body.addEventListener( "click", () => alva.reset(), false );
 
-        onFrame( () =>
+        onFrame( async () =>
         {
             Stats.next();
             Stats.start( 'total' );
@@ -62,21 +63,34 @@ function main()
                 Stats.start( 'video' );
                 ctx.drawImage( $video, 0, 0, $video.videoWidth, $video.videoHeight, size.x, size.y, size.width, size.height );
                 const frame = ctx.getImageData( 0, 0, $canvas.width, $canvas.height );
-                console.log(frame);
                 Stats.stop( 'video' );
 
                 Stats.start( 'slam' );
-                //const pose = alva.findCameraPose( frame );
+
+                let pose = null
+
+                try {
+                    pose = await fetch("localhost:3000/video", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(frame),
+                      })
+                } catch(e) {
+                    console.error(e)
+                }
+
+                // const pose = alva.findCameraPose( frame );
+                // console.log(pose)
+
                 Stats.stop( 'slam' );
 
                 //WebSocket
                 //Json
                 //Ver o que é o pose
                 //Serializar
-                
-                
 
-                /*
                 if( pose )
                 {
                     view.updateCameraPose( pose );
@@ -93,7 +107,6 @@ function main()
                         ctx.fillRect( p.x, p.y, 2, 2 );
                     }
                 }
-                */
             }
 
             Stats.stop( 'total' );

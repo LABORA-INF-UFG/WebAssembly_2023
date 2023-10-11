@@ -1,5 +1,17 @@
 interface Frame {
-    data: any
+    data: Uint8ClampedArray
+    width: number
+    height: number
+}
+
+type Pose = Float32Array[16]
+
+interface Media {
+    el: HTMLVideoElement,
+    width: number,
+    height: number,
+    _canvas: HTMLCanvasElement,
+    _ctx: CanvasRenderingContext2D
 }
 
 interface AlvaAR {
