@@ -75,6 +75,8 @@ function main() {
                         data: frame.data
                     }
 
+                    console.log(JSON.stringify(bodyObj))
+
                     const response = await fetch("http://localhost:3000/video", {
                         method: "POST",
                         headers: {
@@ -84,6 +86,7 @@ function main() {
                     });
 
                     pose = await response.json();
+                    console.log(pose)
                 } catch (e) {
                     console.error(e)
                 }
