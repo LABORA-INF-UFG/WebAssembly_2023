@@ -4,16 +4,16 @@ import express from 'express'
 import cors from 'cors';
 
 const app = express()
-app.use(express.json());
+app.use(express.json({limit: "50mb"}));
 app.use(cors())
 const port = 3000
 const videoPath = 'assets/video.mp4';
 
 // TODO: Get dimensions dynamically
-const width = 364;
-const height = 674;
+const width = 1536;
+const height = 445;
 
-let alva: AlvaAR | null = null;
+const alvaPromise = AlvaAR.Initialize(width, height);
 
 app.get('/', async (req, res) => {
   res.json({
@@ -22,16 +22,14 @@ app.get('/', async (req, res) => {
   })
 })
 
-app.post('/initialize', async (req, res) => {
-  alva = await AlvaAR.Initialize(width, height);
-
-  res.send("AlvaAR initialized")
-})
-
 app.post('/video', async (req, res) => {
-  console.log(req.body)
+  console.log("/video")
+  const alva = await alvaPromise;
 
-  res.json(req.body)
+  const pose = alva.findCameraPose( req.body );
+  // console.log(pose)
+
+  res.json(pose)
 })
 
 app.listen(port, () => {
