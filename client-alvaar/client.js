@@ -83,9 +83,7 @@ function main() {
                         body: JSON.stringify(bodyObj),
                     });
 
-                    const body = await response.json();
-
-                    console.log(body);
+                    pose = await response.json();
                 } catch (e) {
                     console.error(e)
                 }
