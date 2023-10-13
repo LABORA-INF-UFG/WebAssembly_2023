@@ -11,15 +11,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { AlvaAR } from "../libraries/alva_ar.js";
 import express from "express";
 import cors from "cors";
+import fs from "fs";
 const app = express();
 app.use(express.json({ limit: "100mb" }));
 app.use(cors());
 const port = 3000;
-const videoPath = "../assets/video.mp4";
 // TODO: Get dimensions dynamically
 const width = 364;
 const height = 674;
 const alvaPromise = AlvaAR.Initialize(width, height);
+function log(obj, callback) {
+    try {
+        fs.writeFile("./log.json", JSON.stringify(obj), callback);
+    }
+    catch (error) {
+        console.error(error);
+    }
+}
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.json({
         message: "OK",
@@ -28,16 +36,14 @@ app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 app.post("/video", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const alva = yield alvaPromise;
-    console.log(req.body.width);
-    console.log(req.body.height);
-    console.log(typeof req.body.data);
-    // fs.writeFile("/log.json", req.body.toString(), (err) => {
-    //     if (err) {
-    //         console.error(err);
-    //     }
-    //     // ficheiro escrito com sucesso
-    // });
-    const pose = alva.findCameraPose(req.body);
+    const { width, height, data } = req.body;
+    const frame = {
+        width,
+        height,
+        data: new Uint8ClampedArray(data)
+    };
+    const pose = alva.findCameraPose(frame);
+    console.log(pose);
     res.json(pose);
 }));
 app.listen(port, () => {

@@ -1,124 +1,121 @@
 import { Stats } from "./stats.js";
-    import { AlvaAR } from './alva_ar.js';
-    import { ARSimpleView, ARSimpleMap } from "./view.js";
-    import { Video, onFrame } from "./utils.js";
+import { AlvaAR } from './alva_ar.js';
+import { ARSimpleView, ARSimpleMap } from "./view.js";
+import { Video, onFrame } from "./utils.js";
 
-    async function main()
-    {
-        document.body.appendChild( Stats.el );
-        Stats.add( 'total' );
-        Stats.add( 'video' );
-        Stats.add( 'slam' );
+async function main() {
+    document.body.appendChild(Stats.el);
+    Stats.add('total');
+    Stats.add('video');
+    Stats.add('slam');
 
-        const media = await Video.Initialize( './video.mp4' );
-        const alva = await AlvaAR.Initialize( media.width, media.height );
+    const media = await Video.Initialize('./video.mp4');
+    const alva = await AlvaAR.Initialize(media.width, media.height);
 
-        const $cam = document.getElementById( 'renderer-cam' );
-        const $map = document.getElementById( 'renderer-map' );
-        const ctx = document.getElementById( 'renderer-video' ).getContext( '2d' );
+    const $cam = document.getElementById('renderer-cam');
+    const $map = document.getElementById('renderer-map');
+    const ctx = document.getElementById('renderer-video').getContext('2d');
 
-        //console.log($map);
-        //console.log($cam);
+    ctx.canvas.width = media.width;
+    ctx.canvas.height = media.height;
 
-        ctx.canvas.width = media.width;
-        ctx.canvas.height = media.height;
+    const mapRenderer = new ARSimpleMap($map, media.width, media.height);
+    const camRenderer = new ARSimpleView($cam, media.width, media.height, mapRenderer);
 
-        const mapRenderer = new ARSimpleMap( $map, media.width, media.height );
-        const camRenderer = new ARSimpleView( $cam, media.width, media.height, mapRenderer );
+    let doFindPlane = false;
 
-        let doFindPlane = false;
+    $cam.addEventListener('click', (event) => doFindPlane = true);
+    $cam.parentElement.style.display = 'block';
 
-        $cam.addEventListener( 'click', ( event ) => doFindPlane = true );
-        $cam.parentElement.style.display = 'block';
-
+    media.el.play();
+    media.el.loop = false;
+    media.el.onended = (event) => {
+        media.el.load();
         media.el.play();
-        media.el.loop = false;
-        media.el.onended = ( event ) =>
-        {
-            media.el.load();
-            media.el.play();
-            camRenderer.reset();
-        };
+        camRenderer.reset();
+    };
 
-        onFrame( async () =>
-        {
-            Stats.next();
-            Stats.start( 'total' );
+    onFrame(async () => {
+        Stats.next();
+        Stats.start('total');
 
-            Stats.start( 'video' );
-            const frame = media.getImageData();
+        Stats.start('video');
+        const frame = media.getImageData();
 
+        ctx.clearRect(0, 0, media.width, media.height);
+        ctx.putImageData(frame, 0, 0);
+        Stats.stop('video');
 
-            ctx.clearRect( 0, 0, media.width, media.height );
-            ctx.putImageData( frame, 0, 0 );
-            Stats.stop( 'video' );
+        Stats.start('slam');
 
-            Stats.start( 'slam' );
-            
-            try {
-                if(!frame)
-                    return;
+        // const pose = alva.findCameraPose(frame);
+        // console.log(pose)
 
-                const bodyObj = {
-                    width: frame.width,
-                    height: frame.height,
-                    data: frame.data
-                }
-                
+        let pose = null;
 
-                //Dar uma olhada nesses parametros do fetch
-                const response = await fetch("http://localhost:3000/video", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(bodyObj),
-                });
+        try {
+            if (!frame)
+                return;
 
-                const body = await response.json();
-                pose = body;
-
-                console.log(pose);
-            } catch (e) {
-                console.error(e)
+            const bodyObj = {
+                width: frame.width,
+                height: frame.height,
+                data: Object.values(frame.data)
             }
-            
-            Stats.stop( 'slam' );
-            
-            /*
-            if( pose )
-            {
-                camRenderer.updateCameraPose( pose );
 
-                if( doFindPlane )
-                {
-                    const planePose = alva.findPlane();
+            console.log(JSON.stringify(bodyObj));
 
-                    if( planePose )
-                    {
-                        camRenderer.createObjectWithPose( planePose );
-                        doFindPlane = false;
-                    }
+            const response = await fetch("http://localhost:3000/video", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(bodyObj),
+            });
+
+            const body = await response.json();
+
+
+            if (!body)
+                return;
+
+            pose = new Float32Array(body)
+
+            console.log(pose);
+        } catch (e) {
+            console.error(e)
+        }
+
+        Stats.stop('slam');
+
+        if (pose) {
+            camRenderer.updateCameraPose(pose);
+
+            if (doFindPlane) {
+                const planePose = alva.findPlane();
+
+                if (planePose) {
+                    camRenderer.createObjectWithPose(planePose);
+                    doFindPlane = false;
                 }
             }
-            else
-            {
-                camRenderer.lostCamera();
+        }
+        else {
+            camRenderer.lostCamera();
 
-                const dots = alva.getFramePoints();
+            const dots = alva.getFramePoints();
 
-                for( const p of dots )
-                {
-                    ctx.fillStyle = 'white';
-                    ctx.fillRect( p.x, p.y, 2, 2 );
-                }
+            for (const p of dots) {
+                ctx.fillStyle = 'white';
+                ctx.fillRect(p.x, p.y, 2, 2);
             }
-            */
-            Stats.stop( 'total' );
-            Stats.render();
+        }
 
-            return true;
-        }, 30 );
-    }
+        Stats.stop('total');
+        Stats.render();
 
-    window.addEventListener( 'load', main );
+        return true;
+    }, 30);
+}
+
+window.addEventListener('load', main);

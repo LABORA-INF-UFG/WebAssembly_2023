@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npx tsc",
     "serve": "node build/app.js",
-    "start": "npx nodemon --esm src/app.ts"
+    "start": "npx nodemon --ignore 'log.json' --esm src/app.ts"
   },
   "author": "Matheus Lucas e Gabriel Nery",
   "type": "module",
