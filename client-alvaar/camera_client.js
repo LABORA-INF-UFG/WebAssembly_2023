@@ -75,8 +75,6 @@ function main() {
                         data: frame.data
                     }
 
-                    console.log(JSON.stringify(bodyObj))
-
                     const response = await fetch("http://localhost:3000/video", {
                         method: "POST",
                         headers: {
@@ -85,8 +83,9 @@ function main() {
                         body: JSON.stringify(bodyObj),
                     });
 
-                    pose = await response.json();
-                    console.log(pose)
+                    const body = await response.json();
+
+                    console.log(body);
                 } catch (e) {
                     console.error(e)
                 }
@@ -100,7 +99,7 @@ function main() {
                 //Json
                 //Ver o que é o pose
                 //Serializar
-                
+
                 if (pose) {
                     view.updateCameraPose(pose);
                 }
@@ -114,7 +113,6 @@ function main() {
                         ctx.fillRect(p.x, p.y, 2, 2);
                     }
                 }
-                
             }
 
             Stats.stop('total');
