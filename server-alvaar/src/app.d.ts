@@ -4,6 +4,15 @@ interface Frame {
     height: number
 }
 
+type PlanePose = Float32Array[16]
+
+interface Dot {
+    x: number
+    y: number
+}
+
+type Dots = Dot[]
+
 type Pose = Float32Array[16]
 
 interface Media {

@@ -48,23 +48,25 @@ async function main() {
 
         Stats.start('slam');
 
-        // const pose = alva.findCameraPose(frame);
+        const pose = alva.findCameraPose(frame);
         // console.log(pose)
 
+        /**
+         * 
         let pose = null;
-
+        
         try {
             if (!frame)
-                return;
-
+            return;
+        
             const bodyObj = {
                 width: frame.width,
                 height: frame.height,
                 data: Object.values(frame.data)
             }
-
+            
             console.log(JSON.stringify(bodyObj));
-
+            
             const response = await fetch("http://localhost:3000/video", {
                 method: "POST",
                 headers: {
@@ -74,18 +76,18 @@ async function main() {
             });
 
             const body = await response.json();
-
-
+            
+            
             if (!body)
-                return;
-
-            pose = new Float32Array(body)
-
-            console.log(pose);
+            return;
+        
+        pose = new Float32Array(body)
+        
+        console.log(pose);
         } catch (e) {
             console.error(e)
         }
-
+    */
         Stats.stop('slam');
 
         if (pose) {
@@ -93,6 +95,8 @@ async function main() {
 
             if (doFindPlane) {
                 const planePose = alva.findPlane();
+
+                console.log(planePose);
 
                 if (planePose) {
                     camRenderer.createObjectWithPose(planePose);
@@ -102,13 +106,13 @@ async function main() {
         }
         else {
             camRenderer.lostCamera();
+        }
 
-            const dots = alva.getFramePoints();
+        const dots = alva.getFramePoints();
 
-            for (const p of dots) {
-                ctx.fillStyle = 'white';
-                ctx.fillRect(p.x, p.y, 2, 2);
-            }
+        for (const p of dots) {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(p.x, p.y, 2, 2);
         }
 
         Stats.stop('total');
