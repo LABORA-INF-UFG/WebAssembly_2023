@@ -1,5 +1,4 @@
 import { Stats } from "./stats.js";
-import { AlvaAR } from './alva_ar.js';
 import { ARSimpleView, ARSimpleMap } from "./view.js";
 import { Video, onFrame } from "./utils.js";
 
@@ -10,7 +9,6 @@ async function main() {
     Stats.add('slam');
 
     const media = await Video.Initialize('./video.mp4');
-    const alva = await AlvaAR.Initialize(media.width, media.height);
 
     const $cam = document.getElementById('renderer-cam');
     const $map = document.getElementById('renderer-map');
@@ -48,12 +46,9 @@ async function main() {
 
         Stats.start('slam');
 
-        const pose = alva.findCameraPose(frame);
-        // console.log(pose)
-
-        /**
-         * 
         let pose = null;
+        let planePose = null;
+        let dots;
         
         try {
             if (!frame)
@@ -65,8 +60,6 @@ async function main() {
                 data: Object.values(frame.data)
             }
             
-            console.log(JSON.stringify(bodyObj));
-            
             const response = await fetch("http://localhost:3000/video", {
                 method: "POST",
                 headers: {
@@ -77,27 +70,23 @@ async function main() {
 
             const body = await response.json();
             
-            
             if (!body)
             return;
         
-        pose = new Float32Array(body)
-        
-        console.log(pose);
+            pose = new Float32Array(body.pose);
+            planePose = new Float32Array(body.planePose);
+            dots = body.dots;
+
         } catch (e) {
             console.error(e)
         }
-    */
+
         Stats.stop('slam');
 
         if (pose) {
             camRenderer.updateCameraPose(pose);
 
             if (doFindPlane) {
-                const planePose = alva.findPlane();
-
-                console.log(planePose);
-
                 if (planePose) {
                     camRenderer.createObjectWithPose(planePose);
                     doFindPlane = false;
@@ -108,9 +97,8 @@ async function main() {
             camRenderer.lostCamera();
         }
 
-        const dots = alva.getFramePoints();
-
         for (const p of dots) {
+            console.log(p);
             ctx.fillStyle = 'white';
             ctx.fillRect(p.x, p.y, 2, 2);
         }

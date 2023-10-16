@@ -34,9 +34,23 @@ app.get("/", async (req, res) => {
     });
 });
 
-app.post("/video", async (req, res) => {
+async function processVideo(frame: any) {
     const alva = await alvaPromise;
 
+    const pose = alva.findCameraPose(frame); 
+    const planePose = alva.findPlane(); 
+    const dots = alva.getFramePoints(); 
+    
+
+    return {
+        pose: pose == null? null: Object.values(pose),
+        planePose: planePose == null? null: Object.values(planePose),
+        dots: dots == null ? null : dots
+    }
+
+}
+
+app.post("/video", async (req, res) => {
     const { width, height, data } = req.body;
 
     const frame = {
@@ -45,10 +59,12 @@ app.post("/video", async (req, res) => {
         data: new Uint8ClampedArray(data)
     }
 
-    const pose = alva.findCameraPose(frame);
+    const response = await processVideo(frame);
 
-    res.json(pose ? Object.values(pose) : null);
+    res.json(response);
 });
+
+
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);

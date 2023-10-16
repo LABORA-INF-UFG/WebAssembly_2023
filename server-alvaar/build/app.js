@@ -34,17 +34,28 @@ app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         status: true,
     });
 }));
+function processVideo(frame) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const alva = yield alvaPromise;
+        const pose = alva.findCameraPose(frame);
+        const planePose = alva.findPlane();
+        const dots = alva.getFramePoints();
+        return {
+            pose: pose == null ? null : Object.values(pose),
+            planePose: planePose == null ? null : Object.values(planePose),
+            dots: dots == null ? null : dots
+        };
+    });
+}
 app.post("/video", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const alva = yield alvaPromise;
     const { width, height, data } = req.body;
     const frame = {
         width,
         height,
         data: new Uint8ClampedArray(data)
     };
-    const pose = alva.findCameraPose(frame);
-    console.log(pose);
-    res.json(pose);
+    const response = yield processVideo(frame);
+    res.json(response);
 }));
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);
