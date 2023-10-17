@@ -178,8 +178,8 @@
                     }
                 }
             }
-            else
-            {
+            
+            
                 camRenderer.lostCamera();
 
                 const dots = alva.getFramePoints();
@@ -189,7 +189,7 @@
                     ctx.fillStyle = 'white';
                     ctx.fillRect( p.x, p.y, 2, 2 );
                 }
-            }
+            
 
             Stats.stop( 'total' );
             Stats.render();

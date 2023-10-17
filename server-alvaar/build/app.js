@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { AlvaAR } from "../libraries/alva_ar.js";
 import express from "express";
 import cors from "cors";
-import fs from "fs";
 const app = express();
 app.use(express.json({ limit: "100mb" }));
 app.use(cors());
@@ -20,20 +19,6 @@ const port = 3000;
 const width = 364;
 const height = 674;
 const alvaPromise = AlvaAR.Initialize(width, height);
-function log(obj, callback) {
-    try {
-        fs.writeFile("./log.json", JSON.stringify(obj), callback);
-    }
-    catch (error) {
-        console.error(error);
-    }
-}
-app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.json({
-        message: "OK",
-        status: true,
-    });
-}));
 function processVideo(frame) {
     return __awaiter(this, void 0, void 0, function* () {
         const alva = yield alvaPromise;

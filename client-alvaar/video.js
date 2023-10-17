@@ -32,8 +32,10 @@ async function main() {
         media.el.play();
         camRenderer.reset();
     };
+    ctx.fillStyle = 'red';
 
     onFrame(async () => {
+
         Stats.next();
         Stats.start('total');
 
@@ -48,7 +50,7 @@ async function main() {
 
         let pose = null;
         let planePose = null;
-        let dots;
+        let dots = null;
         
         try {
             if (!frame)
@@ -72,11 +74,11 @@ async function main() {
             
             if (!body)
             return;
-        
+
             pose = new Float32Array(body.pose);
             planePose = new Float32Array(body.planePose);
             dots = body.dots;
-
+            //console.log(dots);
         } catch (e) {
             console.error(e)
         }
@@ -93,21 +95,22 @@ async function main() {
                 }
             }
         }
-        else {
-            camRenderer.lostCamera();
-        }
+       
+        
+        camRenderer.lostCamera();
 
         for (const p of dots) {
-            console.log(p);
             ctx.fillStyle = 'white';
+            console.log(p.x);
+            console.log(p.y);
             ctx.fillRect(p.x, p.y, 2, 2);
         }
-
+        
         Stats.stop('total');
         Stats.render();
 
         return true;
-    }, 30);
+    }, 5);
 }
 
 window.addEventListener('load', main);

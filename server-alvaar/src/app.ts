@@ -15,25 +15,6 @@ const height = 674;
 
 const alvaPromise = AlvaAR.Initialize(width, height);
 
-function log(obj: any, callback: any) {
-    try {
-        fs.writeFile(
-            "./log.json",
-            JSON.stringify(obj),
-            callback
-        );
-    } catch (error) {
-        console.error(error)
-    }
-}
-
-app.get("/", async (req, res) => {
-    res.json({
-        message: "OK",
-        status: true,
-    });
-});
-
 async function processVideo(frame: any) {
     const alva = await alvaPromise;
 
@@ -41,7 +22,6 @@ async function processVideo(frame: any) {
     const planePose = alva.findPlane(); 
     const dots = alva.getFramePoints(); 
     
-
     return {
         pose: pose == null? null: Object.values(pose),
         planePose: planePose == null? null: Object.values(planePose),
@@ -60,8 +40,8 @@ app.post("/video", async (req, res) => {
     }
 
     const response = await processVideo(frame);
-
     res.json(response);
+    
 });
 
 
