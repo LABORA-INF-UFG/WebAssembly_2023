@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { AlvaAR } from "../libraries/alva_ar.js";
 import express from "express";
 import cors from "cors";
+import fs from "fs";
 const app = express();
 app.use(express.json({ limit: "100mb" }));
 app.use(cors());
@@ -19,16 +20,27 @@ const port = 3000;
 const width = 364;
 const height = 674;
 const alvaPromise = AlvaAR.Initialize(width, height);
+export function log(obj) {
+    try {
+        fs.appendFileSync("./log.json", JSON.stringify(obj) + '\n');
+    }
+    catch (error) {
+        console.error(error);
+    }
+}
 function processVideo(frame) {
     return __awaiter(this, void 0, void 0, function* () {
         const alva = yield alvaPromise;
         const pose = alva.findCameraPose(frame);
-        const planePose = alva.findPlane();
+        let planePose = null;
+        if (pose) {
+            planePose = alva.findPlane();
+        }
         const dots = alva.getFramePoints();
         return {
-            pose: pose == null ? null : Object.values(pose),
-            planePose: planePose == null ? null : Object.values(planePose),
-            dots: dots == null ? null : dots
+            pose: !pose ? null : Object.values(pose),
+            planePose: !planePose ? null : Object.values(planePose),
+            dots
         };
     });
 }
