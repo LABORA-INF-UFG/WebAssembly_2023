@@ -2,7 +2,55 @@
 import { AlvaAR } from "../libraries/alva_ar.js";
 import express from "express";
 import cors from "cors";
-import fs from "fs";
+
+interface Frame {
+    data: Uint8ClampedArray
+    width: number
+    height: number
+}
+
+type PlanePose = Float32Array[16]
+
+interface Dot {
+    x: number
+    y: number
+}
+
+type Dots = Dot[]
+
+type Pose = Float32Array[16]
+
+interface Media {
+    el: HTMLVideoElement,
+    width: number,
+    height: number,
+    _canvas: HTMLCanvasElement,
+    _ctx: CanvasRenderingContext2D
+}
+
+interface AlvaAR {
+    wasm: any
+    system: any
+    intrinsics: Intrinsics
+    memCam: any
+    memObj: any
+    memPts: any
+    memIMU: any
+    memImg: any
+}
+
+interface Intrinsics {
+    width: number
+    height: number
+    fx: number
+    fy: number
+    cx: number
+    cy: number
+    k1: number
+    k2: number
+    p1: number
+    p2: number
+}
 
 const app = express();
 app.use(express.json({ limit: "100mb" }));
@@ -15,17 +63,17 @@ const height = 674;
 
 const alvaPromise = AlvaAR.Initialize(width, height);
 
-async function processVideo(frame: any) {
+async function processVideo(frame: Frame) {
     const alva = await alvaPromise;
 
     const pose = alva.findCameraPose(frame); 
-    const planePose = alva.findPlane(); 
+    // const planePose = alva.findPlane(); 
     const dots = alva.getFramePoints(); 
     
     return {
-        pose: pose == null? null: Object.values(pose),
-        planePose: planePose == null? null: Object.values(planePose),
-        dots: dots == null ? null : dots
+        pose: !pose ? null : Object.values(pose),
+        // planePose: !planePose ? null : Object.values(planePose),
+        dots
     }
 
 }

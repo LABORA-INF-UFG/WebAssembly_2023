@@ -75,10 +75,19 @@ async function main() {
             if (!body)
             return;
 
-            pose = new Float32Array(body.pose);
-            planePose = new Float32Array(body.planePose);
-            dots = body.dots;
-            //console.log(dots);
+            console.log(body)
+
+            if(body.pose) {
+                pose = new Float32Array(body.pose);
+            }
+
+            if(body.planePose) {
+                planePose = new Float32Array(body.planePose);
+            }
+
+            if(body.dots) {
+                dots = body.dots;
+            }
         } catch (e) {
             console.error(e)
         }
@@ -94,11 +103,10 @@ async function main() {
                     doFindPlane = false;
                 }
             }
+        } else {
+            camRenderer.lostCamera();
         }
        
-        
-        camRenderer.lostCamera();
-
         for (const p of dots) {
             ctx.fillStyle = 'white';
             ctx.fillRect(p.x, p.y, 2, 2);
@@ -108,7 +116,7 @@ async function main() {
         Stats.render();
 
         return true;
-    }, 30);
+    }, 5);
 }
 
 window.addEventListener('load', main);
