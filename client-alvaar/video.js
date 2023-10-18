@@ -75,8 +75,6 @@ async function main() {
             if (!body)
             return;
 
-            console.log(body)
-
             if(body.pose) {
                 pose = new Float32Array(body.pose);
             }

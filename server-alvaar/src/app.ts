@@ -10,7 +10,7 @@ interface Frame {
     height: number
 }
 
-type PlanePose = Float32Array[16]
+type PlanePose = Float32Array // Size: 16
 
 interface Dot {
     x: number
@@ -19,7 +19,7 @@ interface Dot {
 
 type Dots = Dot[]
 
-type Pose = Float32Array[16]
+type Pose = Float32Array // Size: 16
 
 interface Media {
     el: HTMLVideoElement,
@@ -53,14 +53,15 @@ interface Intrinsics {
     p2: number
 }
 
-const app = express();
-app.use(express.json({ limit: "100mb" }));
-app.use(cors());
-const port = 3000;
 
 // TODO: Get dimensions dynamically
 const width = 364;
 const height = 674;
+const port = 3000;
+const app = express();
+
+app.use(express.json({ limit: "100mb" }));
+app.use(cors());
 
 const alvaPromise = AlvaAR.Initialize(width, height);
 
@@ -86,11 +87,10 @@ async function processVideo(frame: Frame) {
     const dots = alva.getFramePoints(); 
     
     return {
-        pose: !pose ? null : Object.values(pose),
-        planePose: !planePose ? null : Object.values(planePose),
+        pose: pose ? Object.values(pose) : null,
+        planePose: planePose ? Object.values(planePose) : null,
         dots
     }
-
 }
 
 app.post("/video", async (req, res) => {
@@ -103,8 +103,8 @@ app.post("/video", async (req, res) => {
     }
 
     const response = await processVideo(frame);
-    res.json(response);
     
+    res.json(response);
 });
 
 

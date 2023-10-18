@@ -12,13 +12,13 @@ import { AlvaAR } from "../libraries/alva_ar.js";
 import express from "express";
 import cors from "cors";
 import fs from "fs";
-const app = express();
-app.use(express.json({ limit: "100mb" }));
-app.use(cors());
-const port = 3000;
 // TODO: Get dimensions dynamically
 const width = 364;
 const height = 674;
+const port = 3000;
+const app = express();
+app.use(express.json({ limit: "100mb" }));
+app.use(cors());
 const alvaPromise = AlvaAR.Initialize(width, height);
 export function log(obj) {
     try {
@@ -38,8 +38,8 @@ function processVideo(frame) {
         }
         const dots = alva.getFramePoints();
         return {
-            pose: !pose ? null : Object.values(pose),
-            planePose: !planePose ? null : Object.values(planePose),
+            pose: pose ? Object.values(pose) : null,
+            planePose: planePose ? Object.values(planePose) : null,
             dots
         };
     });
