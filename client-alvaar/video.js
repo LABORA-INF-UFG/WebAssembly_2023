@@ -101,8 +101,6 @@ async function main() {
 
         for (const p of dots) {
             ctx.fillStyle = 'white';
-            console.log(p.x);
-            console.log(p.y);
             ctx.fillRect(p.x, p.y, 2, 2);
         }
         
@@ -110,7 +108,7 @@ async function main() {
         Stats.render();
 
         return true;
-    }, 5);
+    }, 30);
 }
 
 window.addEventListener('load', main);
