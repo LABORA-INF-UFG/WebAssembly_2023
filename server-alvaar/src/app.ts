@@ -2,6 +2,7 @@
 import { AlvaAR } from "../libraries/alva_ar.js";
 import express from "express";
 import cors from "cors";
+import fs from "fs";
 
 interface Frame {
     data: Uint8ClampedArray
@@ -63,16 +64,34 @@ const height = 674;
 
 const alvaPromise = AlvaAR.Initialize(width, height);
 
+function log(obj: any, callback: any = () => {}) {
+    try {
+        fs.writeFile("./log.json", JSON.stringify(obj), callback);
+    }
+    catch (error) {
+        console.error(error);
+    }
+}
+
 async function processVideo(frame: Frame) {
     const alva = await alvaPromise;
 
     const pose = alva.findCameraPose(frame); 
-    // const planePose = alva.findPlane(); 
+    let planePose = null;
+
+    log("a");
+
+
+    if(pose) {
+        log("Call findPlane");
+        planePose = alva.findPlane(); 
+    }
+
     const dots = alva.getFramePoints(); 
     
     return {
         pose: !pose ? null : Object.values(pose),
-        // planePose: !planePose ? null : Object.values(planePose),
+        planePose: !planePose ? null : Object.values(planePose),
         dots
     }
 

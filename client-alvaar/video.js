@@ -50,7 +50,7 @@ async function main() {
 
         let pose = null;
         let planePose = null;
-        let dots = null;
+        let dots = [];
         
         try {
             if (!frame)
