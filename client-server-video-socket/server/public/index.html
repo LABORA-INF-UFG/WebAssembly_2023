@@ -99,12 +99,13 @@
     </style>
 </head>
 <body>
-<div id="container">
+    <script src="/socket.io/socket.io.js"></script>
+    <div id="container">
     <div id="renderer-cam">
         <canvas id="renderer-video"></canvas>
     </div>
     <div id="renderer-map"></div>
 </div>
-<script type="module" src="video.js"></script>
+<script type="module" src="./modules/video.js"></script>
 </body>
 </html>

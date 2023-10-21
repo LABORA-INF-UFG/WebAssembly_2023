@@ -1,6 +1,8 @@
-import { Stats } from "./modules/stats.js";
-import { ARSimpleView, ARSimpleMap } from "./modules/view.js";
-import { Video, onFrame } from "./modules/utils.js";
+import { Stats } from "./stats.js";
+import { ARSimpleView, ARSimpleMap } from "./view.js";
+import { Video, onFrame } from "./utils.js";
+
+const socket = io();
 
 async function main() {
     document.body.appendChild(Stats.el);
@@ -8,7 +10,7 @@ async function main() {
     Stats.add('video');
     Stats.add('slam');
 
-    const media = await Video.Initialize('./video.mp4');
+    const media = await Video.Initialize('../video.mp4');
 
     const $cam = document.getElementById('renderer-cam');
     const $map = document.getElementById('renderer-map');
@@ -47,10 +49,32 @@ async function main() {
         Stats.stop('video');
 
         Stats.start('slam');
+        
+            socket.on('connect', ()=>{
+                console.log(socket.id);
+            });
+    
+            socket.emit('frame',  {
+                width: frame.width,
+                height: frame.height,
+                data: frame.data
+            });
+    
+    
+            socket.on('processed frame', async (data) => {
+                 
+                    pose = new Float32Array(data.pose),
+                    planePose =  new Float32Array(data.planePose),
+                    dots= data.dots
+                
 
-        let pose = null;
-        let planePose = null;
-        let dots = [];
+                
+            });
+        
+        
+        
+        /*
+        
         
         try {
             if (!frame)
@@ -89,9 +113,12 @@ async function main() {
         } catch (e) {
             console.error(e)
         }
+        */
 
         Stats.stop('slam');
 
+       /* 
+       
         if (pose) {
             camRenderer.updateCameraPose(pose);
 
@@ -104,17 +131,20 @@ async function main() {
         } else {
             camRenderer.lostCamera();
         }
-       
+        
+        
         for (const p of dots) {
             ctx.fillStyle = 'white';
             ctx.fillRect(p.x, p.y, 2, 2);
         }
+        */
         
+
         Stats.stop('total');
         Stats.render();
 
         return true;
-    }, 5);
+    }, 30);
 }
 
 window.addEventListener('load', main);
