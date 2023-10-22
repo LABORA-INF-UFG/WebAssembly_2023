@@ -5,42 +5,39 @@ import { AlvaAR } from './alva_ar.js';
 
 const app = express();
 const server = createServer(app);
-const sockets = new Server(server);
-
+const sockets = new Server(server, {
+  cors: {
+    origin: "*"
+  }
+});
 
 app.use(express.static('public'));
 
 sockets.on('connection', async (socket) => {
   const width = 364;
   const height = 674;
-
   const alva = await AlvaAR.Initialize(width, height);
-  
-  function processVideo(frame) {
 
-    const pose = alva.findCameraPose(frame); 
-    const planePose =  alva.findPlane();
-    const dots =  alva.getFramePoints(); 
-    
-    return {
-      pose: pose,
-      planePose :planePose,
-      dots: dots
-    };
-
-  }
-  
-  console.log("id: " + socket.id);
   socket.on('frame', async (frame) => {
-      
-    const data = await processVideo(frame);
-    
-      socket.emit('processed frame', data);
-  });
-  
-}); 
+    const data = await processVideo(alva, frame);
 
+    socket.emit('processed frame', data);
+  });
+
+});
 
 server.listen(3000, () => {
   console.log('server running at http://localhost:3000');
 });
+
+function processVideo(alva, frame) {
+  const pose = alva.findCameraPose(frame);
+  const planePose = alva.findPlane();
+  const dots = alva.getFramePoints();
+
+  return {
+    pose: pose ? pose : null,
+    planePose: planePose ? planePose : null,
+    dots: dots
+  };
+}
