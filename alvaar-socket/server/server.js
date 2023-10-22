@@ -1,17 +1,14 @@
-import express from 'express';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { AlvaAR } from './alva_ar.js';
 
-const app = express();
-const server = createServer(app);
+const server = createServer().listen(3000);
+
 const sockets = new Server(server, {
   cors: {
     origin: "*"
   }
 });
-
-app.use(express.static('public'));
 
 sockets.on('connection', async (socket) => {
   const width = 364;
@@ -24,10 +21,6 @@ sockets.on('connection', async (socket) => {
     socket.emit('processed frame', data);
   });
 
-});
-
-server.listen(3000, () => {
-  console.log('server running at http://localhost:3000');
 });
 
 function processVideo(alva, frame) {
