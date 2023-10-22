@@ -115,8 +115,14 @@
     import { AlvaAR } from './alva_ar.js';
     import { ARSimpleView, ARSimpleMap } from "./view.js";
     import { Video, onFrame } from "./utils.js";
+    import { Stats } from "./stats.js";
 
     async function main() {
+      document.body.appendChild(Stats.el);
+      Stats.add('video');
+      Stats.add('slam');
+      Stats.add('render');
+
       const socket = io("localhost:3000/");
 
       const media = await Video.Initialize('./video.mp4');
@@ -161,12 +167,23 @@
         if(data.dots) {
           dots = data.dots
         }
+
+        Stats.stop('slam');
       });
 
       onFrame(() => {
+        Stats.next();
+        
+        Stats.start('video');
+
         const frame = media.getImageData();
+
         ctx.clearRect(0, 0, media.width, media.height);
         ctx.putImageData(frame, 0, 0);
+
+        Stats.stop('video');
+
+        Stats.start('slam');
 
         socket.emit('frame', {
           width: frame.width,
@@ -174,7 +191,7 @@
           data: frame.data
         });
 
-        console.log(pose)
+        Stats.start('render');
 
         if (pose) {
           camRenderer.updateCameraPose(pose);
@@ -186,17 +203,21 @@
               doFindPlane = false;
             }
           }
+        } else {
+          camRenderer.lostCamera();
         }
-
-        camRenderer.lostCamera();
 
         for (const p of dots) {
           ctx.fillStyle = 'white';
           ctx.fillRect(p.x, p.y, 2, 2);
         }
 
+        Stats.stop('render');
+
+        Stats.render();
+
         return true;
-      }, 5);
+      }, 30);
     }
 
     window.addEventListener('load', main);
