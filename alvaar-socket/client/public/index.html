@@ -112,7 +112,6 @@
     integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
     crossorigin="anonymous"></script>
   <script type="module">
-    import { AlvaAR } from './alva_ar.js';
     import { ARSimpleView, ARSimpleMap } from "./view.js";
     import { Video, onFrame } from "./utils.js";
     import { Stats } from "./stats.js";
@@ -126,7 +125,6 @@
       const socket = io("localhost:3000/");
 
       const media = await Video.Initialize('./video.mp4');
-      const alva = await AlvaAR.Initialize(media.width, media.height);
 
       const $cam = document.getElementById('renderer-cam');
       const $map = document.getElementById('renderer-map');
