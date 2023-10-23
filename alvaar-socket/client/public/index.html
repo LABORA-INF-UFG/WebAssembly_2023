@@ -122,9 +122,13 @@
       Stats.add('slam');
       Stats.add('render');
 
-      const socket = io("localhost:3000/");
-
       const media = await Video.Initialize('./video.mp4');
+
+      const socket = io("localhost:3000/");
+      
+      socket.on('connect', () => {
+        socket.emit('initialize alva', {width: media.width, height: media.height});
+      });
 
       const $cam = document.getElementById('renderer-cam');
       const $map = document.getElementById('renderer-map');

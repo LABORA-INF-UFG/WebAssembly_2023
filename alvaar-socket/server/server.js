@@ -11,11 +11,18 @@ const sockets = new Server(server, {
 });
 
 sockets.on('connection', async (socket) => {
-  const width = 364;
-  const height = 674;
-  const alva = await AlvaAR.Initialize(width, height);
+  let alva;
+
+  socket.on('initialize alva', async (dimensions) => {
+    const { width, height } = dimensions;
+    alva = await AlvaAR.Initialize(width, height);
+  });
 
   socket.on('frame', async (frame) => {
+    if (!alva) {
+      return;
+    }
+    
     const data = await processVideo(alva, frame);
 
     socket.emit('processed frame', data);
