@@ -4,9 +4,9 @@ import { Video, onFrame } from "./utils.js";
 
 async function main() {
     document.body.appendChild(Stats.el);
-    Stats.add('total');
     Stats.add('video');
     Stats.add('slam');
+    Stats.add('render');
 
     const media = await Video.Initialize('./video.mp4');
 
@@ -37,7 +37,6 @@ async function main() {
     onFrame(async () => {
 
         Stats.next();
-        Stats.start('total');
 
         Stats.start('video');
         const frame = media.getImageData();
@@ -92,6 +91,8 @@ async function main() {
 
         Stats.stop('slam');
 
+        Stats.start('render');
+
         if (pose) {
             camRenderer.updateCameraPose(pose);
 
@@ -110,7 +111,8 @@ async function main() {
             ctx.fillRect(p.x, p.y, 2, 2);
         }
         
-        Stats.stop('total');
+        Stats.stop('render');
+
         Stats.render();
 
         return true;

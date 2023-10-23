@@ -158,6 +158,10 @@
       let dots = [];
 
       socket.on('processed frame', (data) => {
+        pose = null;
+        planePose = null;
+        dots = [];
+
         if(!data) return;
 
         if(data.pose) {
