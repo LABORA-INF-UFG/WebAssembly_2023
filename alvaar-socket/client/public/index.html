@@ -158,6 +158,8 @@
       let dots = [];
 
       socket.on('processed frame', (data) => {
+        if(!data) return;
+
         if(data.pose) {
           pose = new Float32Array(data.pose)
         }
