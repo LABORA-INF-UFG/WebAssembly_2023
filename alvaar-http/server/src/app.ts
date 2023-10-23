@@ -57,7 +57,7 @@ interface Intrinsics {
 // TODO: Get dimensions dynamically
 const width = 364;
 const height = 674;
-const port = 3000;
+const port = 3001;
 const app = express();
 
 app.use(express.json({ limit: "100mb" }));

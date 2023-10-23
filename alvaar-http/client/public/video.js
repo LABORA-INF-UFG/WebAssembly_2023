@@ -62,7 +62,7 @@ async function main() {
                 data: Object.values(frame.data)
             }
             
-            const response = await fetch("http://localhost:3000/video", {
+            const response = await fetch("http://localhost:3001/video", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -114,7 +114,7 @@ async function main() {
         Stats.render();
 
         return true;
-    }, 5);
+    }, 30);
 }
 
 window.addEventListener('load', main);
