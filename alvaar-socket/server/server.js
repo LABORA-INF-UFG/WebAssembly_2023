@@ -7,7 +7,8 @@ const server = createServer().listen(3000);
 const sockets = new Server(server, {
   cors: {
     origin: "*"
-  }
+  },
+  maxHttpBufferSize: 20 * 1024 * 1024
 });
 
 sockets.on('connection', async (socket) => {
