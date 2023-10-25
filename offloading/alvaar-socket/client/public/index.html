@@ -159,21 +159,18 @@
       let frameIndex = 0;
 
       onFrame(async () => {
-        console.log("Current frame: ", frameIndex)
+        // console.log("Current frame: ", frameIndex)
 
         Stats.next();
 
         Stats.start('video');
 
         const frame = media.getImageData();
-
-        ctx.clearRect(0, 0, media.width, media.height);
-        ctx.putImageData(frame, 0, 0);
-
+        
         Stats.stop('video');
-
+        
         Stats.start('slam');
-
+        
         const {data, responseIndex} = await new Promise(resolve => socket.emit('frame', {
           width: frame.width,
           height: frame.height,
@@ -181,18 +178,18 @@
           indexFrame: frameIndex
         }, (data, responseIndex) => resolve({ data, responseIndex })
         ));
-
-        console.log("Response frame: ", responseIndex)
+        
+        // console.log("Response frame: ", responseIndex)
         pose = null;
         planePose = null;
         dots = [];
 
         if (!data) return;
-
+        
         if (data.pose) {
           pose = new Float32Array(data.pose)
         }
-
+        
         if (data.planePose) {
           planePose = new Float32Array(data.planePose)
         }
@@ -200,10 +197,13 @@
         if (data.dots) {
           dots = data.dots
         }
-
+        
         Stats.stop('slam');
-
+        
         Stats.start('render');
+
+        ctx.clearRect(0, 0, media.width, media.height);
+        ctx.putImageData(frame, 0, 0);
 
         if (pose) {
           camRenderer.updateCameraPose(pose);
@@ -219,9 +219,9 @@
           camRenderer.lostCamera();
         }
 
-        for (const p of dots) {
+        for (const dot of dots) {
           ctx.fillStyle = 'white';
-          ctx.fillRect(p.x, p.y, 2, 2);
+          ctx.fillRect(dot.x, dot.y, 2, 2);
         }
 
         Stats.stop('render');
