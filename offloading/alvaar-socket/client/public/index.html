@@ -184,20 +184,20 @@
         planePose = null;
         dots = [];
 
-        if (!data) return;
-        
-        if (data.pose) {
-          pose = new Float32Array(data.pose)
+        if (data) {
+          if (data.pose) {
+            pose = new Float32Array(data.pose)
+          }
+          
+          if (data.planePose) {
+            planePose = new Float32Array(data.planePose)
+          }
+  
+          if (data.dots) {
+            dots = data.dots
+          }
         }
-        
-        if (data.planePose) {
-          planePose = new Float32Array(data.planePose)
-        }
-
-        if (data.dots) {
-          dots = data.dots
-        }
-        
+         
         Stats.stop('slam');
         
         Stats.start('render');
