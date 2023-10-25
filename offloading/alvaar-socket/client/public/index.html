@@ -158,7 +158,7 @@
       let dots = [];
       let frameIndex = 0;
 
-      onFrame(async () => {
+      const processFrame = async (now, frameMetadata) => {
         // console.log("Current frame: ", frameIndex)
 
         Stats.next();
@@ -230,9 +230,12 @@
 
         frameIndex++;
 
-        return true;
-      }, 60);
+        media.el.requestVideoFrameCallback(processFrame)
+      }
+      
+      media.el.requestVideoFrameCallback(processFrame)
     }
+
 
     window.addEventListener('load', main);
   </script>
