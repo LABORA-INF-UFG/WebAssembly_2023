@@ -11,7 +11,7 @@ const sockets = new Server(server, {
   maxHttpBufferSize: 20 * 1024 * 1024
 });
 
-sockets.on('connection', async (socket) => {
+sockets.on('connection', (socket) => {
   let alva;
 
   socket.on('initialize alva', async (dimensions) => {
@@ -19,14 +19,14 @@ sockets.on('connection', async (socket) => {
     alva = await AlvaAR.Initialize(width, height);
   });
 
-  socket.on('frame', async (frame) => {
+  socket.on('frame', (frame, callback) => {
     if (!alva) {
       return;
     }
     
-    const data = await processVideo(alva, frame);
+    const data = processVideo(alva, frame);
 
-    socket.emit('processed frame', data);
+    callback(data, frame.indexFrame);
   });
 
 });

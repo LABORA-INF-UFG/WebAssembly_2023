@@ -122,12 +122,12 @@
       Stats.add('slam');
       Stats.add('render');
 
-      const media = await Video.Initialize('./video.mp4');
+      const media = await Video.Initialize('./video1.mp4');
 
       const socket = io("localhost:3000/");
-      
+
       socket.on('connect', () => {
-        socket.emit('initialize alva', {width: media.width, height: media.height});
+        socket.emit('initialize alva', { width: media.width, height: media.height });
       });
 
       const $cam = document.getElementById('renderer-cam');
@@ -156,32 +156,13 @@
       let pose = null;
       let planePose = null;
       let dots = [];
+      let frameIndex = 0;
 
-      socket.on('processed frame', (data) => {
-        pose = null;
-        planePose = null;
-        dots = [];
+      onFrame(async () => {
+        console.log("Current frame: ", frameIndex)
 
-        if(!data) return;
-
-        if(data.pose) {
-          pose = new Float32Array(data.pose)
-        }
-
-        if(data.planePose) {
-          planePose = new Float32Array(data.planePose)
-        }
-
-        if(data.dots) {
-          dots = data.dots
-        }
-
-        Stats.stop('slam');
-      });
-
-      onFrame(() => {
         Stats.next();
-        
+
         Stats.start('video');
 
         const frame = media.getImageData();
@@ -193,11 +174,34 @@
 
         Stats.start('slam');
 
-        socket.emit('frame', {
+        const {data, responseIndex} = await new Promise(resolve => socket.emit('frame', {
           width: frame.width,
           height: frame.height,
-          data: frame.data
-        });
+          data: frame.data,
+          indexFrame: frameIndex
+        }, (data, responseIndex) => resolve({ data, responseIndex })
+        ));
+
+        console.log("Response frame: ", responseIndex)
+        pose = null;
+        planePose = null;
+        dots = [];
+
+        if (!data) return;
+
+        if (data.pose) {
+          pose = new Float32Array(data.pose)
+        }
+
+        if (data.planePose) {
+          planePose = new Float32Array(data.planePose)
+        }
+
+        if (data.dots) {
+          dots = data.dots
+        }
+
+        Stats.stop('slam');
 
         Stats.start('render');
 
@@ -224,8 +228,10 @@
 
         Stats.render();
 
+        frameIndex++;
+
         return true;
-      }, 30);
+      }, 60);
     }
 
     window.addEventListener('load', main);
