@@ -25,7 +25,6 @@ sockets.on('connection', (socket) => {
     }
     
     const data = processVideo(alva, frame);
-
     callback(data, frame.indexFrame);
   });
 

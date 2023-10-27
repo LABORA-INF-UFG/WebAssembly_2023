@@ -166,19 +166,22 @@
         Stats.start('video');
 
         const frame = media.getImageData();
-        
+
         Stats.stop('video');
-        
+
         Stats.start('slam');
-        
-        const {data, responseIndex} = await new Promise(resolve => socket.emit('frame', {
-          width: frame.width,
-          height: frame.height,
-          data: frame.data,
-          indexFrame: frameIndex
-        }, (data, responseIndex) => resolve({ data, responseIndex })
-        ));
-        
+
+        const { data, responseIndex } = await new Promise(resolve =>
+          socket.emit('frame', {
+            width: frame.width,
+            height: frame.height,
+            data: frame.data,
+            indexFrame: frameIndex
+          }, (data, responseIndex) =>
+            resolve({ data, responseIndex })
+          )
+        );
+
         // console.log("Response frame: ", responseIndex)
         pose = null;
         planePose = null;
@@ -188,18 +191,18 @@
           if (data.pose) {
             pose = new Float32Array(data.pose)
           }
-          
+
           if (data.planePose) {
             planePose = new Float32Array(data.planePose)
           }
-  
+
           if (data.dots) {
             dots = data.dots
           }
         }
-         
+
         Stats.stop('slam');
-        
+
         Stats.start('render');
 
         ctx.clearRect(0, 0, media.width, media.height);
@@ -229,11 +232,9 @@
         Stats.render();
 
         frameIndex++;
-
-        media.el.requestVideoFrameCallback(processFrame)
       }
-      
-      media.el.requestVideoFrameCallback(processFrame)
+
+      onFrame(processFrame, 30)
     }
 
 
