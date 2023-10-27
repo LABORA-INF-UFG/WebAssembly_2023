@@ -126,9 +126,10 @@
 
       const socket = io("localhost:3000/");
 
-      socket.on('connect', () => {
+      await new Promise((resolve) => socket.on('connect', () => {
         socket.emit('initialize alva', { width: media.width, height: media.height });
-      });
+        resolve()
+      }));
 
       const $cam = document.getElementById('renderer-cam');
       const $map = document.getElementById('renderer-map');
