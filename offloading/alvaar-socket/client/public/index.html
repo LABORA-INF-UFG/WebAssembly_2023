@@ -116,6 +116,29 @@
     import { Video, onFrame } from "./utils.js";
     import { Stats } from "./stats.js";
 
+    const serverUrl = "localhost:3000/";
+
+    const initializeServer = async (serverUrl) => {
+      try {
+        const socket = io(serverUrl);
+
+        if (!socket.connected) {
+          throw new Error("Failed to connect to " + serverUrl)
+        }
+
+        await new Promise((resolve) => socket.on('connect', () => {
+          socket.emit('initialize alva', { width: media.width, height: media.height });
+          resolve()
+        }));
+
+        return socket;
+      } catch (error) {
+        window.alert("Não foi possível conectar ao servidor");
+        console.error(error);
+      }
+
+    }
+
     async function main() {
       document.body.appendChild(Stats.el);
       Stats.add('video');
@@ -124,12 +147,7 @@
 
       const media = await Video.Initialize('./video1.mp4');
 
-      const socket = io("localhost:3000/");
-
-      await new Promise((resolve) => socket.on('connect', () => {
-        socket.emit('initialize alva', { width: media.width, height: media.height });
-        resolve()
-      }));
+      const socket = await initializeServer(serverUrl);
 
       const $cam = document.getElementById('renderer-cam');
       const $map = document.getElementById('renderer-map');
@@ -235,7 +253,9 @@
         frameIndex++;
       }
 
-      onFrame(processFrame, 30)
+      if(socket) {
+        onFrame(processFrame, 30);
+      }
     }
 
 
