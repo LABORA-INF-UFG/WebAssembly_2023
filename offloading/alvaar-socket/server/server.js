@@ -19,18 +19,29 @@ sockets.on('connection', (socket) => {
     alva = await AlvaAR.Initialize(width, height);
   });
 
-  socket.on('frame', (frame, callback) => {
+  socket.on('frame', async (frame, callback) => {
     if (!alva) {
       return;
     }
+
+    const start = Date.now(); 
+
+    const data = await processVideo(alva, frame);
     
-    const data = processVideo(alva, frame);
+    const end = Date.now();
+
+    const slamTime = end - start;
+
+    data.slamTime = slamTime;
+    
     callback(data, frame.indexFrame);
   });
+
 
 });
 
 function processVideo(alva, frame) {
+  
   const pose = alva.findCameraPose(frame);
   const planePose = alva.findPlane();
   const dots = alva.getFramePoints();
@@ -38,6 +49,7 @@ function processVideo(alva, frame) {
   return {
     pose: pose ? pose : null,
     planePose: planePose ? planePose : null,
-    dots: dots
+    dots: dots,
+    slamTime: null
   };
 }

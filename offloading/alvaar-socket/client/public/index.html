@@ -116,7 +116,7 @@
     import { Video, onFrame } from "./utils.js";
     import { Stats } from "./stats.js";
 
-    const serverUrl = "localhost:3000/";
+    const serverUrl = "localhost:3000";
 
     const initializeServer = async (serverUrl, width, height) => {
       const socket = io(serverUrl);
@@ -138,13 +138,25 @@
       return socket;
     }
 
-    async function main() {
+    async function main() {     
+      //Depois de 5s, termina o programa e baixa as estatisticas
+      setTimeout(() => {
+  
+        getCSV(statistics);
+      
+      }, 5000);
+
       document.body.appendChild(Stats.el);
       Stats.add('video');
       Stats.add('slam');
       Stats.add('render');
 
-      const media = await Video.Initialize('./video1.mp4');
+      let statistics = [
+        ['TotalSlamTime', 'SlamTime', 'TransmitionTime', 'RenderTime', 'VideoTime' ]
+      ];
+
+
+      const media = await Video.Initialize('./video.mp4');
 
       const socket = await initializeServer(serverUrl, media.width, media.height);
 
@@ -176,18 +188,35 @@
       let dots = [];
       let frameIndex = 0;
 
+
+      function getCSV(statistics){
+        let csvContent = statistics.map(e => e.join(",")).join("\n");    
+        let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement("a");
+       
+        link.href = URL.createObjectURL(blob);
+        link.download = 'statistics.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+  
+      }
+
       const processFrame = async (now, frameMetadata) => {
-        // console.log("Current frame: ", frameIndex)
 
         Stats.next();
 
         Stats.start('video');
+        const iniVideoTime = Date.now();
 
-        const frame = media.getImageData();
+        const frame = await media.getImageData();
 
+        const endVideoTime = Date.now();
         Stats.stop('video');
+        const totalVideoTime = endVideoTime - iniVideoTime;
 
         Stats.start('slam');
+        const iniTotalSlamTime = Date.now(); 
 
         const { data, responseIndex } = await new Promise(resolve =>
           socket.emit('frame', {
@@ -217,11 +246,19 @@
           if (data.dots) {
             dots = data.dots
           }
+          
         }
 
+        const endTotalSlamTime = Date.now();
         Stats.stop('slam');
+        
+        const totalSlamTime = endTotalSlamTime - iniTotalSlamTime;
+        const slamTime = data.slamTime
+        const transmitionTime = totalSlamTime - slamTime;
+        
 
         Stats.start('render');
+        const iniRenderTime = Date.now();
 
         ctx.clearRect(0, 0, media.width, media.height);
         ctx.putImageData(frame, 0, 0);
@@ -244,8 +281,14 @@
           ctx.fillStyle = 'white';
           ctx.fillRect(dot.x, dot.y, 2, 2);
         }
-
+        
+        const endRenderTime = Date.now();
         Stats.stop('render');
+        
+        const totalRenderTime = endRenderTime - iniRenderTime;
+
+        console.log(`TotalSlamTime: ${totalSlamTime}\nSlamTime: ${slamTime}\nTransmitionTime: ${transmitionTime}\nRender: ${totalRenderTime}\nVideo: ${totalVideoTime}`);
+        statistics.push([totalSlamTime, slamTime, transmitionTime, totalRenderTime, totalVideoTime]);
 
         Stats.render();
 
@@ -255,8 +298,8 @@
       if (socket) {
         onFrame(processFrame, 30);
       }
-    }
 
+    }
 
     window.addEventListener('load', main);
   </script>
