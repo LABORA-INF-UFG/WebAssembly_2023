@@ -134,7 +134,7 @@
         socket.emit('initialize alva', { width, height });
         resolve();
       }));
-      
+
       return socket;
     }
 
@@ -144,7 +144,7 @@
       Stats.add('slam');
       Stats.add('render');
 
-      const media = await Video.Initialize('./video1.mp4');
+      const media = await Video.Initialize('./video-short.mp4');
 
       const socket = await initializeServer(serverUrl, media.width, media.height);
 
@@ -157,28 +157,29 @@
 
       const mapRenderer = new ARSimpleMap($map, media.width, media.height);
       const camRenderer = new ARSimpleView($cam, media.width, media.height, mapRenderer);
-
-      let doFindPlane = false;
-
-      $cam.addEventListener('click', (event) => doFindPlane = true);
       $cam.parentElement.style.display = 'block';
-
+      
+      let videoHasEnded = false;
       media.el.play();
       media.el.loop = false;
-      media.el.onended = (event) => {
-        media.el.load();
-        media.el.play();
-        camRenderer.reset();
-      };
 
-      let pose = null;
-      let planePose = null;
-      let dots = [];
-      let frameIndex = 0;
+      let addCube = false;
+      
+      const addCubeInterval = setInterval(() => {
+        console.log("Add cube");
+        addCube = true;
+      }, 2000);
+
+      const endVideo = () => {
+        camRenderer.reset();
+        ctx.clearRect(0, 0, media.width, media.height);
+        clearInterval(addCubeInterval);
+        videoHasEnded = true;
+      }
+
+      media.el.onended = endVideo;
 
       const processFrame = async (now, frameMetadata) => {
-        // console.log("Current frame: ", frameIndex)
-
         Stats.next();
 
         Stats.start('video');
@@ -189,21 +190,18 @@
 
         Stats.start('slam');
 
-        const { data, responseIndex } = await new Promise(resolve =>
+        const data = await new Promise(resolve =>
           socket.emit('frame', {
             width: frame.width,
             height: frame.height,
-            data: frame.data,
-            indexFrame: frameIndex
-          }, (data, responseIndex) =>
-            resolve({ data, responseIndex })
+            data: frame.data
+          }, data => resolve(data)
           )
         );
 
-        // console.log("Response frame: ", responseIndex)
-        pose = null;
-        planePose = null;
-        dots = [];
+        let pose = null;
+        let planePose = null;
+        let dots = [];
 
         if (data) {
           if (data.pose) {
@@ -229,15 +227,10 @@
         if (pose) {
           camRenderer.updateCameraPose(pose);
 
-          if (doFindPlane) {
-
-            if (planePose) {
-              camRenderer.createObjectWithPose(planePose);
-              doFindPlane = false;
-            }
+          if (addCube && planePose) {
+            camRenderer.createObjectWithPose(planePose);
+            addCube = false;
           }
-        } else {
-          camRenderer.lostCamera();
         }
 
         for (const dot of dots) {
@@ -249,12 +242,18 @@
 
         Stats.render();
 
-        frameIndex++;
+        if(!videoHasEnded) {
+          media.el.requestVideoFrameCallback(processFrame);
+        }
+
+        //return !videoHasEnded;
       }
 
       if (socket) {
-        onFrame(processFrame, 30);
+        media.el.requestVideoFrameCallback(processFrame);
+        // onFrame(processFrame, 30);
       }
+
     }
 
 

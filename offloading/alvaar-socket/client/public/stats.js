@@ -2,7 +2,7 @@ const singletonEnforcer = Symbol( 'Singleton Enforcer' );
 
 class StatsTimer
 {
-    constructor( bufferSize = 30 )
+    constructor( bufferSize = 120 )
     {
         this.t = 0;
         this.delta = 0;

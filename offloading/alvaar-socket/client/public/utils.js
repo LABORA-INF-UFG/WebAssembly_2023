@@ -1,7 +1,7 @@
 const rad2deg = 180.0 / Math.PI;
 const deg2rad = Math.PI / 180;
 
-function onFrame( frameTickFn, fps = 30 )
+function onFrame( frameTickFn, fps = 30)
 {
     const fpsInterval = ~~(1000 / fps);
 
