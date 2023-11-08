@@ -116,7 +116,7 @@
     import { Video, onFrame } from "./utils.js";
     import { Stats } from "./stats.js";
 
-    const serverUrl = "localhost:3000/";
+    const serverUrl = "localhost:3000";
 
     const initializeServer = async (serverUrl, width, height) => {
       const socket = io(serverUrl);
@@ -158,23 +158,32 @@
       const mapRenderer = new ARSimpleMap($map, media.width, media.height);
       const camRenderer = new ARSimpleView($cam, media.width, media.height, mapRenderer);
       $cam.parentElement.style.display = 'block';
-      
+
       let videoHasEnded = false;
       media.el.play();
       media.el.loop = false;
 
       let addCube = false;
-      
+
       const addCubeInterval = setInterval(() => {
-        console.log("Add cube");
         addCube = true;
       }, 2000);
 
-      const endVideo = () => {
+      const endVideo = async () => {
+        videoHasEnded = true;
         camRenderer.reset();
         ctx.clearRect(0, 0, media.width, media.height);
         clearInterval(addCubeInterval);
-        videoHasEnded = true;
+
+        const p1 = fetch("http://localhost:5000/close", {
+          'method': 'GET',
+        });
+
+        const p2 = fetch(`http://${serverUrl}/close`, {
+          'method': 'GET',
+        });
+
+        await Promise.all([p1, p2]);
       }
 
       media.el.onended = endVideo;
@@ -242,7 +251,7 @@
 
         Stats.render();
 
-        if(!videoHasEnded) {
+        if (!videoHasEnded) {
           media.el.requestVideoFrameCallback(processFrame);
         }
 

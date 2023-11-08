@@ -2,7 +2,19 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { AlvaAR } from './alva_ar.js';
 
-const server = createServer().listen(3000);
+const server = createServer((req, res) => {
+  if(req.url === "/close") {
+    sockets.close();
+    server.close();
+    res.writeHead(200, {
+      'Content-Type': 'text/plain',
+      'Access-Control-Allow-Origin': '*'
+    });
+    res.end('OK\n');
+    return;
+ }
+
+}).listen(3000);
 
 const sockets = new Server(server, {
   cors: {

@@ -7,6 +7,11 @@ const port = 5000;
 
 app.use(express.static('public'));
 
+app.get('/close', async (req, res) => {
+  server.close();
+  res.send("OK");
+})
+
 server.listen(port, () => {
   console.log(`server running at http://localhost:${port}`);
 });
