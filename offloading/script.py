@@ -1,26 +1,17 @@
-import os
-
-def shell(command):
-    os.system(command)
-
-def cd(path):
-    os.chdir(path)
-
-def runServer():
-    cd("serve")
-    shell("npm run serve")
-    cd("..")
-
-def runClient():
-    cd("serve")
-    shell("npm run serve")
-    
-    cd("..")
+from subprocess import Popen
 
 def main():
-    cd("alvaar-socket")
-    runServer()
-    runClient()
+    # run commands in parallel
+    processes = [
+        Popen("./server.bash", shell=True),
+        Popen("./client.bash", shell=True),
+    ]
+
+    # collect statuses
+    exitcodes = [p.wait() for p in processes]
+
+    print(processes)
+    print(exitcodes)
 
 if __name__ == "__main__":
     main()

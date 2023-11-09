@@ -1,5 +1,5 @@
 {
-  "name": "release",
+  "name": "server",
   "version": "1.0.0",
   "description": "",
   "main": "serve.js",

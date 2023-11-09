@@ -2,8 +2,10 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { AlvaAR } from './alva_ar.js';
 
+const port = 3000;
+
 const server = createServer((req, res) => {
-  if(req.url === "/close") {
+  if (req.url === "/close") {
     sockets.close();
     server.close();
     res.writeHead(200, {
@@ -12,9 +14,11 @@ const server = createServer((req, res) => {
     });
     res.end('OK\n');
     return;
- }
+  }
 
-}).listen(3000);
+}).listen(port, () =>
+  console.log(`slam server running at http://localhost:${port}`)
+);
 
 const sockets = new Server(server, {
   cors: {
@@ -35,7 +39,7 @@ sockets.on('connection', (socket) => {
     if (!alva) {
       return;
     }
-    
+
     const data = processVideo(alva, frame);
     callback(data);
   });
