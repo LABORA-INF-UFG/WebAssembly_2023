@@ -114,7 +114,6 @@
   <script type="module">
     import { ARSimpleView, ARSimpleMap } from "./view.js";
     import { Video, onFrame } from "./utils.js";
-    import { Stats } from "./stats.js";
 
     const serverUrl = "localhost:3000";
 
@@ -138,6 +137,19 @@
       return socket;
     }
 
+    function getCSV(statistics){
+      let csvContent = statistics.map(e => e.join(",")).join("\n");    
+      let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      let link = document.createElement("a");
+     
+      link.href = URL.createObjectURL(blob);
+      link.download = 'statistics.csv';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+    }
+
     async function main() {     
       //Depois de 30s, termina o programa e baixa as estatisticas
       setTimeout(() => {
@@ -146,10 +158,6 @@
       
       }, 60000);
 
-      document.body.appendChild(Stats.el);
-      Stats.add('video');
-      Stats.add('slam');
-      Stats.add('render');
 
       let statistics = [
         ['TotalSlamTime', 'SlamTime', 'TransmitionTime', 'RenderTime', 'VideoTime' ]
@@ -189,33 +197,16 @@
       let frameIndex = 0;
 
 
-      function getCSV(statistics){
-        let csvContent = statistics.map(e => e.join(",")).join("\n");    
-        let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        let link = document.createElement("a");
-       
-        link.href = URL.createObjectURL(blob);
-        link.download = 'statistics.csv';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-  
-      }
-
       const processFrame = async (now, frameMetadata) => {
 
-        Stats.next();
 
-        Stats.start('video');
 
         const iniVideoTime = performance.now();
         const frame = await media.getImageData();
         const endVideoTime = performance.now();
 
-        Stats.stop('video');
         const totalVideoTime = endVideoTime - iniVideoTime;
 
-        Stats.start('slam');
         const iniTotalSlamTime = performance.now(); 
 
         const { data, responseIndex } = await new Promise(resolve =>
@@ -249,14 +240,12 @@
         }
 
         const endTotalSlamTime = performance.now();
-        Stats.stop('slam');
         
         const totalSlamTime = endTotalSlamTime - iniTotalSlamTime;
         const slamTime = data.slamTime
         const transmitionTime = totalSlamTime - slamTime;
         
 
-        Stats.start('render');
         const iniRenderTime = performance.now();
 
         ctx.clearRect(0, 0, media.width, media.height);
@@ -282,14 +271,12 @@
         }
         
         const endRenderTime = performance.now();
-        Stats.stop('render');
         
         const totalRenderTime = endRenderTime - iniRenderTime;
 
         //console.log(`TotalSlamTime: ${totalSlamTime}\nSlamTime: ${slamTime}\nTransmitionTime: ${transmitionTime}\nRender: ${totalRenderTime}\nVideo: ${totalVideoTime}`);
         statistics.push([totalSlamTime, slamTime, transmitionTime, totalRenderTime, totalVideoTime]);
 
-        Stats.render();
 
         frameIndex++;
       }
