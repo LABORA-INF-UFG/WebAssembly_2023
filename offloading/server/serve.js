@@ -29,21 +29,19 @@ sockets.on('connection', (socket) => {
 
   socket.on('frame', async (frame, callback) => {
     const start = performance.now(); 
+    
+    const memory = process.memoryUsage();
 
     if (!alva) {
       const end = performance.now();
-      return callback(undefined, start - end);
+      return callback([undefined, end - start, memory.heapUsed]);
     }
 
     const data = processVideo(alva, frame);
     
     const end = performance.now();
-
-    const slamTime = end - start;
-
-    data.slamTime = slamTime;
     
-    callback(data, slamTime);
+    callback([data, end - start, memory.heapUsed]);
   });
 
 
