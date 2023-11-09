@@ -37,11 +37,11 @@ sockets.on('connection', (socket) => {
 
   socket.on('frame', (frame, callback) => {
     if (!alva) {
-      return;
+      return callback(undefined);
     }
 
     const data = processVideo(alva, frame);
-    callback(data);
+    return callback(data);
   });
 
 });

@@ -160,37 +160,36 @@
       $cam.parentElement.style.display = 'block';
 
       const socket = await socketPromise;
-      
+
       if (socket) {
         media.el.play();
         let videoHasEnded = false;
         media.el.loop = false;
-        
+
         let addCube = false;
-        
+
         const addCubeInterval = setInterval(() => {
           addCube = true;
         }, 2000);
 
         const endVideo = async () => {
           videoHasEnded = true;
-          camRenderer.reset();
           ctx.clearRect(0, 0, media.width, media.height);
           clearInterval(addCubeInterval);
-          
-          const closeServer = fetch("http://localhost:5000/close", {
-            'method': 'GET',
-          });
 
-          const closeClient = fetch(`http://${serverUrl}/close`, {
-            'method': 'GET',
-          });
+          // const closeServer = fetch("http://localhost:5000/close", {
+          //   'method': 'GET',
+          // });
 
-          await Promise.all([closeServer, closeClient]);
+          // const closeClient = fetch(`http://${serverUrl}/close`, {
+          //   'method': 'GET',
+          // });
+
+          // await Promise.all([closeServer, closeClient]);
         }
-        
+
         media.el.onended = endVideo;
-        
+
         const processFrame = async (now, frameMetadata) => {
           Stats.next();
 
@@ -207,7 +206,8 @@
               width: frame.width,
               height: frame.height,
               data: frame.data
-            }, data => resolve(data)
+            }, data =>
+              resolve(data)
             )
           );
 
