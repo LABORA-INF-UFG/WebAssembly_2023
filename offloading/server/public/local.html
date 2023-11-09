@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no" name="viewport"/>
-    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"
+        name="viewport" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
     <title>AlvaAR Video</title>
     <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
     <style>
@@ -44,7 +46,7 @@
             width: 100%;
         }
 
-        #container > div {
+        #container>div {
             display: inline-flex;
             vertical-align: top;
             margin: 100px 15px 0 15px;
@@ -54,19 +56,19 @@
             outline: 1px solid #d20000;
         }
 
-        #container > div > canvas {
+        #container>div>canvas {
             position: absolute;
             left: 0;
             top: 0;
             user-select: none;
         }
 
-        #container > div > canvas:first-child {
+        #container>div>canvas:first-child {
             display: inline-block;
             position: relative;
         }
 
-        .tracking #container > div {
+        .tracking #container>div {
             outline: 1px solid #bebebe;
         }
 
@@ -86,7 +88,7 @@
                 content: '';
             }
 
-            #container > div {
+            #container>div {
                 margin: 0;
                 padding: 0;
                 box-shadow: none;
@@ -98,108 +100,106 @@
         }
     </style>
 </head>
+
 <body>
-<div id="container">
-    <div id="renderer-cam">
-        <canvas id="renderer-video"></canvas>
+    <div id="container">
+        <div id="renderer-cam">
+            <canvas id="renderer-video"></canvas>
+        </div>
+        <div id="renderer-map"></div>
     </div>
-    <div id="renderer-map"></div>
-</div>
-<script type="module">
-    import { Stats } from "/scripts/stats.js";
-    import { AlvaAR } from '/scripts/alva_ar.js';
-    import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
-    import { Video, onFrame } from "/scripts/utils.js";
+    <script type="module">
+        import { Stats } from "/scripts/stats.js";
+        import { AlvaAR } from '/scripts/alva_ar.js';
+        import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
+        import { Video, onFrame } from "/scripts/utils.js";
 
-    async function main()
-    {
-        document.body.appendChild( Stats.el );
-        Stats.add( 'video' );
-        Stats.add( 'slam' );
-        Stats.add( 'render' );
+        async function main() {
+            document.body.appendChild(Stats.el);
+            Stats.add('video');
+            Stats.add('slam');
+            Stats.add('render');
 
-        const media = await Video.Initialize( '/videos/video.mp4' );
-        const alva = await AlvaAR.Initialize( media.width, media.height );
+            const media = await Video.Initialize('/videos/video-short.mp4');
+            const alva = await AlvaAR.Initialize(media.width, media.height);
 
-        const $cam = document.getElementById( 'renderer-cam' );
-        const $map = document.getElementById( 'renderer-map' );
-        const ctx = document.getElementById( 'renderer-video' ).getContext( '2d' );
+            const $cam = document.getElementById('renderer-cam');
+            const $map = document.getElementById('renderer-map');
+            const ctx = document.getElementById('renderer-video').getContext('2d');
 
-        console.log($map);
-        console.log($cam);
+            ctx.canvas.width = media.width;
+            ctx.canvas.height = media.height;
 
-        ctx.canvas.width = media.width;
-        ctx.canvas.height = media.height;
+            const mapRenderer = new ARSimpleMap($map, media.width, media.height);
+            const camRenderer = new ARSimpleView($cam, media.width, media.height, mapRenderer);
 
-        const mapRenderer = new ARSimpleMap( $map, media.width, media.height );
-        const camRenderer = new ARSimpleView( $cam, media.width, media.height, mapRenderer );
+            let doFindPlane = false;
 
-        let doFindPlane = false;
+            $cam.parentElement.style.display = 'block';
 
-        $cam.addEventListener( 'click', ( event ) => doFindPlane = true );
-        $cam.parentElement.style.display = 'block';
-
-        media.el.play();
-        media.el.loop = false;
-        media.el.onended = ( event ) =>
-        {
-            media.el.load();
+            let videoHasEnded = false;
             media.el.play();
-            camRenderer.reset();
-        };
+            media.el.loop = false;
 
-        onFrame( () =>
-        {
-            Stats.next();
-            
-            Stats.start( 'video' );
-            const frame = media.getImageData();
-            ctx.clearRect( 0, 0, media.width, media.height );
-            ctx.putImageData( frame, 0, 0 );
-            Stats.stop( 'video' );
-            
-            Stats.start( 'slam' );
-            const pose = alva.findCameraPose( frame );
-            Stats.stop( 'slam' );
-            
+            let addCube = false;
+            const addCubeInterval = setInterval(() => {
+                addCube = true;
+            }, 2000);
 
-            Stats.start( 'render' );
-            if( pose )
-            {
-                camRenderer.updateCameraPose( pose );
+            media.el.onended = (event) => {
+                videoHasEnded = true;
+                ctx.clearRect(0, 0, media.width, media.height);
+                clearInterval(addCubeInterval);
+            };
 
-                if( doFindPlane )
-                {
+            const processFrame = () => {
+                Stats.next();
+
+                Stats.start('video');
+                const frame = media.getImageData();
+                ctx.clearRect(0, 0, media.width, media.height);
+                ctx.putImageData(frame, 0, 0);
+                Stats.stop('video');
+
+                Stats.start('slam');
+                const pose = alva.findCameraPose(frame);
+                Stats.stop('slam');
+
+                Stats.start('render');
+                if (pose) {
+                    camRenderer.updateCameraPose(pose);
                     const planePose = alva.findPlane();
 
-                    if( planePose )
-                    {
-                        camRenderer.createObjectWithPose( planePose );
-                        doFindPlane = false;
+                    if (addCube && planePose) {
+                        camRenderer.createObjectWithPose(planePose);
+                        addCube = false;
                     }
                 }
-            }
-            
-            
-                camRenderer.lostCamera();
 
                 const dots = alva.getFramePoints();
-                console.log(dots);
-                for( const p of dots )
-                {
+
+                for (const p of dots) {
                     ctx.fillStyle = 'white';
-                    ctx.fillRect( p.x, p.y, 2, 2 );
+                    ctx.fillRect(p.x, p.y, 2, 2);
                 }
-            
 
-            Stats.stop( 'render' );
-            Stats.render();
+                Stats.stop('render');
+                Stats.render();
 
-            return true;
-        }, 30 );
-    }
+                if(!videoHasEnded) {
+                    media.el.requestVideoFrameCallback(processFrame)
+                }
 
-    window.addEventListener( 'load', main );
-</script>
+                // return !videoHasEnded;
+            };
+
+            media.el.requestVideoFrameCallback(processFrame)
+            // onFrame(processFrame, 30);
+        }
+
+
+        window.addEventListener('load', main);
+    </script>
 </body>
+
 </html>
