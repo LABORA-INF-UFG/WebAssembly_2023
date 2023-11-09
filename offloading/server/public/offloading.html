@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"
@@ -99,6 +100,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="container">
     <div id="renderer-cam">
@@ -106,6 +108,7 @@
     </div>
     <div id="renderer-map"></div>
   </div>
+  <!-- TODO: DECIDIR QUAL LINK USAR PARA PEGAR A BIBLIOTECA DO SOCKET.IO -->
   <!-- <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
     integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
     crossorigin="anonymous"></script> -->
@@ -137,6 +140,18 @@
       return socket;
     }
 
+    function getCSV(statistics) {
+        let csvContent = statistics.map(e => e.join(",")).join("\n");
+        let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement("a");
+
+        link.href = URL.createObjectURL(blob);
+        link.download = 'statistics.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     async function main() {
       const media = await Video.Initialize('/videos/video-short.mp4');
 
@@ -146,6 +161,10 @@
       Stats.add('video');
       Stats.add('slam');
       Stats.add('render');
+
+      let statistics = [
+        ['TotalSlamTime', 'SlamTime', 'TransmitionTime', 'RenderTime', 'VideoTime']
+      ];
 
       const $cam = document.getElementById('renderer-cam');
       const $map = document.getElementById('renderer-map');
@@ -159,6 +178,93 @@
       $cam.parentElement.style.display = 'block';
 
       const socket = await socketPromise;
+
+      const processFrame = async (now, frameMetadata) => {
+        Stats.next();
+
+        Stats.start('video');
+
+        const iniVideoTime = performance.now();
+        const frame = await media.getImageData();
+        const endVideoTime = performance.now();
+
+        Stats.stop('video');
+        const totalVideoTime = endVideoTime - iniVideoTime;
+
+        Stats.start('slam');
+        const iniTotalSlamTime = performance.now();
+
+        const [ data, slamTime ] = await new Promise(resolve =>
+          socket.emit('frame', {
+            width: frame.width,
+            height: frame.height,
+            data: frame.data
+          }, (data, slamTime) =>
+            resolve([data, slamTime])
+          )
+        );
+
+        let pose = null;
+        let planePose = null;
+        let dots = [];
+
+        if (data) {
+          if (data.pose) {
+            pose = new Float32Array(data.pose)
+          }
+
+          if (data.planePose) {
+            planePose = new Float32Array(data.planePose)
+          }
+
+          if (data.dots) {
+            dots = data.dots
+          }
+
+        }
+
+        const endTotalSlamTime = performance.now();
+        Stats.stop('slam');
+
+        const totalSlamTime = endTotalSlamTime - iniTotalSlamTime;
+        const streamingTime = totalSlamTime - slamTime;
+
+        Stats.start('render');
+        const iniRenderTime = performance.now();
+
+        ctx.clearRect(0, 0, media.width, media.height);
+        ctx.putImageData(frame, 0, 0);
+
+        if (pose) {
+          camRenderer.updateCameraPose(pose);
+
+          if (addCube && planePose) {
+            camRenderer.createObjectWithPose(planePose);
+            doFindPlane = false;
+          }
+
+        }
+
+        for (const dot of dots) {
+          ctx.fillStyle = 'white';
+          ctx.fillRect(dot.x, dot.y, 2, 2);
+        }
+
+        const endRenderTime = performance.now();
+        Stats.stop('render');
+
+        const totalRenderTime = endRenderTime - iniRenderTime;
+
+        statistics.push([totalSlamTime, slamTime, streamingTime, totalRenderTime, totalVideoTime]);
+
+        Stats.render();
+
+        if(!videoHasEnded) {
+          media.el.requestVideoFrameCallback(processFrame);
+        }
+
+        // return !videoHasEnded
+      }
 
       if (socket) {
         media.el.play();
@@ -175,90 +281,11 @@
           videoHasEnded = true;
           ctx.clearRect(0, 0, media.width, media.height);
           clearInterval(addCubeInterval);
+          getCSV(statistics);
 
-          // const closeServer = fetch("http://localhost:5000/close", {
-          //   'method': 'GET',
-          // });
-
-          // const closeClient = fetch(`http://${serverUrl}/close`, {
-          //   'method': 'GET',
-          // });
-
-          // await Promise.all([closeServer, closeClient]);
         }
 
         media.el.onended = endVideo;
-
-        const processFrame = async (now, frameMetadata) => {
-          Stats.next();
-
-          Stats.start('video');
-
-          const frame = media.getImageData();
-
-          Stats.stop('video');
-
-          Stats.start('slam');
-
-          const data = await new Promise(resolve =>
-            socket.emit('frame', {
-              width: frame.width,
-              height: frame.height,
-              data: frame.data
-            }, data =>
-              resolve(data)
-            )
-          );
-
-          let pose = null;
-          let planePose = null;
-          let dots = [];
-
-          if (data) {
-            if (data.pose) {
-              pose = new Float32Array(data.pose)
-            }
-
-            if (data.planePose) {
-              planePose = new Float32Array(data.planePose)
-            }
-
-            if (data.dots) {
-              dots = data.dots
-            }
-          }
-
-          Stats.stop('slam');
-
-          Stats.start('render');
-
-          ctx.clearRect(0, 0, media.width, media.height);
-          ctx.putImageData(frame, 0, 0);
-
-          if (pose) {
-            camRenderer.updateCameraPose(pose);
-
-            if (addCube && planePose) {
-              camRenderer.createObjectWithPose(planePose);
-              addCube = false;
-            }
-          }
-
-          for (const dot of dots) {
-            ctx.fillStyle = 'white';
-            ctx.fillRect(dot.x, dot.y, 2, 2);
-          }
-
-          Stats.stop('render');
-
-          Stats.render();
-
-          if (!videoHasEnded) {
-            media.el.requestVideoFrameCallback(processFrame);
-          }
-
-          //return !videoHasEnded;
-        }
 
         media.el.requestVideoFrameCallback(processFrame);
         // onFrame(processFrame, 30);
