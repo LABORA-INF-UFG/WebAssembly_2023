@@ -109,16 +109,14 @@
         <div id="renderer-map"></div>
     </div>
     <script type="module">
-        import { Stats } from "/scripts/stats.js";
         import { AlvaAR } from '/scripts/alva_ar.js';
         import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
-        import { Video, onFrame } from "/scripts/utils.js";
+        import { Video, onFrame, getCSV } from "/scripts/utils.js";
 
         async function main() {
-            document.body.appendChild(Stats.el);
-            Stats.add('video');
-            Stats.add('slam');
-            Stats.add('render');
+            let statistics = [
+                ['slamTime', 'renderTime', 'videoTime', 'clientMemoryUsage']
+            ];
 
             const media = await Video.Initialize('/videos/video-short.mp4');
             const alva = await AlvaAR.Initialize(media.width, media.height);
@@ -146,29 +144,37 @@
                 addCube = true;
             }, 2000);
 
-            media.el.onended = (event) => {
+            media.el.onended = () => {
                 videoHasEnded = true;
                 ctx.clearRect(0, 0, media.width, media.height);
                 clearInterval(addCubeInterval);
+                // getCSV(statistics, "local"); // Uncomment to save statistics in CSV file 
             };
 
             const processFrame = () => {
-                Stats.next();
-
-                Stats.start('video');
+                const startVideoTime = performance.now();
                 const frame = media.getImageData();
+                const endVideoTime = performance.now();
+
+                const totalVideoTime = endVideoTime - startVideoTime;
+
+                const startSlamTime = performance.now();
+
+                const pose = alva.findCameraPose(frame);
+                const planePose = alva.findPlane();
+                const dots = alva.getFramePoints();
+
+                const endSlamTime = performance.now();
+
+                const totalSlamTime = endSlamTime - startSlamTime;
+
+                const startRenderTime = performance.now();
+
                 ctx.clearRect(0, 0, media.width, media.height);
                 ctx.putImageData(frame, 0, 0);
-                Stats.stop('video');
 
-                Stats.start('slam');
-                const pose = alva.findCameraPose(frame);
-                Stats.stop('slam');
-
-                Stats.start('render');
                 if (pose) {
                     camRenderer.updateCameraPose(pose);
-                    const planePose = alva.findPlane();
 
                     if (addCube && planePose) {
                         camRenderer.createObjectWithPose(planePose);
@@ -176,17 +182,22 @@
                     }
                 }
 
-                const dots = alva.getFramePoints();
-
                 for (const p of dots) {
                     ctx.fillStyle = 'white';
                     ctx.fillRect(p.x, p.y, 2, 2);
                 }
 
-                Stats.stop('render');
-                Stats.render();
+                const endRenderTime = performance.now();
 
-                if(!videoHasEnded) {
+                const totalRenderTime = endRenderTime - startRenderTime;
+
+                const clientMemoryUsage = performance.memory.usedJSHeapSize;
+
+                statistics.push([
+                    totalSlamTime, totalRenderTime, totalVideoTime, clientMemoryUsage
+                ]);
+
+                if (!videoHasEnded) {
                     media.el.requestVideoFrameCallback(processFrame)
                 }
 
