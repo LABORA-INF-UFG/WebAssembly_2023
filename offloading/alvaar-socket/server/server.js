@@ -24,11 +24,11 @@ sockets.on('connection', (socket) => {
       return;
     }
 
-    const start = Date.now(); 
+    const start = performance.now(); 
 
     const data = await processVideo(alva, frame);
     
-    const end = Date.now();
+    const end = performance.now();
 
     const slamTime = end - start;
 

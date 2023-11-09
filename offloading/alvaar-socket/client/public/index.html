@@ -139,12 +139,12 @@
     }
 
     async function main() {     
-      //Depois de 5s, termina o programa e baixa as estatisticas
+      //Depois de 30s, termina o programa e baixa as estatisticas
       setTimeout(() => {
   
         getCSV(statistics);
       
-      }, 5000);
+      }, 60000);
 
       document.body.appendChild(Stats.el);
       Stats.add('video');
@@ -207,16 +207,16 @@
         Stats.next();
 
         Stats.start('video');
-        const iniVideoTime = Date.now();
 
+        const iniVideoTime = performance.now();
         const frame = await media.getImageData();
+        const endVideoTime = performance.now();
 
-        const endVideoTime = Date.now();
         Stats.stop('video');
         const totalVideoTime = endVideoTime - iniVideoTime;
 
         Stats.start('slam');
-        const iniTotalSlamTime = Date.now(); 
+        const iniTotalSlamTime = performance.now(); 
 
         const { data, responseIndex } = await new Promise(resolve =>
           socket.emit('frame', {
@@ -229,7 +229,6 @@
           )
         );
 
-        // console.log("Response frame: ", responseIndex)
         pose = null;
         planePose = null;
         dots = [];
@@ -249,7 +248,7 @@
           
         }
 
-        const endTotalSlamTime = Date.now();
+        const endTotalSlamTime = performance.now();
         Stats.stop('slam');
         
         const totalSlamTime = endTotalSlamTime - iniTotalSlamTime;
@@ -258,7 +257,7 @@
         
 
         Stats.start('render');
-        const iniRenderTime = Date.now();
+        const iniRenderTime = performance.now();
 
         ctx.clearRect(0, 0, media.width, media.height);
         ctx.putImageData(frame, 0, 0);
@@ -282,12 +281,12 @@
           ctx.fillRect(dot.x, dot.y, 2, 2);
         }
         
-        const endRenderTime = Date.now();
+        const endRenderTime = performance.now();
         Stats.stop('render');
         
         const totalRenderTime = endRenderTime - iniRenderTime;
 
-        console.log(`TotalSlamTime: ${totalSlamTime}\nSlamTime: ${slamTime}\nTransmitionTime: ${transmitionTime}\nRender: ${totalRenderTime}\nVideo: ${totalVideoTime}`);
+        //console.log(`TotalSlamTime: ${totalSlamTime}\nSlamTime: ${slamTime}\nTransmitionTime: ${transmitionTime}\nRender: ${totalRenderTime}\nVideo: ${totalVideoTime}`);
         statistics.push([totalSlamTime, slamTime, transmitionTime, totalRenderTime, totalVideoTime]);
 
         Stats.render();
