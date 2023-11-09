@@ -10,7 +10,6 @@ for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
         if os.path.isfile(file_path):
            df = pd.read_csv(file_path)      
-           mean.append(df.mean())      
            arr.append(df)
 
 data = pd.concat(arr, ignore_index=True)
