@@ -20,11 +20,16 @@ sockets.on('connection', (socket) => {
   });
 
   socket.on('frame', async (frame, callback) => {
+    const start = performance.now(); 
+
     if (!alva) {
-      return;
+      const end = performance.now();
+
+
+      return callback({slamTime : end-start});
     }
 
-    const start = performance.now(); 
+    
 
     const data = await processVideo(alva, frame);
     

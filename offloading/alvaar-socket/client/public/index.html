@@ -151,12 +151,12 @@
     }
 
     async function main() {     
-      //Depois de 30s, termina o programa e baixa as estatisticas
+      //Depois de 60s, termina o programa e baixa as estatisticas
       setTimeout(() => {
   
         getCSV(statistics);
       
-      }, 60000);
+      }, 5000);
 
 
       let statistics = [
@@ -199,8 +199,6 @@
 
       const processFrame = async (now, frameMetadata) => {
 
-
-
         const iniVideoTime = performance.now();
         const frame = await media.getImageData();
         const endVideoTime = performance.now();
@@ -209,14 +207,14 @@
 
         const iniTotalSlamTime = performance.now(); 
 
-        const { data, responseIndex } = await new Promise(resolve =>
+        const data  = await new Promise(resolve =>
           socket.emit('frame', {
             width: frame.width,
             height: frame.height,
             data: frame.data,
             indexFrame: frameIndex
           }, (data, responseIndex) =>
-            resolve({ data, responseIndex })
+            resolve(data)
           )
         );
 
