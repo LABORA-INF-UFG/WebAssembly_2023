@@ -112,9 +112,9 @@
     integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
     crossorigin="anonymous"></script>
   <script type="module">
-    import { ARSimpleView, ARSimpleMap } from "./view.js";
-    import { Video, onFrame } from "./utils.js";
-    import { Stats } from "./stats.js";
+    import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
+    import { Video, onFrame } from "/scripts/utils.js";
+    import { Stats } from "/scripts/stats.js";
 
     const serverUrl = "localhost:3000";
 
@@ -139,7 +139,7 @@
     }
 
     async function main() {
-      const media = await Video.Initialize('./video-short.mp4');
+      const media = await Video.Initialize('/videos/video-short.mp4');
 
       const socketPromise = initializeServer(serverUrl, media.width, media.height);
 

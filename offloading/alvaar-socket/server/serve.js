@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
-import { AlvaAR } from './alva_ar.js';
+import { AlvaAR } from './public/scripts/alva_ar.js';
 import express from 'express';
 import cors from 'cors';
 
