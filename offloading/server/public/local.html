@@ -197,15 +197,15 @@
                     totalSlamTime, totalRenderTime, totalVideoTime, clientMemoryUsage
                 ]);
 
-                // if (!videoHasEnded) {
-                //     media.el.requestVideoFrameCallback(processFrame)
-                // }
+                if (!videoHasEnded) {
+                    media.el.requestVideoFrameCallback(processFrame)
+                }
 
-                return !videoHasEnded;
+                // return !videoHasEnded;
             };
 
-            // media.el.requestVideoFrameCallback(processFrame)
-            onFrame(processFrame, 30);
+            media.el.requestVideoFrameCallback(processFrame)
+            // onFrame(processFrame, 30);
         }
 
 
