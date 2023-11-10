@@ -113,7 +113,7 @@
     import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
     import { Video, onFrame, getCSV, roughSizeOfObject } from "/scripts/utils.js";
 
-    const serverUrl = "192.168.10.2:3000";
+    const serverUrl = "localhost:3000";
 
     const initializeServer = async (serverUrl, width, height) => {
       const socket = io(serverUrl, { reconnection: false });
