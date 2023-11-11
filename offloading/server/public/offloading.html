@@ -141,7 +141,7 @@
       const socketPromise = initializeServer(serverUrl, media.width, media.height);
 
       let statistics = [
-        ['serverTime', 'slamTime', 'streamingTime', 'renderTime', 'videoTime', 'clientMemoryUsage', 'serverMemoryUsage', 'requestSize', 'responseSize']
+        ['FPS','serverTime', 'slamTime', 'streamingTime', 'renderTime', 'videoTime', 'clientMemoryUsage', 'serverMemoryUsage', 'requestSize', 'responseSize']
       ];
 
       const $cam = document.getElementById('renderer-cam');
@@ -161,6 +161,8 @@
       const socket = await socketPromise;
 
       const processFrame = async (now, frameMetadata) => {
+        const startFPS = performance.now();
+        
         const startVideoTime = performance.now();
         const frame = media.getImageData();
         const endVideoTime = performance.now();
@@ -241,7 +243,11 @@
 
         const clientMemoryUsage = performance.memory && performance.memory.usedJSHeapSize;
 
+        const endFPS = performance.now();
+        const FPS = 1000/(endFPS - startFPS);
+
         statistics.push([
+          FPS,
           totalServerTime,
           totalSlamTime,
           totalStreamingTime,
@@ -266,7 +272,7 @@
 
         const addCubeInterval = setInterval(() => {
           addCube = true;
-        }, 2000);
+        }, 200);
 
         const endVideo = async () => {
           videoHasEnded = true;

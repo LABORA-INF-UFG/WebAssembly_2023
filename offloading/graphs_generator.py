@@ -24,6 +24,7 @@ def genGraph(statistic):
             arr.append(df)
     
     data = pd.concat(arr, ignore_index=True)
+    data.drop(columns=['clientMemoryUsage', 'serverMemoryUsage', 'requestSize', 'responseSize'], inplace=True)
     labels = data.columns
     
     mean[float(case)] = data.mean().to_frame().transpose()

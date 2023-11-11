@@ -57,6 +57,5 @@ function processVideo(alva, frame) {
     pose: pose ? pose : null,
     planePose: planePose ? planePose : null,
     dots: dots,
-    slamTime: null
   };
 }
