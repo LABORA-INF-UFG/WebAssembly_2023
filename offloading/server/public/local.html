@@ -115,7 +115,7 @@
 
         async function main() {
             let statistics = [
-                ['slamTime', 'renderTime', 'videoTime', 'clientMemoryUsage']
+                ['FPS','slamTime', 'renderTime', 'videoTime', 'clientMemoryUsage']
             ];
 
             const media = await Video.Initialize('/videos/video-short.mp4');
@@ -152,6 +152,8 @@
             };
 
             const processFrame = () => {
+                const startFPS = performance.now();
+                
                 const startVideoTime = performance.now();
                 const frame = media.getImageData();
                 const endVideoTime = performance.now();
@@ -192,9 +194,11 @@
                 const totalRenderTime = endRenderTime - startRenderTime;
 
                 const clientMemoryUsage = performance.memory && performance.memory.usedJSHeapSize;
-
+                
+                const endFPS = performance.now();
+                const FPS = endFPS - startFPS;
                 statistics.push([
-                    totalSlamTime, totalRenderTime, totalVideoTime, clientMemoryUsage
+                    FPS, totalSlamTime, totalRenderTime, totalVideoTime, clientMemoryUsage
                 ]);
 
                 if (!videoHasEnded) {
