@@ -196,7 +196,7 @@
                 const clientMemoryUsage = performance.memory && performance.memory.usedJSHeapSize;
                 
                 const endFPS = performance.now();
-                const FPS = endFPS - startFPS;
+                const FPS =1000/ (endFPS - startFPS);
                 statistics.push([
                     FPS, totalSlamTime, totalRenderTime, totalVideoTime, clientMemoryUsage
                 ]);
