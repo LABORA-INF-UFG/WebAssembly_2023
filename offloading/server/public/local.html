@@ -151,8 +151,16 @@
                 getCSV(statistics, "local"); // Uncomment to save statistics in CSV file 
             };
 
+            let startFps = null;
+
             const processFrame = () => {
-                const startFPS = performance.now();
+                const endFps = performance.now();
+
+                const totalFps = endFps - startFps;
+
+                const FPS = 1000/ (endFPS - startFPS);
+
+                startFps = performance.now();
                 
                 const startVideoTime = performance.now();
                 const frame = media.getImageData();
@@ -194,9 +202,7 @@
                 const totalRenderTime = endRenderTime - startRenderTime;
 
                 const clientMemoryUsage = performance.memory && performance.memory.usedJSHeapSize;
-                
-                const endFPS = performance.now();
-                const FPS =1000/ (endFPS - startFPS);
+ 
                 statistics.push([
                     FPS, totalSlamTime, totalRenderTime, totalVideoTime, clientMemoryUsage
                 ]);
@@ -207,6 +213,8 @@
 
                 // return !videoHasEnded;
             };
+
+            startFps = performance.now();
 
             media.el.requestVideoFrameCallback(processFrame)
             // onFrame(processFrame, 30);
