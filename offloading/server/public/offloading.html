@@ -159,10 +159,17 @@
       let addCube = false;
 
       const socket = await socketPromise;
+      
+      let startFps = null;
 
       const processFrame = async (now, frameMetadata) => {
-        const startFPS = performance.now();
+        const endFps = performance.now();
+        const totalFps = endFps - startFps;
+
+        const FPS = 1000 / (endFps - startFps);
         
+        startFps = performance.now()
+
         const startVideoTime = performance.now();
         const frame = media.getImageData();
         const endVideoTime = performance.now();
@@ -243,8 +250,6 @@
 
         const clientMemoryUsage = performance.memory && performance.memory.usedJSHeapSize;
 
-        const endFPS = performance.now();
-        const FPS = 1000/(endFPS - startFPS);
 
         statistics.push([
           FPS,
@@ -263,7 +268,6 @@
           media.el.requestVideoFrameCallback(processFrame);
         }
 
-        // return !videoHasEnded
       }
 
       if (socket) {
@@ -283,6 +287,7 @@
 
         media.el.onended = endVideo;
 
+        startFps = performance.now();
         media.el.requestVideoFrameCallback(processFrame);
         // onFrame(processFrame, 30);
       }

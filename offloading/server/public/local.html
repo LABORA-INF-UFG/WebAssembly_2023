@@ -155,10 +155,9 @@
 
             const processFrame = () => {
                 const endFps = performance.now();
-
                 const totalFps = endFps - startFps;
 
-                const FPS = 1000/ (endFPS - startFPS);
+                const FPS = 1000/ (endFps - startFps);
 
                 startFps = performance.now();
                 
@@ -209,15 +208,15 @@
 
                 if (!videoHasEnded) {
                     media.el.requestVideoFrameCallback(processFrame)
+                    //onFrame(processFrame, 30)
                 }
 
                 // return !videoHasEnded;
             };
 
             startFps = performance.now();
-
             media.el.requestVideoFrameCallback(processFrame)
-            // onFrame(processFrame, 30);
+            //onFrame(processFrame, 30);
         }
 
 
