@@ -61,7 +61,7 @@ def gen_all_data_graph(statistic, data, local_statistics, legend):
         data[key] = pd.concat([data[key], local_statistics], axis=1)
     
     
-    fig, ax = plt.subplots(figsize=(10, 10))    
+    fig, ax = plt.subplots(figsize=(12, 10))    
 
     for label in legend:
         x = list(data.keys())
@@ -82,7 +82,7 @@ def gen_all_data_graph(statistic, data, local_statistics, legend):
     if statistic == 'packetloss':
         plt.xlabel("Packetloss(%)")
     
-    plt.savefig(f'./graphsOffloading/{statistic}.png')
+    plt.savefig(f'./graphs/{statistic}.png')
 
 
 def gen_pair_graphs(pair, raw_data, local_statistics, statistic):
@@ -94,7 +94,7 @@ def gen_pair_graphs(pair, raw_data, local_statistics, statistic):
         data[key] = data[key][pair]
         data[key] = data[key].T.drop_duplicates().T    
     
-    fig, ax = plt.subplots(figsize=(10, 6))  
+    fig, ax = plt.subplots(figsize=(12, 6))  
   
     for label in pair:
         x = list(data.keys())
@@ -120,13 +120,13 @@ def gen_pair_graphs(pair, raw_data, local_statistics, statistic):
         plt.xlabel("Packetloss(%)")
     
     if pair[0] == 'FPSOffloading':
-        plt.savefig(f'./graphsOffloading/{statistic}_FPS.png')
+        plt.savefig(f'./graphs/{statistic}_FPS.png')
     elif pair[0] == 'serverTimeOffloading':
-        plt.savefig(f'./graphsOffloading/{statistic}_slam_time.png')
+        plt.savefig(f'./graphs/{statistic}_slam_time.png')
     elif pair[0] == 'renderTimeOffloading':
-        plt.savefig(f'./graphsOffloading/{statistic}_render_time.png')
+        plt.savefig(f'./graphs/{statistic}_render_time.png')
     elif pair[0] == 'videoTimeOffloading':
-        plt.savefig(f'./graphsOffloading/{statistic}_video_time.png')
+        plt.savefig(f'./graphs/{statistic}_video_time.png')
         
 
 def main():
