@@ -104,7 +104,7 @@
 <body>
     <div id="container">
         <div id="renderer-cam">
-            <canvas data-testid="a" id="renderer-video"></canvas>
+            <canvas id="renderer-video"></canvas>
         </div>
         <div id="renderer-map"></div>
     </div>
@@ -112,6 +112,9 @@
         import { AlvaAR } from '/scripts/alva_ar.js';
         import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
         import { Video, onFrame, getCSV } from "/scripts/utils.js";
+
+        const eventStart = new Event("start");
+        const eventEnd = new Event("end");
 
         async function main() {
             let statistics = [
@@ -136,8 +139,6 @@
             $cam.parentElement.style.display = 'block';
 
             let videoHasEnded = false;
-            media.el.play();
-            media.el.loop = false;
 
             let addCube = false;
             const addCubeInterval = setInterval(() => {
@@ -146,9 +147,10 @@
 
             media.el.onended = () => {
                 videoHasEnded = true;
+                getCSV(statistics, "local"); // Uncomment to save statistics in CSV file 
                 ctx.clearRect(0, 0, media.width, media.height);
                 clearInterval(addCubeInterval);
-                getCSV(statistics, "local"); // Uncomment to save statistics in CSV file 
+                window.dispatchEvent(eventEnd);
             };
 
             let startFps = null;
@@ -214,6 +216,9 @@
                 // return !videoHasEnded;
             };
 
+            media.el.play();
+            media.el.loop = false;
+            window.dispatchEvent(eventStart);
             startFps = performance.now();
             media.el.requestVideoFrameCallback(processFrame)
             //onFrame(processFrame, 30);
