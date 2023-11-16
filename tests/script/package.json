@@ -4,5 +4,8 @@
   "description": "",
   "main": "index.js",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "ssh2": "^1.14.0"
+  }
 }

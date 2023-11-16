@@ -114,6 +114,8 @@
     import { Video, onFrame, getCSV, roughSizeOfObject } from "/scripts/utils.js";
 
     const serverUrl = "localhost:3000";
+    const eventStart = new Event("start");
+    const eventEnd = new Event("end");
 
     const initializeServer = async (serverUrl, width, height) => {
       const socket = io(serverUrl, { reconnection: false });
@@ -283,10 +285,12 @@
           ctx.clearRect(0, 0, media.width, media.height);
           clearInterval(addCubeInterval);
           getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file 
+          window.dispatchEvent(eventEnd);
         }
 
         media.el.onended = endVideo;
 
+        window.dispatchEvent(eventStart);
         startFps = performance.now();
         media.el.requestVideoFrameCallback(processFrame);
         // onFrame(processFrame, 30);
