@@ -10,7 +10,10 @@ const app = express();
 app.use(express.static('public'));
 app.use(cors())
 
-const server = createServer(app).listen(port);
+const server = createServer(app)
+  .listen(port, () =>
+    console.log(`Server running on port ${port}`)
+  );
 
 const sockets = new Server(server, {
   cors: {
@@ -28,8 +31,8 @@ sockets.on('connection', (socket) => {
   });
 
   socket.on('frame', async (frame, callback) => {
-    const start = performance.now(); 
-    
+    const start = performance.now();
+
     const memory = process.memoryUsage();
 
     if (!alva) {
@@ -38,9 +41,9 @@ sockets.on('connection', (socket) => {
     }
 
     const data = processVideo(alva, frame);
-    
+
     const end = performance.now();
-    
+
     callback([data, end - start, memory.heapUsed]);
   });
 
@@ -48,7 +51,7 @@ sockets.on('connection', (socket) => {
 });
 
 function processVideo(alva, frame) {
-  
+
   const pose = alva.findCameraPose(frame);
   const planePose = alva.findPlane();
   const dots = alva.getFramePoints();

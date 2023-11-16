@@ -11,10 +11,8 @@ async function sleep(time) {
 
     // Expose a handler to the page
     await page.exposeFunction('onCustomEvent', async ({ type }) => {
-        console.log(type);
-
         if(type === "end") {
-            await page.screenshot({ path: 'screenshot.png' })
+            // await page.screenshot({ path: 'screenshot.png' })
             await sleep(1000);
             await browser.close();
         }
