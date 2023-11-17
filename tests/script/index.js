@@ -3,6 +3,7 @@ const exec = promisify(require('child_process').exec);
 const { spawn } = require('node:child_process');
 const { Client } = require('ssh2');
 var events = require('events');
+const exp = require('constants');
 
 async function getGitUser() {
     const nameOutput = await exec('git config --global user.name')
@@ -61,6 +62,8 @@ const serverPath = 'C:\\Users\\mathe\\Programming\\WebAssembly_2023\\offloading\
 const clientPath = 'C:\\Users\\mathe\\Programming\\WebAssembly_2023\\tests\\puppeteer';
 const sshPath = 'C:\\Users\\mathe\\.ssh\\id_rsa';
 
+/**
+ * 
 async function experiment() {
     changeDirectory(serverPath);
 
@@ -94,10 +97,61 @@ async function experiment() {
         server.kill();
     });
 }
+ */
 
+function experiment(client, eventEmitter) {
+    client.exec('.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/tests/puppeteer/index.js', (err, stream) => {
+        if (err) throw err;
 
+        stream.on('data', (data) => {
+            process.stdout.write(data.toString());
+        })
 
-(async () => {
+        stream.stderr.on('data', (data) => {
+            throw new Error(data.toString());
+        });
+
+        stream.on('close', (code, signal) => {
+            eventEmitter.emit("close server");
+        })
+    });
+}
+
+function startServer(server, eventEmitter) {
+    server.shell((err, stream) => {
+        if (err) throw err;
+
+        stream.on('data', (data) => {
+            const message = data.toString();
+            process.stdout.write(data.toString());
+
+            if (message.trim() === "Server running on port 3000") {
+                eventEmitter.emit("start client")
+            }
+        });
+
+        stream.stderr.on('data', (data) => {
+            throw new Error(data.toString());
+        });
+
+        eventEmitter.on("close connections", () => {
+            stream.write('\x03');
+            server.end()
+        });
+        
+        stream.run = (command) => stream.write(command + '\n')
+        
+        stream.run('cd Documents/WebAssembly_2023/offloading/server');
+        stream.run('node index.js');
+
+        eventEmitter.on("close server", () => {
+            stream.write('\x03');
+        });
+
+    });
+}
+
+(() => {
     const serverConfig = {
         host: '10.16.1.3',
         username: 'wasm',
@@ -110,62 +164,19 @@ async function experiment() {
         privateKey: require('fs').readFileSync(sshPath)
     };
 
-
     const server = new Client();
     const client = new Client();
 
     const eventEmitter = new events.EventEmitter();
 
     server.on('ready', () => {
-
-        server.shell((err, stream) => {
-            if (err) throw err;
-
-            stream.on('close', () => {
-                server.end();
-            }).on('data', (data) => {
-                const message = data.toString();
-                process.stdout.write(data.toString());
-
-                if (message.trim() === "Server running on port 3000") {
-                    eventEmitter.emit("start client")
-                }
-
-            });
-            stream.run = (command) => stream.write(command + '\n')
-
-            stream.run('cd Documents/WebAssembly_2023/offloading/server');
-            stream.run('node index.js');
-
-            eventEmitter.on("end experiment", () => {
-                stream.end("^C");
-            })
-
-            // stream.run('exit');
-        });
+        eventEmitter.on('start server', () => startServer(server, eventEmitter))
+        eventEmitter.emit('start server')
     }).connect(serverConfig);
 
-
     client.on('ready', () => {
-        server.shell((err, stream) => {
-            if (err) throw err;
-
-            stream.on('close', () => {
-                server.end();
-            }).on('data', (data) => {
-                const message = data.toString();
-                process.stdout.write(data.toString());
-            });
-            stream.run = (command) => stream.write(command + '\n')
-
-            eventEmitter.on("start experiment", () => {
-                stream.run('cd WebAssembly_2023/tests/puppeteer');
-                stream.run('node index.js');
-                eventEmitter.emit("end experiment")
-            });
-
-            // stream.run('exit');
-        });
+        eventEmitter.on("start client", () => experiment(client, eventEmitter));
+        eventEmitter.on("close connections", () => client.end());
     }).connect(clientConfig);
 
 
