@@ -98,11 +98,18 @@ async function experiment() {
 
 
 (async () => {
-    const sshConfig = {
+    const serverConfig = {
         host: '10.16.1.3',
         username: 'wasm',
         privateKey: require('fs').readFileSync(sshPath)
     };
+
+    const clientConfig = {
+        host: '10.16.1.1',
+        username: 'wasm',
+        privateKey: require('fs').readFileSync(sshPath)
+    };
+
 
     const server = new Client();
     const client = new Client();
@@ -128,17 +135,32 @@ async function experiment() {
             stream.run = (command) => stream.write(command + '\n')
 
             stream.run('cd Documents/WebAssembly_2023/offloading/server');
-            stream.run('node serve.js');
+            stream.run('node index.js');
 
             // stream.run('exit');
         });
-    }).connect(sshConfig);
+    }).connect(serverConfig);
 
 
-    // client.on('ready', () => {
-    //     .e
-    // }).connect(sshConfig);
+    client.on('ready', () => {
+        server.shell((err, stream) => {
+            if (err) throw err;
+
+            stream.on('close', () => {
+                server.end();
+            }).on('data', (data) => {
+                const message = data.toString();
+                process.stdout.write(data.toString());
+            });
+            stream.run = (command) => stream.write(command + '\n')
+
+            stream.run('cd WebAssembly_2023/tests/puppeteer');
+            stream.run('node index.js');
+
+            // stream.run('exit');
+        });
+    }).connect(clientConfig);
 
 
-    // eventEmitter.on("start experiment",);
+    eventEmitter.on("start experiment",);
 })()
