@@ -2,9 +2,7 @@ const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
 const { spawn } = require('node:child_process');
 const { Client } = require('ssh2');
-const readline = require('readline');
- 
-const rl = readline.createInterface(process.stdin, process.stdout);
+var events = require('events');
 
 async function getGitUser() {
     const nameOutput = await exec('git config --global user.name')
@@ -97,62 +95,50 @@ async function experiment() {
     });
 }
 
-function execute(client) {
-    // Prompt the user to enter a command
-    rl.question('Enter a command to execute on the remote server: ', (command) => {
-      // Execute the user-entered command on the remote server
-      client.exec(command, (err, stream) => {
-        if (err) throw err;
-  
-        stream
-          .on('close', (code, signal) => {
-            console.log('Command execution closed');
-            rl.close();
-          })
-          .on('data', (data) => {
-            console.log('Command output:', data.toString());
-          })
-          .stderr.on('data', (data) => {
-            console.error('Command error:', data.toString());
-          });
-      });
-    });
-  }
+
 
 (async () => {
-
-    // Create a new SSH client instance
-    const sshClient = new Client();
-
-    // Configure the connection parameters
-    const connectionParams = {
-        host: '200.137.197.212',
-        username: 'matheus',
+    const sshConfig = {
+        host: '10.16.1.3',
+        username: 'wasm',
         privateKey: require('fs').readFileSync(sshPath)
     };
 
-    // Connect to the SSH server
-    sshClient.connect(connectionParams);
+    const server = new Client();
+    const client = new Client();
 
-    // Handle events when the connection is established
+    const eventEmitter = new events.EventEmitter();
 
-    sshClient.on('ready', () => {
+    server.on('ready', () => {
 
-        console.log('Connected via SSH!');
+        server.shell((err, stream) => {
+            if (err) throw err;
 
-        // Now you can execute commands, transfer files, etc.
+            stream.on('close', () => {
+                server.end();
+            }).on('data', (data) => {
+                const message = data.toString();
+                process.stdout.write(data.toString());
 
-    });
+                if (message.trim() === "Server running on port 3000") {
+                    eventEmitter.emit("start client")
+                }
 
-    // Handle errors during the SSH connection process
+            });
+            stream.run = (command) => stream.write(command + '\n')
 
-    sshClient.on('error', (err) => {
+            stream.run('cd Documents/WebAssembly_2023/offloading/server');
+            stream.run('node serve.js');
 
-        console.error('Error connecting via SSH:', err);
+            // stream.run('exit');
+        });
+    }).connect(sshConfig);
 
-    });
 
-    execute(sshClient);
+    // client.on('ready', () => {
+    //     .e
+    // }).connect(sshConfig);
 
-    // await experiment();
+
+    // eventEmitter.on("start experiment",);
 })()
