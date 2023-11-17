@@ -137,6 +137,10 @@ async function experiment() {
             stream.run('cd Documents/WebAssembly_2023/offloading/server');
             stream.run('node index.js');
 
+            eventEmitter.on("end experiment", () => {
+                stream.end("^C");
+            })
+
             // stream.run('exit');
         });
     }).connect(serverConfig);
@@ -154,13 +158,15 @@ async function experiment() {
             });
             stream.run = (command) => stream.write(command + '\n')
 
-            stream.run('cd WebAssembly_2023/tests/puppeteer');
-            stream.run('node index.js');
+            eventEmitter.on("start experiment", () => {
+                stream.run('cd WebAssembly_2023/tests/puppeteer');
+                stream.run('node index.js');
+                eventEmitter.emit("end experiment")
+            });
 
             // stream.run('exit');
         });
     }).connect(clientConfig);
 
 
-    eventEmitter.on("start experiment",);
 })()
