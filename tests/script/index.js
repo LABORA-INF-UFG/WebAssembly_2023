@@ -115,7 +115,7 @@ function test(numberOfExperiments) {
     })
 }
 
-async function configNetwork() {
+async function configNetwork(config, value) {
     const clientConfig = {
         host: '10.16.1.1',
         username: 'wasm',
@@ -142,18 +142,18 @@ async function configNetwork() {
 
             stream.run = (command) => stream.write(command + '\n')
 
-	    stream.run("sudo su");
-	    await sleep(500);
-	    stream.run("aula123");
-	    await sleep(500);
+            stream.run("sudo su");
+            await sleep(500);
+            stream.run("aula123");
+            await sleep(500);
             stream.run("tcdel eno1 --all");
-	    stream.run("tcset eno1 --rate 100Kbps");
-	    client.end();
+            stream.run(`tcset eno1 --${config} ${value}`);
+            client.end();
         });
     }).connect(clientConfig);
 }
 
 (async () => {
-    await configNetwork();
-    // test(3);
+    await configNetwork("rate", "750Mbps");
+    test(3);
 })()
