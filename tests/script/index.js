@@ -60,7 +60,7 @@ async function sleep(time) {
 
 const serverPath = 'C:\\Users\\mathe\\Programming\\WebAssembly_2023\\offloading\\server';
 const clientPath = 'C:\\Users\\mathe\\Programming\\WebAssembly_2023\\tests\\puppeteer';
-const sshPath = 'C:\\Users\\mathe\\.ssh\\id_rsa';
+const sshPath = '/home/matheus/.ssh/id_rsa';
 
 /**
  * 
@@ -99,19 +99,19 @@ async function experiment() {
 }
  */
 
-function experiment(client, eventEmitter) {
+function experiment(client, eventEmitter) {;
     client.exec('.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/tests/puppeteer/index.js', (err, stream) => {
         if (err) throw err;
 
         stream.on('data', (data) => {
-            process.stdout.write(data.toString());
+            process.stdout.write(`client: ${data.toString()}`);
         })
 
         stream.stderr.on('data', (data) => {
             throw new Error(data.toString());
         });
 
-        stream.on('close', (code, signal) => {
+        stream.on('close', (code, signal) => {;
             eventEmitter.emit("close server");
         })
     });
@@ -123,7 +123,10 @@ function startServer(server, eventEmitter) {
 
         stream.on('data', (data) => {
             const message = data.toString();
-            process.stdout.write(data.toString());
+            
+	    if(!message.includes("wasm@wasm-ater06")) {
+		process.stdout.write(data.toString());
+	    }
 
             if (message.trim() === "Server running on port 3000") {
                 eventEmitter.emit("start client")
@@ -139,7 +142,7 @@ function startServer(server, eventEmitter) {
         stream.run('node index.js');
 
         eventEmitter.on("close connections", () => {
-            stream.write('\x03');
+            stream.run('\x03');
             server.end()
         });
         
@@ -148,7 +151,7 @@ function startServer(server, eventEmitter) {
         });
 
         eventEmitter.on("close server", () => {
-            stream.write('\x03');
+            stream.run('\x03');
             eventEmitter.emit("experiment finished")
         });
 
@@ -179,6 +182,7 @@ function startServer(server, eventEmitter) {
     server.on('ready', () => {
         startServer(server, eventEmitter);
         experimentIndex++;
+	console.log(`Experiment number ${experimentIndex}`);
         eventEmitter.emit('start server')
     }).connect(serverConfig);
 
@@ -188,8 +192,9 @@ function startServer(server, eventEmitter) {
     }).connect(clientConfig);
 
     eventEmitter.on("experiment finished", () => {
-        if(experimentIndex <= numberOfExperiments) {
-            experimentIndex++;
+        if(experimentIndex < numberOfExperiments) {;
+	    experimentIndex++;
+	    console.log(`Experiment number ${experimentIndex}`);
             eventEmitter.emit("start server");
         } else {
             eventEmitter.emit("close connections")
