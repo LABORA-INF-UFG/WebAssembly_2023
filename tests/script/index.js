@@ -2,6 +2,7 @@ const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
 const { Client } = require('ssh2');
 var events = require('events');
+const { exit } = require('process');
 
 async function sleep(time) {
     await new Promise(resolve => setTimeout(resolve, time));
@@ -69,7 +70,7 @@ function startServer(server, eventEmitter) {
     });
 }
 
-function test(numberOfExperiments, eventEmitter) {
+function test(numberOfExperiments, networkEvents) {
     if (numberOfExperiments < 1) {
         throw new Error("Number of experiments invalid");
     }
@@ -89,35 +90,39 @@ function test(numberOfExperiments, eventEmitter) {
     const server = new Client();
     const client = new Client();
 
+    const experimentEvents = new events.EventEmitter();
+
     let experimentIndex = 0;
 
     server.on('ready', () => {
-        startServer(server, eventEmitter);
+        startServer(server, experimentEvents);
         experimentIndex++;
         console.log(`Experiment number ${experimentIndex}`);
-        eventEmitter.emit('start server')
+        experimentEvents.emit('start server')
     }).connect(serverConfig);
 
     client.on('ready', () => {
-        console.log("Cliente conectado e pronto");
-        eventEmitter.on("start client", () => experiment(client, eventEmitter));
-        eventEmitter.on("close connections", () => client.end());
+        experimentEvents.on("start client", () => experiment(client, experimentEvents));
+        experimentEvents.on("close connections", () => {
+            client.end()
+            networkEvents.emit("new network");
+        });
     }).connect(clientConfig);
 
-    eventEmitter.on("experiment finished", () => {
+    experimentEvents.on("experiment finished", () => {
         experimentIndex++;
 
         if (experimentIndex > numberOfExperiments) {
-            eventEmitter.emit("close connections");
+            experimentEvents.emit("close connections");
             return;
         }
 
         console.log(`Experiment number ${experimentIndex}`);
-        eventEmitter.emit("start server");
+        experimentEvents.emit("start server");
     })
 }
 
-function configNetwork(config, value, eventEmitter) {
+function configNetwork(config, value, networkEvents) {
     const clientConfig = {
         host: '10.16.1.1',
         username: 'wasm',
@@ -134,13 +139,13 @@ function configNetwork(config, value, eventEmitter) {
                 const message = data.toString();
 
                 if (!message.includes("@wasm-OptiPlex-7010")) {
-                    process.stdout.write(data.toString());
+                    process.stdout.write(message);
                 }
-            });
 
-            stream.on('close', () => {
-                console.log("Configuração de rede encerrada")
-                eventEmitter.emit("network configured");
+                if(message.trim() === "exit") {
+                    process.stdout.write(`Rede configurada ${config} ${value}\n`)
+                    networkEvents.emit("network configured");
+                }
             });
 
             stream.stderr.on('data', (data) => {
@@ -150,19 +155,19 @@ function configNetwork(config, value, eventEmitter) {
             stream.run = (command) => stream.write(command + '\n')
 
             stream.run("sudo su");
-            await sleep(500);
             stream.run("aula123");
             await sleep(500);
-            stream.run("tcdel eno1 --all");
-            stream.run(`tcset eno1 --${config} ${value}`);
-            client.end();
+            stream.run(`sudo tcdel eno1 --all`);
+            stream.run(`sudo tcset eno1 --${config} ${value}`);
+            stream.run("sudo tcshow eno1");
+            stream.end("exit\n");
         });
     }).connect(clientConfig);
 }
 
 (async () => {
-    const eventEmitter = new events.EventEmitter();
-    const numberOfExperiments = 3;
+    const networkEvents = new events.EventEmitter();
+    const numberOfExperiments = 1;
 
     const networkConfig = [
         {
@@ -175,12 +180,12 @@ function configNetwork(config, value, eventEmitter) {
         }
     ]
 
-    eventEmitter.on("network configured", () => test(numberOfExperiments, eventEmitter));
+    networkEvents.on("network configured", () => test(numberOfExperiments, networkEvents));
 
     let networkIndex = 0;
     let networkValueIndex = 0;
 
-    eventEmitter.on("close connections", () => {
+    networkEvents.on("new network", () => {
         networkValueIndex++;
 
         if (networkValueIndex >= networkConfig[networkIndex].values.length) {
@@ -188,14 +193,15 @@ function configNetwork(config, value, eventEmitter) {
             networkIndex++;
         }
 
-        if (networkIndex < networkConfig.length) {
-            const { name, values } = networkConfig[networkIndex];
-            const value = values[networkValueIndex];
-            const experimentalEvents = new events.EventEmitter();
-            configNetwork(name, value, experimentalEvents);
+        if (networkIndex >= networkConfig.length) {
+            exit(0);
         }
+
+        const { name, values } = networkConfig[networkIndex];
+        const value = values[networkValueIndex];
+        configNetwork(name, value, networkEvents);
     });
 
     const initialNetwork = networkConfig[networkIndex];
-    configNetwork(initialNetwork.name, initialNetwork.values[networkValueIndex], eventEmitter);
+    configNetwork(initialNetwork.name, initialNetwork.values[networkValueIndex], networkEvents);
 })()
