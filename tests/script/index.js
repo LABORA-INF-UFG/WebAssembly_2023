@@ -136,6 +136,7 @@ function startServer(server, eventEmitter) {
         stream.run = (command) => stream.write(command + '\n')
 
         stream.run('cd Documents/WebAssembly_2023/offloading/server');
+        stream.run('node index.js');
 
         eventEmitter.on("close connections", () => {
             stream.write('\x03');
