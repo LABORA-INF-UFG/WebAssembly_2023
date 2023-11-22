@@ -7,7 +7,8 @@ async function sleep(time) {
     await new Promise(resolve => setTimeout(resolve, time));
 }
 
-const sshPath = '/home/matheus/.ssh/id_rsa';
+// const sshPath = '/home/matheus/.ssh/id_rsa';
+const sshPath = "C:\\Users\\mathe\\.ssh\\id_rsa";
 
 function experiment(client, eventEmitter) {
     client.exec('.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/tests/puppeteer/index.js', (err, stream) => {
@@ -34,7 +35,7 @@ function startServer(server, eventEmitter) {
         stream.on('data', (data) => {
             const message = data.toString();
 
-            if (!message.includes("wasm@wasm-ater06")) {
+            if (!message.includes("@wasm-ater06")) {
                 process.stdout.write(data.toString());
             }
 
@@ -68,7 +69,7 @@ function startServer(server, eventEmitter) {
     });
 }
 
-function test(numberOfExperiments) {
+function test(numberOfExperiments, eventEmitter) {
     if (numberOfExperiments < 1) {
         throw new Error("Number of experiments invalid");
     }
@@ -88,8 +89,6 @@ function test(numberOfExperiments) {
     const server = new Client();
     const client = new Client();
 
-    const eventEmitter = new events.EventEmitter();
-
     let experimentIndex = 0;
 
     server.on('ready', () => {
@@ -100,22 +99,25 @@ function test(numberOfExperiments) {
     }).connect(serverConfig);
 
     client.on('ready', () => {
+        console.log("Cliente conectado e pronto");
         eventEmitter.on("start client", () => experiment(client, eventEmitter));
         eventEmitter.on("close connections", () => client.end());
     }).connect(clientConfig);
 
     eventEmitter.on("experiment finished", () => {
-        if (experimentIndex < numberOfExperiments) {
-            experimentIndex++;
-            console.log(`Experiment number ${experimentIndex}`);
-            eventEmitter.emit("start server");
-        } else {
-            eventEmitter.emit("close connections")
+        experimentIndex++;
+
+        if (experimentIndex > numberOfExperiments) {
+            eventEmitter.emit("close connections");
+            return;
         }
+
+        console.log(`Experiment number ${experimentIndex}`);
+        eventEmitter.emit("start server");
     })
 }
 
-async function configNetwork(config, value) {
+function configNetwork(config, value, eventEmitter) {
     const clientConfig = {
         host: '10.16.1.1',
         username: 'wasm',
@@ -136,6 +138,11 @@ async function configNetwork(config, value) {
                 }
             });
 
+            stream.on('close', () => {
+                console.log("Configuração de rede encerrada")
+                eventEmitter.emit("network configured");
+            });
+
             stream.stderr.on('data', (data) => {
                 throw new Error(data.toString());
             });
@@ -154,6 +161,41 @@ async function configNetwork(config, value) {
 }
 
 (async () => {
-    await configNetwork("rate", "750Mbps");
-    test(3);
+    const eventEmitter = new events.EventEmitter();
+    const numberOfExperiments = 3;
+
+    const networkConfig = [
+        {
+            name: "rate",
+            values: [
+                "750Mbps",
+                "500Mbps",
+                "100Mbps",
+            ]
+        }
+    ]
+
+    eventEmitter.on("network configured", () => test(numberOfExperiments, eventEmitter));
+
+    let networkIndex = 0;
+    let networkValueIndex = 0;
+
+    eventEmitter.on("close connections", () => {
+        networkValueIndex++;
+
+        if (networkValueIndex >= networkConfig[networkIndex].values.length) {
+            networkValueIndex = 0;
+            networkIndex++;
+        }
+
+        if (networkIndex < networkConfig.length) {
+            const { name, values } = networkConfig[networkIndex];
+            const value = values[networkValueIndex];
+            const experimentalEvents = new events.EventEmitter();
+            configNetwork(name, value, experimentalEvents);
+        }
+    });
+
+    const initialNetwork = networkConfig[networkIndex];
+    configNetwork(initialNetwork.name, initialNetwork.values[networkValueIndex], eventEmitter);
 })()
