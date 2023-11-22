@@ -146,6 +146,7 @@ function startServer(server, eventEmitter) {
 
         eventEmitter.on("close server", () => {
             stream.write('\x03');
+            eventEmitter.emit("experiment finished")
         });
 
     });
@@ -169,8 +170,12 @@ function startServer(server, eventEmitter) {
 
     const eventEmitter = new events.EventEmitter();
 
+    const numberOfExperiments = 3;
+    let experimentIndex = 0;
+
     server.on('ready', () => {
         eventEmitter.on('start server', () => startServer(server, eventEmitter))
+        experimentIndex++;
         eventEmitter.emit('start server')
     }).connect(serverConfig);
 
@@ -179,5 +184,13 @@ function startServer(server, eventEmitter) {
         eventEmitter.on("close connections", () => client.end());
     }).connect(clientConfig);
 
+    eventEmitter.on("experiment finished", () => {
+        if(experimentIndex <= numberOfExperiments) {
+            experimentIndex++;
+            eventEmitter.emit("start server");
+        } else {
+            eventEmitter.emit("close connections")
+        }
+    })
 
 })()
