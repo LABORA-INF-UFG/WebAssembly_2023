@@ -23,7 +23,7 @@ function experiment(client, eventEmitter) {
             throw new Error(data.toString());
         });
 
-        stream.on('close', (code, signal) => {
+        stream.on('close', () => {
             eventEmitter.emit("close server");
         })
     });
@@ -104,7 +104,7 @@ function test(numberOfExperiments, networkEvents) {
     client.on('ready', () => {
         experimentEvents.on("start client", () => experiment(client, experimentEvents));
         experimentEvents.on("close connections", () => {
-            client.end()
+            client.end();
             networkEvents.emit("new network");
         });
     }).connect(clientConfig);
@@ -122,7 +122,7 @@ function test(numberOfExperiments, networkEvents) {
     })
 }
 
-function configNetwork(config, value, networkEvents) {
+function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
     const clientConfig = {
         host: '10.16.1.1',
         username: 'wasm',
@@ -142,7 +142,7 @@ function configNetwork(config, value, networkEvents) {
                     process.stdout.write(message);
                 }
 
-                if(message.trim() === "exit") {
+                if (message.trim() === "exit") {
                     process.stdout.write(`Rede configurada ${config} ${value}\n`)
                     networkEvents.emit("network configured");
                 }
@@ -157,17 +157,18 @@ function configNetwork(config, value, networkEvents) {
             stream.run("sudo su");
             stream.run("aula123");
             await sleep(500);
-            stream.run(`sudo tcdel eno1 --all`);
-            stream.run(`sudo tcset eno1 --${config} ${value}`);
-            stream.run("sudo tcshow eno1");
-            stream.end("exit\n");
+            stream.run(`mv Downloads/* planilhas/${lastConfig}/${lastValue}`);
+            stream.run(`tcdel eno1 --all`);
+            stream.run(`tcset eno1 --${config} ${value}`);
+            stream.run("tcshow eno1");
+            stream.run("exit");
         });
     }).connect(clientConfig);
 }
 
 (async () => {
     const networkEvents = new events.EventEmitter();
-    const numberOfExperiments = 1;
+    const numberOfExperiments = 10;
 
     const networkConfig = [
         {
@@ -184,24 +185,36 @@ function configNetwork(config, value, networkEvents) {
 
     let networkIndex = 0;
     let networkValueIndex = 0;
+    let lastName = "";
+    let lastValue = "";
 
     networkEvents.on("new network", () => {
         networkValueIndex++;
+
+        if (!networkConfig[networkIndex]) {
+            exit(0);
+        }
 
         if (networkValueIndex >= networkConfig[networkIndex].values.length) {
             networkValueIndex = 0;
             networkIndex++;
         }
 
-        if (networkIndex >= networkConfig.length) {
-            exit(0);
+        if (networkIndex === networkConfig.length) {
+            configNetwork("rate", "1Gbps", networkEvents, lastName, lastValue);
+            return;
         }
 
         const { name, values } = networkConfig[networkIndex];
         const value = values[networkValueIndex];
-        configNetwork(name, value, networkEvents);
+        console.log(lastName, lastValue);
+        configNetwork(name, value, networkEvents, lastName, lastValue);
+        lastName = name;
+        lastValue = value;
     });
 
     const initialNetwork = networkConfig[networkIndex];
-    configNetwork(initialNetwork.name, initialNetwork.values[networkValueIndex], networkEvents);
+    configNetwork(initialNetwork.name, initialNetwork.values[networkValueIndex], networkEvents, lastName, lastValue);
+    lastName = initialNetwork.name;
+    lastValue = initialNetwork.values[networkIndex];
 })()
