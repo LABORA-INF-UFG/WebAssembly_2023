@@ -125,13 +125,13 @@ async function configNetwork() {
     const client = new Client();
 
     client.on('ready', () => {
-        client.shell((err, stream) => {
+        client.shell(async (err, stream) => {
             if (err) throw err;
 
             stream.on('data', (data) => {
                 const message = data.toString();
 
-                if (!message.includes("wasm@wasm-ater06")) {
+                if (!message.includes("@wasm-OptiPlex-7010")) {
                     process.stdout.write(data.toString());
                 }
             });
@@ -142,10 +142,13 @@ async function configNetwork() {
 
             stream.run = (command) => stream.write(command + '\n')
 
-            stream.run("sudo tcdel eth0 --all")
-
-
-
+	    stream.run("sudo su");
+	    await sleep(500);
+	    stream.run("aula123");
+	    await sleep(500);
+            stream.run("tcdel eno1 --all");
+	    stream.run("tcset eno1 --rate 100Kbps");
+	    client.end();
         });
     }).connect(clientConfig);
 }
