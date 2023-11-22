@@ -125,20 +125,29 @@ async function configNetwork() {
     const client = new Client();
 
     client.on('ready', () => {
-        client.exec('echo aula123 | sudo tcdel eno1 --all', { pty: true }, (err, stream) => {
+        client.shell((err, stream) => {
             if (err) throw err;
-    
+
             stream.on('data', (data) => {
-                process.stdout.write(data.toString());
-            })
-    
+                const message = data.toString();
+
+                if (!message.includes("wasm@wasm-ater06")) {
+                    process.stdout.write(data.toString());
+                }
+            });
+
             stream.stderr.on('data', (data) => {
                 throw new Error(data.toString());
             });
+
+            stream.run = (command) => stream.write(command + '\n')
+
+            stream.run("sudo tcdel eth0 --all")
+
+
+
         });
     }).connect(clientConfig);
-
-    await exec("tcdel eth0 --all")
 }
 
 (async () => {
