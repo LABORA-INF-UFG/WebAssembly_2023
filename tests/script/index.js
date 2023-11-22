@@ -1,65 +1,12 @@
 const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
-const { spawn } = require('node:child_process');
 const { Client } = require('ssh2');
 var events = require('events');
-const exp = require('constants');
-
-async function getGitUser() {
-    const nameOutput = await exec('git config --global user.name')
-    const emailOutput = await exec('git config --global user.email')
-
-    return {
-        name: nameOutput.stdout.trim(),
-        email: emailOutput.stdout.trim()
-    }
-};
-
-async function getProcessStatus() {
-    const processStatus = await exec('ps');
-
-    return processStatus.stdout
-        .trim()
-        .split('\n')
-        .filter((value, index) => index > 0)
-        .map(processStr => processStr
-            .trim()
-            .split(' ')
-        )
-        .map(processArray => {
-            return {
-                pid: processArray[0],
-                tty: processArray[1],
-                time: processArray[5],
-                cmd: processArray[6],
-                params: processArray[7]
-            }
-        });
-};
-
-async function getCurrentDirectory() {
-    const currentDirectory = await exec('pwd')
-
-    return currentDirectory.stdout.trim();
-};
-
-function changeDirectory(path) {
-    process.chdir(path)
-}
-
-async function kill(pid) {
-    await exec('kill -9 ' + pid);
-}
 
 async function sleep(time) {
     await new Promise(resolve => setTimeout(resolve, time));
 }
 
-// const serverPath = '/mnt/c/Users/mathe/Programming/WebAssembly_2023/offloading/server';
-// const clientPath = '/mnt/c/Users/mathe/Programming/WebAssembly_2023/tests/puppeteer';
-
-const serverPath = 'C:\\Users\\mathe\\Programming\\WebAssembly_2023\\offloading\\server';
-const clientPath = 'C:\\Users\\mathe\\Programming\\WebAssembly_2023\\tests\\puppeteer';
 const sshPath = '/home/matheus/.ssh/id_rsa';
 
 /**
