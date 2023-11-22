@@ -133,16 +133,18 @@ function startServer(server, eventEmitter) {
         stream.stderr.on('data', (data) => {
             throw new Error(data.toString());
         });
+        stream.run = (command) => stream.write(command + '\n')
+
+        stream.run('cd Documents/WebAssembly_2023/offloading/server');
 
         eventEmitter.on("close connections", () => {
             stream.write('\x03');
             server.end()
         });
         
-        stream.run = (command) => stream.write(command + '\n')
-        
-        stream.run('cd Documents/WebAssembly_2023/offloading/server');
-        stream.run('node index.js');
+        eventEmitter.on("start server", () => {
+            stream.run('node index.js');
+        });
 
         eventEmitter.on("close server", () => {
             stream.write('\x03');
@@ -174,7 +176,7 @@ function startServer(server, eventEmitter) {
     let experimentIndex = 0;
 
     server.on('ready', () => {
-        eventEmitter.on('start server', () => startServer(server, eventEmitter))
+        startServer(server, eventEmitter);
         experimentIndex++;
         eventEmitter.emit('start server')
     }).connect(serverConfig);
