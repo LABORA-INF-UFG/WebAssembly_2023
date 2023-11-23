@@ -4,9 +4,8 @@ async function sleep(time) {
 }
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false, defaultViewport: null });
+    const browser = await puppeteer.launch({ headless: 'new', defaultViewport: null });
     const page = await browser.newPage();
-    // await page.setViewport({ width: 1080, height: 1024 });
 
     await page.exposeFunction('endExperiment', async () => {
         await sleep(1000);
