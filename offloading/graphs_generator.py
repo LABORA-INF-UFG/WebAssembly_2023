@@ -2,9 +2,11 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import numpy as np
+import math
 
 def gen_local_statistics(local_statistic_path, labels):
-
+    z = 1.96
     arr = []
     
     for filename in os.listdir(local_statistic_path):
@@ -16,16 +18,28 @@ def gen_local_statistics(local_statistic_path, labels):
         
         arr.append(df[labels])        
     try:
-        statistics = pd.concat(arr, ignore_index=True).mean().to_frame().transpose()
+        statistics = pd.concat(arr, ignore_index=True).describe().T
+        statistics = statistics[['mean', 'std', 'count']]
+        interval = z * statistics['std']/np.sqrt(statistics['count'])
+        
+        statistics['upper'] = statistics['mean'] + interval
+        statistics['lower'] = statistics['mean'] - interval
+        
+        statistics = statistics.T
+
     except:
-        statistics = pd.DataFrame(columns=labels)
+        statistics = pd.DataFrame(columns = labels)
+    
+    
     
     return statistics
     
+
     
 def gen_formated_data(offloading_statistics_path, labels): 
-    mean = {}
-
+    cases = {}
+    z= 1.96
+    
     for case in os.listdir(offloading_statistics_path):
         case_path = os.path.join(offloading_statistics_path, case)
         arr = []
@@ -40,17 +54,24 @@ def gen_formated_data(offloading_statistics_path, labels):
             arr.append(df[labels])
 
         try:
-            data = pd.concat(arr, ignore_index=True).mean().to_frame().transpose()
+        
+            data = pd.concat(arr, ignore_index=True).describe().T
+            data = data[['mean', 'std', 'count']]
+            interval = z * data['std']/np.sqrt(data['count'])
+
+            data['upper'] = data['mean'] + interval
+            data['lower'] = data['mean'] - interval
+            data = data.T
             
         except:
             data = pd.DataFrame(columns= labels)
 
-        mean[float(case)] = data
+        cases[float(case)] = data
     
         
-    mean = dict(sorted(mean.items()))  
+    cases = dict(sorted(cases.items()))  
     
-    return mean
+    return cases
     
     
 def gen_all_data_graph(statistic, raw_data, local_statistics, legend):
@@ -90,26 +111,8 @@ def gen_all_data_graph(statistic, raw_data, local_statistics, legend):
 
 def gen_pair_graphs(pair, raw_data, local_statistics, statistic):
     data = {}
+    fig, ax = plt.subplots(figsize=(13, 6))  
 
-    for key in raw_data.keys():    
-        data[key] = raw_data[key].copy(deep= True)
-        data[key] = pd.concat([data[key], local_statistics], axis=1)
-        data[key] = data[key][pair]
-        data[key] = data[key].T.drop_duplicates().T    
-    
-    fig, ax = plt.subplots(figsize=(12, 6))  
-  
-    for label in pair:
-        x = list(data.keys())
-        y = [data[key][label] for key in x]
-        plt.xticks(x)
-
-        ax.plot(x, y, marker='o', label=label)       
-        
-    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
-    
-    ax.legend() 
-     
     if pair[0] == 'FPSOffloading':
         plt.ylabel('FPS')
     else:
@@ -117,11 +120,54 @@ def gen_pair_graphs(pair, raw_data, local_statistics, statistic):
     
     if statistic == 'bandwidth':
         plt.xlabel("Bandwidth(Mbps)")
+        horizontal_line_width=10
     if statistic == 'delay':
+        horizontal_line_width=1
         plt.xlabel("Delay(ms)")
     if statistic == 'packetloss':
         plt.xlabel("Packetloss(%)")
+        horizontal_line_width=0.05
     
+    for key in raw_data.keys():    
+        data[key] = raw_data[key].copy(deep= True)
+        data[key] = pd.concat([data[key], local_statistics], axis=1)
+        data[key] = data[key][pair]
+        data[key] = data[key].T.drop_duplicates().T    
+    
+    arr_max_top = []
+    
+    for label in pair:
+        
+        if label.find('Local') == -1:
+            color = '#ff8c00'
+            legend = 'Offloading'
+        else:
+            color = '#2b35af'
+            legend = 'Local'
+       
+        x = data.keys()
+        y = [data[key][label]['mean'] for key in x]
+         
+        ax.plot(x, y, marker='o', label=legend, color = color, linestyle='--')       
+        plt.xticks(list(data.keys()))
+        
+        for key in data.keys():
+            left = key - horizontal_line_width/2
+            right = key + horizontal_line_width/2
+            bottom = data[key][label]['lower']
+            top = data[key][label]['upper']
+            plt.plot([key, key], [top, bottom], color = color)
+            plt.plot([left, right], [top, top], color = color)
+            plt.plot([left, right], [bottom, bottom], color = color)       
+
+            arr_max_top.append(0 if math.isnan(top) else top)
+
+    plt.ylim([0, max(arr_max_top) + 0.5])    
+    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+    
+    ax.legend() 
+     
+   
     if pair[0] == 'FPSOffloading':
         plt.savefig(f'./graphs/{statistic}_FPS.png')
     elif pair[0] == 'serverTimeOffloading':
@@ -147,7 +193,6 @@ def main():
             ]
     
     local_statistics = gen_local_statistics(local_statistic_path, local_labels)
-
     #fullLegend = offloading_labels + local_statistics.columns.tolist()
     
     #fullLegend.remove('FPSOffloading')
@@ -157,10 +202,9 @@ def main():
         statistic_path = os.path.join(offloading_path, statistic)
         
         data = gen_formated_data(statistic_path, offloading_labels)
-        gen_all_data_graph(statistic, data, local_statistics, ['serverTimeOffloading', 'slamTimeOffloading', 'streamingTimeOffloading', 'renderTimeOffloading', 'videoTimeOffloading'])
+       # gen_all_data_graph(statistic, data, local_statistics, ['serverTimeOffloading', 'slamTimeOffloading', 'streamingTimeOffloading', 'renderTimeOffloading', 'videoTimeOffloading'])
         
-                  
-                      
+                    
         for pair in pairMatrix:
             gen_pair_graphs(pair, data, local_statistics, statistic)        
         
