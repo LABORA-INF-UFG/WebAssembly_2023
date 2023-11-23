@@ -112,6 +112,7 @@ def gen_all_data_graph(statistic, raw_data, local_statistics, legend):
 def gen_pair_graphs(pair, raw_data, local_statistics, statistic):
     data = {}
     fig, ax = plt.subplots(figsize=(13, 6))  
+    ax.grid(axis='y')
 
     if pair[0] == 'FPSOffloading':
         plt.ylabel('FPS')
