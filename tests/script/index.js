@@ -155,8 +155,9 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
             stream.run = (command) => stream.write(command + '\n')
 
             stream.run("sudo su");
+            await sleep(1000);
             stream.run("aula123");
-            await sleep(500);
+            await sleep(1000);
             stream.run(`mv Downloads/* planilhas/${lastConfig}/${lastValue}`);
             stream.run(`tcdel eno1 --all`);
             stream.run(`tcset eno1 --${config} ${value}`);
