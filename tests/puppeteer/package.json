@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
-    "puppeteer": "^21.5.2"
+    "puppeteer": "^21.5.2",
+    "puppeteer-utilz": "^4.0.8"
   }
 }
