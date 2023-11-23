@@ -66,6 +66,13 @@ def gen_formated_data(offloading_statistics_path, labels):
         except:
             data = pd.DataFrame(columns= labels)
 
+        if case.find('%') != -1:
+            case = case.replace('%', '')
+        elif case.find('ms') != -1:
+            case = case.replace('ms', '')
+        elif case.find('Mbps') != -1:
+            case = case.replace('Mbps', '')    
+            
         cases[float(case)] = data
     
         
@@ -76,35 +83,44 @@ def gen_formated_data(offloading_statistics_path, labels):
     
 def gen_all_data_graph(statistic, raw_data, local_statistics, legend):
     data = {}
+    fig, ax = plt.subplots(figsize=(12, 8))    
+    ax.grid(axis='y')
+
+    if statistic == 'rate':
+        plt.xlabel("Bandwidth(Mbps)")
+        column_width = 20
+    if statistic == 'delay':
+        plt.xlabel("Delay(ms)")
+        column_width = 2
+
+    if statistic == 'loss':
+        plt.xlabel("Packetloss(%)")
+        column_width = 0.5
+
     
     for key in raw_data.keys():    
         data[key] = raw_data[key].copy(deep= True)
         data[key] = pd.concat([data[key], local_statistics], axis=1)
         data[key].drop(columns = local_statistics.columns, inplace= True)
         data[key].drop(columns = 'FPSOffloading', inplace= True)
-
         
-    fig, ax = plt.subplots(figsize=(12, 8))    
-
+        data[key].rename(columns= {'slamTimeOffloading': 'Slam', 'renderTimeOffloading':'Render','videoTimeOffloading':'Video', 'streamingTimeOffloading':'Network'} ,inplace = True)
+    bottom = np.zeros(len(data.keys()))
+    
     for label in legend:
         x = list(data.keys())
-        y = [data[key][label] for key in x]
+        y = [data[key][label]['mean'] for key in x]
+        y = np.array([0 if math.isnan(item) else item for item in y])
         plt.xticks(x)
-        ax.plot(x, y, marker='o', label=label)
-  
+        ax.bar(x, y, label=label, bottom= bottom, width= column_width)
+        bottom += y
+    
+    plt.ylim([0, max(bottom) + 5])    
     ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
     
     ax.legend() 
 
     plt.ylabel("Time(ms)")
-
-
-    if statistic == 'bandwidth':
-        plt.xlabel("Bandwidth(Mbps)")
-    if statistic == 'delay':
-        plt.xlabel("Delay(ms)")
-    if statistic == 'packetloss':
-        plt.xlabel("Packetloss(%)")
     
     plt.savefig(f'./graphs/{statistic}.png')
 
@@ -119,13 +135,13 @@ def gen_pair_graphs(pair, raw_data, local_statistics, statistic):
     else:
         plt.ylabel('Time(ms)')
     
-    if statistic == 'bandwidth':
+    if statistic == 'rate':
         plt.xlabel("Bandwidth(Mbps)")
         horizontal_line_width=10
     if statistic == 'delay':
         horizontal_line_width=1
         plt.xlabel("Delay(ms)")
-    if statistic == 'packetloss':
+    if statistic == 'loss':
         plt.xlabel("Packetloss(%)")
         horizontal_line_width=0.05
     
@@ -194,16 +210,13 @@ def main():
             ]
     
     local_statistics = gen_local_statistics(local_statistic_path, local_labels)
-    #fullLegend = offloading_labels + local_statistics.columns.tolist()
     
-    #fullLegend.remove('FPSOffloading')
-    #fullLegend.remove('FPSLocal')
     
     for statistic in os.listdir(offloading_path):
         statistic_path = os.path.join(offloading_path, statistic)
         
         data = gen_formated_data(statistic_path, offloading_labels)
-       # gen_all_data_graph(statistic, data, local_statistics, ['serverTimeOffloading', 'slamTimeOffloading', 'streamingTimeOffloading', 'renderTimeOffloading', 'videoTimeOffloading'])
+        gen_all_data_graph(statistic, data, local_statistics, ['Slam', 'Network', 'Render', 'Video'])
         
                     
         for pair in pairMatrix:
@@ -211,8 +224,5 @@ def main():
         
 
         
-
-  
-    
 if __name__ == "__main__":
     main()
