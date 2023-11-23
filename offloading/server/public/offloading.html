@@ -138,7 +138,7 @@
     }
 
     async function main() {
-      const media = await Video.Initialize('/videos/video-short.mp4');
+      const media = await Video.Initialize('/videos/video-60.mp4');
 
       const socketPromise = initializeServer(serverUrl, media.width, media.height);
 

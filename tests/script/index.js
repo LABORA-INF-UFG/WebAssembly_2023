@@ -8,8 +8,8 @@ async function sleep(time) {
     await new Promise(resolve => setTimeout(resolve, time));
 }
 
-// const sshPath = '/home/matheus/.ssh/id_rsa';
-const sshPath = "C:\\Users\\mathe\\.ssh\\id_rsa";
+const sshPath = '/home/matheus/.ssh/id_rsa';
+// const sshPath = "C:\\Users\\mathe\\.ssh\\id_rsa";
 
 function experiment(client, eventEmitter) {
     client.exec('.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/tests/puppeteer/index.js', (err, stream) => {
@@ -168,7 +168,7 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
 
 (async () => {
     const networkEvents = new events.EventEmitter();
-    const numberOfExperiments = 1;
+    const numberOfExperiments = 10;
 
     const networkConfig = [
         {
