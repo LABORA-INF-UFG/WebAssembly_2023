@@ -168,7 +168,7 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
 
 (async () => {
     const networkEvents = new events.EventEmitter();
-    const numberOfExperiments = 30;
+    const numberOfExperiments = 1;
 
     const networkConfig = [
         {
