@@ -168,15 +168,40 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
 
 (async () => {
     const networkEvents = new events.EventEmitter();
-    const numberOfExperiments = 10;
+    const numberOfExperiments = 30;
 
     const networkConfig = [
         {
             name: "rate",
             values: [
-                "750Mbps",
-                "500Mbps",
+                "25Mbps",
+                "50Mbps",
                 "100Mbps",
+                "200Mbps",
+                "400Mbps",
+                "800Mbps",
+            ]
+        },
+        {
+            name: "delay",
+            values: [
+                "2.5ms",
+                "5ms",
+                "10ms",
+                "20ms",
+                "40ms",
+                "80ms",
+            ]
+        },
+        {
+            name: "loss",
+            values: [
+                "1%",
+                "2%",
+                "3%",
+                "4%",
+                "5%",
+                "6%",
             ]
         }
     ]
