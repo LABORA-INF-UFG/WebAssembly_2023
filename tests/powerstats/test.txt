@@ -1,0 +1,2 @@
+Device is not discharging, cannot measure power usage.
+Perhaps re-run with -z (ignore zero power) or -R (RAPL)
