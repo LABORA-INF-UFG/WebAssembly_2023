@@ -121,7 +121,7 @@
                 ['FPSLocal','slamTimeLocal', 'renderTimeLocal', 'videoTimeLocal', 'clientMemoryUsageLocal']
             ];
 
-            const media = await Video.Initialize('/videos/video-short.mp4');
+            const media = await Video.Initialize('/videos/video-60.mp4');
             const alva = await AlvaAR.Initialize(media.width, media.height);
 
             const $cam = document.getElementById('renderer-cam');
@@ -209,19 +209,19 @@
                 ]);
 
                 if (!videoHasEnded) {
-                    media.el.requestVideoFrameCallback(processFrame)
-                    //onFrame(processFrame, 30)
+                    // media.el.requestVideoFrameCallback(processFrame);
+                    onFrame(processFrame, 30);
                 }
 
-                // return !videoHasEnded;
+                return !videoHasEnded;
             };
 
             media.el.play();
             media.el.loop = false;
             window.dispatchEvent(eventStart);
             startFps = performance.now();
-            media.el.requestVideoFrameCallback(processFrame)
-            //onFrame(processFrame, 30);
+            // media.el.requestVideoFrameCallback(processFrame)
+            onFrame(processFrame, 30);
         }
 
 
