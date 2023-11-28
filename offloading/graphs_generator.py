@@ -49,11 +49,11 @@ def gen_formated_data(offloading_statistics_path, labels):
     cases = dict(sorted(cases.items()))  
     
     return cases
-    
-    
-def gen_all_data_graph(statistic, offlaoding_data, local_data, legend):
-    data = {}
+
+def gen_bar_plot(statistic, raw_data, case, legend):
     fig, ax = plt.subplots(figsize=(12, 8))    
+    data = {}
+    
     ax.grid(axis='y')
 
     if statistic == 'rate':
@@ -66,19 +66,16 @@ def gen_all_data_graph(statistic, offlaoding_data, local_data, legend):
     if statistic == 'loss':
         plt.xlabel("Packetloss(%)")
         column_width = 0.5
-
     
-    for key in offlaoding_data.keys():    
-        data[key] = offlaoding_data[key].copy(deep= True)
-        data[key] = pd.concat([data[key], local_data[key]], axis=1)
-        data[key].drop(columns = local_data[key].columns, inplace= True)
-        data[key].drop(columns = 'FPSOffloading', inplace= True)
+    for key in raw_data.keys():    
+        data[key] = raw_data[key].copy(deep= True)
+        data[key] = data[key][list(legend.keys())]
+        data[key].rename(columns = legend ,inplace = True)
         
-        data[key].rename(columns= {'slamTimeOffloading': 'Slam', 'renderTimeOffloading':'Render','videoTimeOffloading':'Video', 'streamingTimeOffloading':'Network'} ,inplace = True)
     
     bottom = np.zeros(len(data.keys()))
     
-    for label in legend:
+    for label in legend.values():
         x = list(data.keys())
         y = [data[key][label]['mean'] for key in x]
         y = np.array([0 if math.isnan(item) else item for item in y])
@@ -93,7 +90,7 @@ def gen_all_data_graph(statistic, offlaoding_data, local_data, legend):
 
     plt.ylabel("Time(ms)")
     
-    plt.savefig(f'./graphs/{statistic}.png')
+    plt.savefig(f'./graphs/{statistic}_{case}.png')
 
 
 def gen_pair_graphs(pair, offloading_data, local_data, statistic):
@@ -191,8 +188,9 @@ def main():
         offloading_data = gen_formated_data(offloading_statistic_path, offloading_labels)
         local_data = gen_formated_data(local_statistic_path, local_labels)
         
-        gen_all_data_graph(statistic, offloading_data, local_data, ['Slam', 'Network', 'Render', 'Video'])
-        
+        gen_bar_plot(statistic, offloading_data, 'offloading', {'slamTimeOffloading': 'Slam', 'renderTimeOffloading':'Render','videoTimeOffloading':'Video', 'streamingTimeOffloading':'Network'})
+        gen_bar_plot(statistic, local_data, 'local', {'slamTimeLocal': 'Slam', 'renderTimeLocal':'Render','videoTimeLocal':'Video'})
+
         for pair in pairMatrix:
             gen_pair_graphs(pair, offloading_data, local_data, statistic)        
         
