@@ -143,7 +143,7 @@
       const socketPromise = initializeServer(serverUrl, media.width, media.height);
 
       let statistics = [
-        ['FPSOffloading','serverTimeOffloading', 'slamTimeOffloading', 'streamingTimeOffloading', 'renderTimeOffloading', 'videoTimeOffloading', 'clientMemoryUsageOffloading', 'serverMemoryUsageOffloading', 'requestSizeOffloading', 'responseSizeOffloading']
+        ['FPSOffloading', 'serverTimeOffloading', 'slamTimeOffloading', 'streamingTimeOffloading', 'renderTimeOffloading', 'videoTimeOffloading', 'clientMemoryUsageOffloading', 'serverMemoryUsageOffloading', 'requestSizeOffloading', 'responseSizeOffloading']
       ];
 
       const $cam = document.getElementById('renderer-cam');
@@ -161,7 +161,7 @@
       let addCube = false;
 
       const socket = await socketPromise;
-      
+
       let startFps = null;
 
       const processFrame = async (now, frameMetadata) => {
@@ -169,7 +169,7 @@
         const totalFps = endFps - startFps;
 
         const FPS = 1000 / (endFps - startFps);
-        
+
         startFps = performance.now()
 
         const startVideoTime = performance.now();
@@ -268,8 +268,10 @@
 
         if (!videoHasEnded) {
           media.el.requestVideoFrameCallback(processFrame);
+          onFrame(processFrame, 30);
         }
 
+        return !videoHasEnded;
       }
 
       if (socket) {
@@ -292,8 +294,8 @@
 
         window.dispatchEvent(eventStart);
         startFps = performance.now();
-        media.el.requestVideoFrameCallback(processFrame);
-        // onFrame(processFrame, 30);
+        // media.el.requestVideoFrameCallback(processFrame);
+        onFrame(processFrame, 30);
       }
 
     }
