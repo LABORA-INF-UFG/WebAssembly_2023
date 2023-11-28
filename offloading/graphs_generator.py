@@ -5,36 +5,6 @@ import matplotlib.ticker as ticker
 import numpy as np
 import math
 
-def gen_local_statistics(local_statistic_path, labels):
-    z = 1.96
-    arr = []
-    
-    for filename in os.listdir(local_statistic_path):
-        df = pd.DataFrame(columns= labels)
-      
-        if filename.endswith('.csv'):
-            file_path = os.path.join(local_statistic_path, filename)
-            df = pd.read_csv(file_path)    
-        
-        arr.append(df[labels])        
-    try:
-        statistics = pd.concat(arr, ignore_index=True).describe().T
-        statistics = statistics[['mean', 'std', 'count']]
-        interval = z * statistics['std']/np.sqrt(statistics['count'])
-        
-        statistics['upper'] = statistics['mean'] + interval
-        statistics['lower'] = statistics['mean'] - interval
-        
-        statistics = statistics.T
-
-    except:
-        statistics = pd.DataFrame(columns = labels)
-    
-    
-    
-    return statistics
-    
-
     
 def gen_formated_data(offloading_statistics_path, labels): 
     cases = {}
@@ -81,7 +51,7 @@ def gen_formated_data(offloading_statistics_path, labels):
     return cases
     
     
-def gen_all_data_graph(statistic, raw_data, local_statistics, legend):
+def gen_all_data_graph(statistic, offlaoding_data, local_data, legend):
     data = {}
     fig, ax = plt.subplots(figsize=(12, 8))    
     ax.grid(axis='y')
@@ -98,13 +68,14 @@ def gen_all_data_graph(statistic, raw_data, local_statistics, legend):
         column_width = 0.5
 
     
-    for key in raw_data.keys():    
-        data[key] = raw_data[key].copy(deep= True)
-        data[key] = pd.concat([data[key], local_statistics], axis=1)
-        data[key].drop(columns = local_statistics.columns, inplace= True)
+    for key in offlaoding_data.keys():    
+        data[key] = offlaoding_data[key].copy(deep= True)
+        data[key] = pd.concat([data[key], local_data[key]], axis=1)
+        data[key].drop(columns = local_data[key].columns, inplace= True)
         data[key].drop(columns = 'FPSOffloading', inplace= True)
         
         data[key].rename(columns= {'slamTimeOffloading': 'Slam', 'renderTimeOffloading':'Render','videoTimeOffloading':'Video', 'streamingTimeOffloading':'Network'} ,inplace = True)
+    
     bottom = np.zeros(len(data.keys()))
     
     for label in legend:
@@ -125,7 +96,7 @@ def gen_all_data_graph(statistic, raw_data, local_statistics, legend):
     plt.savefig(f'./graphs/{statistic}.png')
 
 
-def gen_pair_graphs(pair, raw_data, local_statistics, statistic):
+def gen_pair_graphs(pair, offloading_data, local_data, statistic):
     data = {}
     fig, ax = plt.subplots(figsize=(13, 6))  
     ax.grid(axis='y')
@@ -145,9 +116,9 @@ def gen_pair_graphs(pair, raw_data, local_statistics, statistic):
         plt.xlabel("Packetloss(%)")
         horizontal_line_width=0.05
     
-    for key in raw_data.keys():    
-        data[key] = raw_data[key].copy(deep= True)
-        data[key] = pd.concat([data[key], local_statistics], axis=1)
+    for key in offloading_data.keys():    
+        data[key] = offloading_data[key].copy(deep= True)
+        data[key] = pd.concat([data[key], local_data[key]], axis=1)
         data[key] = data[key][pair]
         data[key] = data[key].T.drop_duplicates().T    
     
@@ -164,7 +135,7 @@ def gen_pair_graphs(pair, raw_data, local_statistics, statistic):
        
         x = data.keys()
         y = [data[key][label]['mean'] for key in x]
-         
+       
         ax.plot(x, y, marker='o', label=legend, color = color, linestyle='--')       
         plt.xticks(list(data.keys()))
         
@@ -196,7 +167,9 @@ def gen_pair_graphs(pair, raw_data, local_statistics, statistic):
         
 
 def main():
-    local_statistic_path = './dataLocal'
+    statistics = ['rate', 'loss', 'delay']
+
+    local_path = './dataLocal'
     local_labels = ['FPSLocal','slamTimeLocal', 'renderTimeLocal', 'videoTimeLocal']
     
     offloading_path = './dataOffloading'
@@ -209,18 +182,19 @@ def main():
             ['videoTimeOffloading', 'videoTimeLocal']
             ]
     
-    local_statistics = gen_local_statistics(local_statistic_path, local_labels)
     
     
-    for statistic in os.listdir(offloading_path):
-        statistic_path = os.path.join(offloading_path, statistic)
+    for statistic in statistics:
+        offloading_statistic_path = os.path.join(offloading_path, statistic)
+        local_statistic_path = os.path.join(local_path, statistic)
         
-        data = gen_formated_data(statistic_path, offloading_labels)
-        gen_all_data_graph(statistic, data, local_statistics, ['Slam', 'Network', 'Render', 'Video'])
+        offloading_data = gen_formated_data(offloading_statistic_path, offloading_labels)
+        local_data = gen_formated_data(local_statistic_path, local_labels)
         
-                    
+        gen_all_data_graph(statistic, offloading_data, local_data, ['Slam', 'Network', 'Render', 'Video'])
+        
         for pair in pairMatrix:
-            gen_pair_graphs(pair, data, local_statistics, statistic)        
+            gen_pair_graphs(pair, offloading_data, local_data, statistic)        
         
 
         
