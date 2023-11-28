@@ -1,6 +1,5 @@
 const process = require('process'); 
 
-const usageStart = process.cpuUsage(); 
 
 const puppeteer = require('puppeteer');
 const { spawn } = require('child_process');
@@ -15,12 +14,18 @@ async function sleep(time) {
 }
 
 async function measurePowerConsumption() {
+    const usageStart = process.cpuUsage(); 
+
     // Create write stream
 
     const logStream = fs.createWriteStream('test.txt');
 
-    // Start powerstat
-    const powerstat = spawn('sudo', ['powerstat','-d', '0', '1', '-R']);
+    const password = 'sua_senha'; // replace with your password
+    const command = 'powerstat -d 0 1 -R'; // replace with your command
+
+    const powerstat = spawn('sh', ['-c', `echo ${password} | sudo -S ${command}`]);
+
+    
 
     // Pipe powerstat output to log file
     powerstat.stdout.pipe(logStream);
