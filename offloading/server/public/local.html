@@ -208,10 +208,9 @@
                     FPS, totalSlamTime, totalRenderTime, totalVideoTime, clientMemoryUsage
                 ]);
 
-                if (!videoHasEnded) {
-                    // media.el.requestVideoFrameCallback(processFrame);
-                    onFrame(processFrame, 30);
-                }
+                // if (!videoHasEnded) {
+                //     media.el.requestVideoFrameCallback(processFrame);
+                // }
 
                 return !videoHasEnded;
             };

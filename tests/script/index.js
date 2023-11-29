@@ -1,18 +1,20 @@
-const { promisify } = require('util');
-const exec = promisify(require('child_process').exec);
 const { Client } = require('ssh2');
 var events = require('events');
 const { exit } = require('process');
+const fs = require('fs');
 
 async function sleep(time) {
     await new Promise(resolve => setTimeout(resolve, time));
 }
 
 const sshPath = '/home/matheus/.ssh/id_rsa';
+// const sshPath = '/home/matheus-lucas/.ssh/id_rsa';
 // const sshPath = "C:\\Users\\mathe\\.ssh\\id_rsa";
 
 function experiment(client, eventEmitter) {
-    client.exec('.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/tests/puppeteer/index.js', (err, stream) => {
+    const cmd = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/tests/puppeteer/index.js';
+
+    client.exec(cmd, (err, stream) => {
         if (err) throw err;
 
         stream.on('data', (data) => {
@@ -20,6 +22,10 @@ function experiment(client, eventEmitter) {
         })
 
         stream.stderr.on('data', (data) => {
+            throw new Error(data.toString());
+        });
+
+        stream.on('error', (data) => {
             throw new Error(data.toString());
         });
 
@@ -37,11 +43,11 @@ function startServer(server, eventEmitter) {
             const message = data.toString();
 
             if (!message.includes("@wasm-ater06")) {
-                process.stdout.write(data.toString());
+                process.stdout.write(message);
             }
 
             if (message.trim() === "Server running on port 3000") {
-                eventEmitter.emit("start client")
+                eventEmitter.emit("start client");
             }
         });
 
@@ -50,23 +56,22 @@ function startServer(server, eventEmitter) {
         });
         stream.run = (command) => stream.write(command + '\n')
 
-        stream.run('cd Documents/WebAssembly_2023/offloading/server');
-        stream.run('node index.js');
-
         eventEmitter.on("close connections", () => {
             stream.run('\x03');
             server.end()
         });
 
         eventEmitter.on("start server", () => {
-            stream.run('node index.js');
+            process.stdout.write("Iniciando servidor\n");
+            stream.run('/home/wasm/.nvm/versions/node/v21.0.0/bin/node Documents/WebAssembly_2023/offloading/server/index.js');
         });
 
         eventEmitter.on("close server", () => {
             stream.run('\x03');
-            eventEmitter.emit("experiment finished")
+            eventEmitter.emit("experiment finished");
         });
 
+        eventEmitter.emit("start server");
     });
 }
 
@@ -78,13 +83,13 @@ function test(numberOfExperiments, networkEvents) {
     const serverConfig = {
         host: '10.16.1.3',
         username: 'wasm',
-        privateKey: require('fs').readFileSync(sshPath)
+        privateKey: fs.readFileSync(sshPath)
     };
 
     const clientConfig = {
         host: '10.16.1.1',
         username: 'wasm',
-        privateKey: require('fs').readFileSync(sshPath)
+        privateKey: fs.readFileSync(sshPath)
     };
 
     const server = new Client();
@@ -97,12 +102,12 @@ function test(numberOfExperiments, networkEvents) {
     server.on('ready', () => {
         startServer(server, experimentEvents);
         experimentIndex++;
-        console.log(`Experiment number ${experimentIndex}`);
-        experimentEvents.emit('start server')
     }).connect(serverConfig);
 
     client.on('ready', () => {
-        experimentEvents.on("start client", () => experiment(client, experimentEvents));
+        experimentEvents.on("start client", () => {
+            process.stdout.write(`Iniciando experimento número ${experimentIndex}\n`);
+            experiment(client, experimentEvents)});
         experimentEvents.on("close connections", () => {
             client.end();
             networkEvents.emit("new network");
@@ -117,7 +122,6 @@ function test(numberOfExperiments, networkEvents) {
             return;
         }
 
-        console.log(`Experiment number ${experimentIndex}`);
         experimentEvents.emit("start server");
     })
 }
@@ -126,17 +130,35 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
     const clientConfig = {
         host: '10.16.1.1',
         username: 'wasm',
-        privateKey: require('fs').readFileSync(sshPath)
+        privateKey: fs.readFileSync(sshPath)
     };
 
     const client = new Client();
+
+    const controller = new events.EventEmitter();
 
     client.on('ready', () => {
         client.shell(async (err, stream) => {
             if (err) throw err;
 
-            stream.on('data', (data) => {
+            stream.run = (command) => stream.write(command + '\n');
+
+            controller.on("logged", () => {
+                stream.run(`mv Downloads/* planilhas/${lastConfig}/${lastValue}`);
+                stream.run(`tcdel eno1 --all`);
+                stream.run(`tcset eno1 --${config} ${value}`);
+                stream.run("tcshow eno1");
+                stream.run("exit");
+            })
+
+            stream.on('data', async (data) => {
                 const message = data.toString();
+
+                if (message.trim() === "[sudo] senha para wasm:") {
+                    stream.run("aula123");
+                    await sleep(500);
+                    controller.emit("logged");
+                }
 
                 if (!message.includes("@wasm-OptiPlex-7010")) {
                     process.stdout.write(message);
@@ -145,6 +167,7 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
                 if (message.trim() === "exit") {
                     process.stdout.write(`Rede configurada ${config} ${value}\n`)
                     networkEvents.emit("network configured");
+                    client.end();
                 }
             });
 
@@ -152,17 +175,7 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
                 throw new Error(data.toString());
             });
 
-            stream.run = (command) => stream.write(command + '\n')
-
             stream.run("sudo su");
-            await sleep(1000);
-            stream.run("aula123");
-            await sleep(1000);
-            stream.run(`mv Downloads/* planilhas/${lastConfig}/${lastValue}`);
-            stream.run(`tcdel eno1 --all`);
-            stream.run(`tcset eno1 --${config} ${value}`);
-            stream.run("tcshow eno1");
-            stream.run("exit");
         });
     }).connect(clientConfig);
 }
@@ -233,7 +246,6 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
 
         const { name, values } = networkConfig[networkIndex];
         const value = values[networkValueIndex];
-        console.log(lastName, lastValue);
         configNetwork(name, value, networkEvents, lastName, lastValue);
         lastName = name;
         lastValue = value;

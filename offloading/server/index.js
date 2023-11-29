@@ -3,11 +3,15 @@ import { Server } from 'socket.io';
 import { AlvaAR } from './public/scripts/alva_ar.js';
 import express from 'express';
 import cors from 'cors';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const port = 3000;
 
 const app = express();
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 app.use(cors())
 
 const server = createServer(app)

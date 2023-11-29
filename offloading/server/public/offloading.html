@@ -266,10 +266,9 @@
           responseSize
         ]);
 
-        if (!videoHasEnded) {
-          media.el.requestVideoFrameCallback(processFrame);
-          onFrame(processFrame, 30);
-        }
+        // if (!videoHasEnded) {
+        //   media.el.requestVideoFrameCallback(processFrame);
+        // }
 
         return !videoHasEnded;
       }
