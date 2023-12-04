@@ -111,9 +111,10 @@
   <script src="/socket.io/socket.io.js"></script>
   <script type="module">
     import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
-    import { Video, onFrame, getCSV, roughSizeOfObject } from "/scripts/utils.js";
+    import { Video, onFrame, getCSV } from "/scripts/utils.js";
 
     const serverUrl = "192.168.10.2:3000";
+    // const serverUrl = "localhost:3000";
     const eventStart = new Event("start");
     const eventEnd = new Event("end");
 
@@ -143,7 +144,7 @@
       const socketPromise = initializeServer(serverUrl, media.width, media.height);
 
       let statistics = [
-        ['FPSOffloading', 'serverTimeOffloading', 'slamTimeOffloading', 'streamingTimeOffloading', 'renderTimeOffloading', 'videoTimeOffloading', 'clientMemoryUsageOffloading', 'serverMemoryUsageOffloading', 'requestSizeOffloading', 'responseSizeOffloading']
+        ['FPSOffloading', 'serverTimeOffloading', 'slamTimeOffloading', 'streamingTimeOffloading', 'renderTimeOffloading', 'videoTimeOffloading']
       ];
 
       const $cam = document.getElementById('renderer-cam');
@@ -180,25 +181,17 @@
 
         const startServerTime = performance.now();
 
-        let requestSize = 0;
-        let responseSize = 0;
-
-        const [data, totalSlamTime, serverMemoryUsage] = await new Promise(resolve => {
+        const [data, totalSlamTime] = await new Promise(resolve => {
           const request = {
             width: frame.width,
             height: frame.height,
             data: frame.data
           };
 
-          requestSize = roughSizeOfObject(request);
-
           socket.emit(
             'frame',
             request,
-            (response) => {
-              responseSize = roughSizeOfObject(response);
-              resolve(response);
-            }
+            (response) => resolve(response)
           );
         });
 
@@ -250,27 +243,18 @@
 
         const totalRenderTime = endRenderTime - startRenderTime;
 
-        const clientMemoryUsage = performance.memory && performance.memory.usedJSHeapSize;
-
-
         statistics.push([
           FPS,
           totalServerTime,
           totalSlamTime,
           totalStreamingTime,
           totalRenderTime,
-          totalVideoTime,
-          clientMemoryUsage,
-          serverMemoryUsage,
-          requestSize,
-          responseSize
+          totalVideoTime
         ]);
 
-        // if (!videoHasEnded) {
-        //   media.el.requestVideoFrameCallback(processFrame);
-        // }
-
-        return !videoHasEnded;
+        if (!videoHasEnded) {
+          media.el.requestVideoFrameCallback(processFrame);
+        }
       }
 
       if (socket) {
@@ -293,8 +277,7 @@
 
         window.dispatchEvent(eventStart);
         startFps = performance.now();
-        // media.el.requestVideoFrameCallback(processFrame);
-        onFrame(processFrame, 30);
+        media.el.requestVideoFrameCallback(processFrame);
       }
 
     }

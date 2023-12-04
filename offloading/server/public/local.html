@@ -118,7 +118,7 @@
 
         async function main() {
             let statistics = [
-                ['FPSLocal','slamTimeLocal', 'renderTimeLocal', 'videoTimeLocal', 'clientMemoryUsageLocal']
+                ['FPSLocal','slamTimeLocal', 'renderTimeLocal', 'videoTimeLocal']
             ];
 
             const media = await Video.Initialize('/videos/video-60.mp4');
@@ -201,26 +201,21 @@
                 const endRenderTime = performance.now();
 
                 const totalRenderTime = endRenderTime - startRenderTime;
-
-                const clientMemoryUsage = performance.memory && performance.memory.usedJSHeapSize;
  
                 statistics.push([
-                    FPS, totalSlamTime, totalRenderTime, totalVideoTime, clientMemoryUsage
+                    FPS, totalSlamTime, totalRenderTime, totalVideoTime
                 ]);
 
-                // if (!videoHasEnded) {
-                //     media.el.requestVideoFrameCallback(processFrame);
-                // }
-
-                return !videoHasEnded;
+                if (!videoHasEnded) {
+                    media.el.requestVideoFrameCallback(processFrame);
+                }
             };
 
             media.el.play();
             media.el.loop = false;
             window.dispatchEvent(eventStart);
             startFps = performance.now();
-            // media.el.requestVideoFrameCallback(processFrame)
-            onFrame(processFrame, 30);
+            media.el.requestVideoFrameCallback(processFrame);
         }
 
 

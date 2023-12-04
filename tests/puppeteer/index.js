@@ -19,4 +19,5 @@ async function sleep(time) {
     });
 
     await page.goto('http://192.168.10.2:3000/offloading.html');
+    // await page.goto('http://localhost:3000/local.html');
 })();

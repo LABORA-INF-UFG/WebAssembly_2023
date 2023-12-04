@@ -37,18 +37,16 @@ sockets.on('connection', (socket) => {
   socket.on('frame', async (frame, callback) => {
     const start = performance.now();
 
-    const memory = process.memoryUsage();
-
     if (!alva) {
       const end = performance.now();
-      return callback([undefined, end - start, memory.heapUsed]);
+      return callback([undefined, end - start]);
     }
 
     const data = processVideo(alva, frame);
 
     const end = performance.now();
 
-    callback([data, end - start, memory.heapUsed]);
+    callback([data, end - start]);
   });
 
 
