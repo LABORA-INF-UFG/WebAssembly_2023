@@ -12,7 +12,7 @@ const sshPath = '/home/matheus/.ssh/id_rsa';
 // const sshPath = "C:\\Users\\mathe\\.ssh\\id_rsa";
 
 function experiment(client, eventEmitter) {
-    const cmd = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/tests/puppeteer/index.js';
+    const cmd = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/puppeteer/index.js';
 
     client.exec(cmd, (err, stream) => {
         if (err) throw err;
@@ -54,6 +54,7 @@ function startServer(server, eventEmitter) {
         stream.stderr.on('data', (data) => {
             throw new Error(data.toString());
         });
+
         stream.run = (command) => stream.write(command + '\n')
 
         eventEmitter.on("close connections", () => {
@@ -63,7 +64,7 @@ function startServer(server, eventEmitter) {
 
         eventEmitter.on("start server", () => {
             process.stdout.write("Iniciando servidor\n");
-            stream.run('/home/wasm/.nvm/versions/node/v21.0.0/bin/node Documents/WebAssembly_2023/offloading/server/index.js');
+            stream.run('/home/wasm/.nvm/versions/node/v21.0.0/bin/node Documents/WebAssembly_2023/offloading/slamServer/index.js');
         });
 
         eventEmitter.on("close server", () => {
