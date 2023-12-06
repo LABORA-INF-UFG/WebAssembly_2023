@@ -8,7 +8,7 @@ async function sleep(time) {
     const page = await browser.newPage();
 
     await page.exposeFunction('endExperiment', async () => {
-        await sleep(1000);
+        await sleep(2000);
         await browser.close();
     });
 
