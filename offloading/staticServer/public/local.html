@@ -118,10 +118,10 @@
 
         async function main() {
             let statistics = [
-                ['FPSLocal','slamTimeLocal', 'renderTimeLocal', 'videoTimeLocal']
+                ['totalTime','slamTime', 'renderTime', 'segmentationTime']
             ];
 
-            const media = await Video.Initialize('/videos/video-60.mp4');
+            const media = await Video.Initialize('/videos/video-short.mp4');
             const alva = await AlvaAR.Initialize(media.width, media.height);
 
             const $cam = document.getElementById('renderer-cam');
@@ -153,29 +153,34 @@
                 window.dispatchEvent(eventEnd);
             };
 
-            let startFps = null;
+            let startTotalTime = null;
 
-            const processFrame = () => {
-                const endFps = performance.now();
-                const totalFps = endFps - startFps;
-
-                const FPS = 1000/ (endFps - startFps);
-
-                startFps = performance.now();
+            const processFrame = async () => {
+                const endTotalTime = performance.now();
+                const totalTime = endTotalTime - startTotalTime;
                 
-                const startVideoTime = performance.now();
-                const frame = media.getImageData();
-                const endVideoTime = performance.now();
+                startTotalTime = performance.now();
+                
+                const startSegmentationTime = performance.now();
+                const frame = await media.getImageData();
+                const endSegmentationTime = performance.now();
 
-                const totalVideoTime = endVideoTime - startVideoTime;
+                const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
 
-                const startSlamTime = performance.now();
+                let startSlamTime, endSlamTime
 
-                const pose = alva.findCameraPose(frame);
-                const planePose = alva.findPlane();
-                const dots = alva.getFramePoints();
+                let pose, planePose, dots
 
-                const endSlamTime = performance.now();
+                await new Promise(async resolve =>  {
+                    startSlamTime = performance.now();
+                    
+                    pose = await alva.findCameraPose(frame);
+                    planePose = await alva.findPlane();
+                    dots = await alva.getFramePoints();
+
+                    endSlamTime = performance.now();
+                    resolve()
+                })
 
                 const totalSlamTime = endSlamTime - startSlamTime;
 
@@ -203,19 +208,22 @@
                 const totalRenderTime = endRenderTime - startRenderTime;
  
                 statistics.push([
-                    FPS, totalSlamTime, totalRenderTime, totalVideoTime
+                    totalTime, totalSlamTime, totalRenderTime, totalSegmentationTime
                 ]);
 
                 if (!videoHasEnded) {
-                    media.el.requestVideoFrameCallback(processFrame);
+                    //media.el.requestVideoFrameCallback(processFrame);
+                    requestAnimationFrame(processFrame)
+                
                 }
             };
 
             media.el.play();
             media.el.loop = false;
             window.dispatchEvent(eventStart);
-            startFps = performance.now();
-            media.el.requestVideoFrameCallback(processFrame);
+            startTotalTime = performance.now();
+            //media.el.requestVideoFrameCallback(processFrame);
+            requestAnimationFrame(processFrame)
         }
 
 

@@ -139,12 +139,12 @@
     }
 
     async function main() {
-      const media = await Video.Initialize('/videos/video-60.mp4');
+      const media = await Video.Initialize('/videos/video-short.mp4');
 
       const socketPromise = initializeServer(serverUrl, media.width, media.height);
 
       let statistics = [
-        ['FPSOffloading', 'serverTimeOffloading', 'slamTimeOffloading', 'streamingTimeOffloading', 'renderTimeOffloading', 'videoTimeOffloading']
+        ['totalTime', 'slamTime', 'networkTime', 'renderTime', 'segmentationTime']
       ];
 
       const $cam = document.getElementById('renderer-cam');
@@ -163,21 +163,20 @@
 
       const socket = await socketPromise;
 
-      let startFps = null;
+      let startTotalTime = null;
 
       const processFrame = async (now, frameMetadata) => {
-        const endFps = performance.now();
-        const totalFps = endFps - startFps;
+        const endTotalTime = performance.now();
 
-        const FPS = 1000 / (endFps - startFps);
+        const totalTime = endTotalTime - startTotalTime;
 
-        startFps = performance.now()
+        startTotalTime = performance.now()
 
-        const startVideoTime = performance.now();
+        const startSegmentationTime = performance.now();
         const frame = media.getImageData();
-        const endVideoTime = performance.now();
+        const endSegmentationTime = performance.now();
 
-        const totalVideoTime = endVideoTime - startVideoTime;
+        const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
 
         const startServerTime = performance.now();
 
@@ -217,7 +216,7 @@
         const endServerTime = performance.now();
 
         const totalServerTime = endServerTime - startServerTime;
-        const totalStreamingTime = totalServerTime - totalSlamTime;
+        const totalNetworkTime = totalServerTime - totalSlamTime;
 
         const startRenderTime = performance.now();
 
@@ -244,12 +243,11 @@
         const totalRenderTime = endRenderTime - startRenderTime;
 
         statistics.push([
-          FPS,
-          totalServerTime,
+          totalTime,
           totalSlamTime,
-          totalStreamingTime,
+          totalNetworkTime,
           totalRenderTime,
-          totalVideoTime
+          totalSegmentationTime
         ]);
 
         if (!videoHasEnded) {
@@ -276,7 +274,7 @@
         media.el.onended = endVideo;
 
         window.dispatchEvent(eventStart);
-        startFps = performance.now();
+        startTotalTime = performance.now();
         media.el.requestVideoFrameCallback(processFrame);
       }
 
