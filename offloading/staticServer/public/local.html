@@ -121,7 +121,7 @@
                 ['totalTime','slamTime', 'renderTime', 'segmentationTime']
             ];
 
-            const media = await Video.Initialize('/videos/video-short.mp4');
+            const media = await Video.Initialize('/videos/wasm.mp4');
             const alva = await AlvaAR.Initialize(media.width, media.height);
 
             const $cam = document.getElementById('renderer-cam');
