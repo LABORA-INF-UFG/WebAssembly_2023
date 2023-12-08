@@ -167,20 +167,13 @@
 
                 const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
 
-                let startSlamTime, endSlamTime
+                const startSlamTime = performance.now();
+                
+                const pose = await alva.findCameraPose(frame);
+                const planePose = await alva.findPlane();
+                const dots = await alva.getFramePoints();
 
-                let pose, planePose, dots
-
-                await new Promise(async resolve =>  {
-                    startSlamTime = performance.now();
-                    
-                    pose = await alva.findCameraPose(frame);
-                    planePose = await alva.findPlane();
-                    dots = await alva.getFramePoints();
-
-                    endSlamTime = performance.now();
-                    resolve()
-                })
+                const endSlamTime = performance.now();
 
                 const totalSlamTime = endSlamTime - startSlamTime;
 
@@ -212,9 +205,7 @@
                 ]);
 
                 if (!videoHasEnded) {
-                    //media.el.requestVideoFrameCallback(processFrame);
-                    requestAnimationFrame(processFrame)
-                
+                    media.el.requestVideoFrameCallback(processFrame);
                 }
             };
 
@@ -222,8 +213,7 @@
             media.el.loop = false;
             window.dispatchEvent(eventStart);
             startTotalTime = performance.now();
-            //media.el.requestVideoFrameCallback(processFrame);
-            requestAnimationFrame(processFrame)
+            media.el.requestVideoFrameCallback(processFrame);
         }
 
 
