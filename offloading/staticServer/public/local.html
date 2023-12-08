@@ -159,7 +159,7 @@
                 const endTotalTime = performance.now();
                 const totalTime = endTotalTime - startTotalTime;
                 
-                startTotalTime = performance.now();
+                startTotalTime = endTotalTime;
                 
                 const startSegmentationTime = performance.now();
                 const frame = await media.getImageData();

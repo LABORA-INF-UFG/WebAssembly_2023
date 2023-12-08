@@ -139,7 +139,7 @@
     }
 
     async function main() {
-      const media = await Video.Initialize('/videos/video-short.mp4');
+      const media = await Video.Initialize('/videos/wasm.mp4');
 
       const socketPromise = initializeServer(serverUrl, media.width, media.height);
 
@@ -170,7 +170,7 @@
 
         const totalTime = endTotalTime - startTotalTime;
 
-        startTotalTime = performance.now()
+        startTotalTime = endTotalTime;
 
         const startSegmentationTime = performance.now();
         const frame = media.getImageData();
