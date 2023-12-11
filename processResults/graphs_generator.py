@@ -61,13 +61,16 @@ def gen_bar_plot(statistic, raw_data, case, legend):
     if statistic == 'rate':
         plt.xlabel("Bandwidth(Mbps)")
         column_width = 20
+        horizontal_line_width=10
     if statistic == 'delay':
         plt.xlabel("Delay(ms)")
         column_width = 2
+        horizontal_line_width=1
 
     if statistic == 'loss':
         plt.xlabel("Packetloss(%)")
         column_width = 0.5
+        horizontal_line_width=0.5
     
     for key in raw_data.keys():    
         data[key] = raw_data[key].copy(deep= True)
@@ -80,8 +83,21 @@ def gen_bar_plot(statistic, raw_data, case, legend):
         x = list(data.keys())
         y = [data[key][label]['mean'] for key in x]
         y = np.array([0 if math.isnan(item) else item for item in y])
+        
+        lower_limit = [data[key][label]['lower'] for key in x] + bottom
+        upper_limit = [data[key][label]['upper'] for key in x] + bottom
+        left = [key - horizontal_line_width/2 for key in x]
+        right = [key + horizontal_line_width/2 for key in x]
+
+        
         plt.xticks(x)
         ax.bar(x, y, label=label, bottom= bottom, width= column_width)
+        
+        for i in range(len(x)):
+            plt.plot([x[i], x[i]], [upper_limit[i], lower_limit[i]], color = 'black')
+            plt.plot([left[i], right[i]], [upper_limit[i], upper_limit[i]], color = 'black')
+            plt.plot([left[i], right[i]], [lower_limit[i], lower_limit[i]], color = 'black')   
+        
         bottom += y
     
     plt.ylim([0, max(bottom) + 5])    
