@@ -98,9 +98,17 @@ def gen_bar_plot(statistic, raw_data, case, legend):
         upper_limit = [data[key][label]['upper'] for key in x] + bottom
         left = [key - horizontal_line_width/2 for key in x]
         right = [key + horizontal_line_width/2 for key in x]
-
         
         plt.xticks(x)
+    
+        xlabels = []
+        xlabels.append('std')
+        
+        for i in range(1, len(x)):
+            xlabels.append(str(x[i]))
+        
+        ax.set_xticklabels(xlabels)
+        
         ax.bar(x, y , label=label, bottom= bottom, width= column_width, align='center', color = label_color, alpha=0.6)
         plt.plot(x, y + bottom,  marker="o", markersize=3,linestyle="", alpha=0.8, color=label_color)
         for i in range(len(x)):
@@ -144,12 +152,20 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
     offloading_color = '#ff8c00'
     legend_offloading = 'Offloading'
     
-    x_offloading = offloading_data.keys()
+    x_offloading = list(offloading_data.keys())
     y_offloading = [offloading_data[key][graph]['mean'] for key in x_offloading]
     
     plt.xticks(x_offloading)
-    x_offloading[0] = 'Default'
-    ax.set_xticklabels(x_offloading)
+    
+    xlabels_offloading = []
+    xlabels_offloading.append('std')
+        
+    for i in range(1, len(x_offloading)):
+        xlabels_offloading.append(str(x_offloading[i]))
+    
+    
+    ax.set_xticklabels(xlabels_offloading)
+
     ax.plot(x_offloading, y_offloading, marker='o', label=legend_offloading, color = offloading_color, linestyle='--')       
     
     
@@ -172,8 +188,14 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
     y_local = [local_data[key][graph]['mean'] for key in x_local]
     
     plt.xticks(x_local)
-    x_local[0] = 'Default'
-    ax.set_xticklabels(x_local)
+   
+    xlabels_local = []
+    xlabels_local.append('Default')
+        
+    for i in range(1, len(xlabels_local)):
+        xlabels_local.append(str(xlabels_local[i]))
+        
+    #ax.set_xticklabels(xlabels_local)
     
     ax.plot(x_local, y_local, marker='o', label=local_legend, color = local_color, linestyle='--')       
     
