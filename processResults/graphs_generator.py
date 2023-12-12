@@ -102,12 +102,12 @@ def gen_bar_plot(statistic, raw_data, case, legend):
         plt.xticks(x)
     
         xlabels = []
-        xlabels.append('std')
+        xlabels.append('Default')
         
         for i in range(1, len(x)):
             xlabels.append(str(x[i]))
         
-        ax.set_xticklabels(xlabels)
+        ax.set_xticklabels(xlabels, rotation=55)
         
         ax.bar(x, y , label=label, bottom= bottom, width= column_width, align='center', color = label_color, alpha=0.6)
         plt.plot(x, y + bottom,  marker="o", markersize=3,linestyle="", alpha=0.8, color=label_color)
@@ -158,13 +158,13 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
     plt.xticks(x_offloading)
     
     xlabels_offloading = []
-    xlabels_offloading.append('std')
+    xlabels_offloading.append('Default')
         
     for i in range(1, len(x_offloading)):
         xlabels_offloading.append(str(x_offloading[i]))
     
     
-    ax.set_xticklabels(xlabels_offloading)
+    ax.set_xticklabels(xlabels_offloading, rotation=55)
 
     ax.plot(x_offloading, y_offloading, marker='o', label=legend_offloading, color = offloading_color, linestyle='--')       
     
