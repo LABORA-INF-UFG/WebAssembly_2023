@@ -162,16 +162,16 @@
                 startTotalTime = endTotalTime;
                 
                 const startSegmentationTime = performance.now();
-                const frame = await media.getImageData();
+                const frame = media.getImageData();
                 const endSegmentationTime = performance.now();
 
                 const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
 
                 const startSlamTime = performance.now();
                 
-                const pose = await alva.findCameraPose(frame);
-                const planePose = await alva.findPlane();
-                const dots = await alva.getFramePoints();
+                const pose = alva.findCameraPose(frame);
+                const planePose = alva.findPlane();
+                const dots = alva.getFramePoints();
 
                 const endSlamTime = performance.now();
 
