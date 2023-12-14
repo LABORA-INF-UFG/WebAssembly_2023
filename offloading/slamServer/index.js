@@ -26,7 +26,6 @@ sockets.on('connection', (socket) => {
 
   socket.on('frame', async (frame, callback) => { 
     if (!alva) {
-      const end = performance.now();
       return callback([undefined, 0]);
     }
     
