@@ -111,29 +111,21 @@
     <script type="module">
         import { AlvaAR } from '/scripts/alva_ar.js';
         import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
-        import { Video, onFrame, getCSV } from "/scripts/utils.js";
+        import { Video,  getCSV } from "/scripts/utils.js";
+        import getVideoFrames from "/scripts/mod.js" 
 
         const eventStart = new Event("start");
         const eventEnd = new Event("end");
-
+        
         async function main() {
             let statistics = [
                 ['totalTime','slamTime', 'renderTime', 'segmentationTime']
             ];
 
-            const media = await Video.Initialize('/videos/wasm.mp4');
-            const alva = await AlvaAR.Initialize(media.width, media.height);
-
             const $cam = document.getElementById('renderer-cam');
             const $map = document.getElementById('renderer-map');
-            const ctx = document.getElementById('renderer-video').getContext('2d');
-
-            ctx.canvas.width = media.width;
-            ctx.canvas.height = media.height;
-
-            const mapRenderer = new ARSimpleMap($map, media.width, media.height);
-            const camRenderer = new ARSimpleView($cam, media.width, media.height, mapRenderer);
-
+            const ctx = document.getElementById('renderer-video').getContext('2d', {willReadFrequently: true});
+            
             let doFindPlane = false;
 
             $cam.parentElement.style.display = 'block';
@@ -145,33 +137,28 @@
                 addCube = true;
             }, 200);
 
-            media.el.onended = () => {
-                videoHasEnded = true;
-                getCSV(statistics, "local"); // Uncomment to save statistics in CSV file 
-                ctx.clearRect(0, 0, media.width, media.height);
-                clearInterval(addCubeInterval);
-                window.dispatchEvent(eventEnd);
-            };
-
             let startTotalTime = null;
-
-            const processFrame = async () => {
+            
+            const processFrame = async (raw_frame) => {
                 const endTotalTime = performance.now();
                 const totalTime = endTotalTime - startTotalTime;
                 
                 startTotalTime = endTotalTime;
                 
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.drawImage(raw_frame, 0, 0, ctx.canvas.width, ctx.canvas.height);
+
                 const startSegmentationTime = performance.now();
-                const frame = media.getImageData();
+                const frame = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
                 const endSegmentationTime = performance.now();
 
                 const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
 
                 const startSlamTime = performance.now();
                 
-                const pose = alva.findCameraPose(frame);
-                const planePose = alva.findPlane();
-                const dots = alva.getFramePoints();
+                const pose = document.alva.findCameraPose(frame);
+                const planePose = document.alva.findPlane();
+                const dots = document.alva.getFramePoints();
 
                 const endSlamTime = performance.now();
 
@@ -179,14 +166,12 @@
 
                 const startRenderTime = performance.now();
 
-                ctx.clearRect(0, 0, media.width, media.height);
-                ctx.putImageData(frame, 0, 0);
 
                 if (pose) {
-                    camRenderer.updateCameraPose(pose);
+                    document.camRenderer.updateCameraPose(pose);
 
                     if (addCube && planePose) {
-                        camRenderer.createObjectWithPose(planePose);
+                        document.camRenderer.createObjectWithPose(planePose);
                         addCube = false;
                     }
                 }
@@ -203,17 +188,65 @@
                 statistics.push([
                     totalTime, totalSlamTime, totalRenderTime, totalSegmentationTime
                 ]);
-
-                if (!videoHasEnded) {
-                    media.el.requestVideoFrameCallback(processFrame);
-                }
+                
             };
 
-            media.el.play();
-            media.el.loop = false;
             window.dispatchEvent(eventStart);
+            
+            const url = 'videos/video-short.mp4'
+            let response = await fetch(url);
+            let blob = await response.blob();
+            let videoUrl = URL.createObjectURL(blob);
+            let frameCount = 0;
+
+            let alvaInitialized = false;
+            let alvaInitializationPromise = new Promise(resolve => {
+                const checkAlvaInitialization = setInterval(() => {
+                    if (document.alva) {
+                        alvaInitialized = true;
+                        clearInterval(checkAlvaInitialization);
+                        resolve();
+                    }
+                }, 100);
+            });
+
             startTotalTime = performance.now();
-            media.el.requestVideoFrameCallback(processFrame);
+
+            await getVideoFrames({
+                videoUrl,
+                async onFrame(frame) {  // `frame` is a VideoFrame object: https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame
+                    if(!alvaInitialized){
+                        await alvaInitializationPromise;
+                    }
+                    
+                    processFrame(frame)
+                    frameCount++
+                
+                    frame.close();
+                },
+                async onConfig(config) {
+                    ctx.canvas.width = config.codedWidth;
+                    ctx.canvas.height = config.codedHeight;
+
+                    document.alva = await AlvaAR.Initialize(ctx.canvas.width, ctx.canvas.height);
+
+                    const mapRenderer = new ARSimpleMap($map, ctx.canvas.width, ctx.canvas.height);
+                    document.camRenderer = new ARSimpleView($cam, ctx.canvas.width, ctx.canvas.height, mapRenderer);
+                
+
+                },
+                onFinish() {
+                    console.log("finished!");
+                    console.log("frameCount", frameCount);
+                    videoHasEnded = true;
+                    getCSV(statistics, "local"); // Uncomment to save statistics in CSV file 
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    clearInterval(addCubeInterval);
+                    window.dispatchEvent(eventEnd);
+                },
+            });
+
+
         }
 
 

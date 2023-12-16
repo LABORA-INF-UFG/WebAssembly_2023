@@ -1,0 +1,39 @@
+<canvas id="canvasEl"></canvas>
+<br>
+<script type="module">
+  import getVideoFrames from "/scripts/mod.js"
+  
+  let frameCount = 0;
+
+  let ctx = canvasEl.getContext("2d"); 
+
+  let url = '/videos/video-short.mp4';
+
+    // Fetch the video file as a Blob
+  let response = await fetch(url);
+  let blob = await response.blob();
+
+  // `getVideoFrames` requires a video URL as input.
+  // If you have a file/blob instead of a videoUrl, turn it into a URL like this:
+  let videoUrl = URL.createObjectURL(blob);
+
+  await getVideoFrames({
+    videoUrl,
+    onFrame(frame) {  // `frame` is a VideoFrame object: https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame
+      ctx.drawImage(frame, 0, 0, canvasEl.width, canvasEl.height);
+      frame.close();
+      frameCount++;
+    },
+    onConfig(config) {
+      canvasEl.width = config.codedWidth;
+      canvasEl.height = config.codedHeight;
+    },
+    onFinish() {
+      console.log("finished!");
+      console.log("frameCount", frameCount);
+    },
+  });
+
+  URL.revokeObjectURL(videoUrl); // revoke URL to prevent memory leak
+  
+</script> 

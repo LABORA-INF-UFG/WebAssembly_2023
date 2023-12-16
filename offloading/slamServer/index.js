@@ -19,15 +19,14 @@ const sockets = new Server(server, {
 sockets.on('connection', (socket) => {
   let alva;
 
-  socket.on('initialize alva', async (dimensions) => {
+  socket.on('initialize alva', async (dimensions, callback) => {
     const { width, height } = dimensions;
     alva = await AlvaAR.Initialize(width, height);
+    
+    callback(null)
   });
 
   socket.on('frame', async (frame, callback) => { 
-    if (!alva) {
-      return callback([undefined, 0]);
-    }
     
     const start = performance.now();
 
