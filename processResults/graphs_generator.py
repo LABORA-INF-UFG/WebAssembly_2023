@@ -126,6 +126,7 @@ def gen_bar_plot(statistic, raw_data, case, legend):
     plt.ylabel("Time(ms)")
     
     plt.savefig(f'./graphs/{statistic}_{case}.png')
+    plt.close()
 
 
 def gen_pair_graphs(graph, offloading_data, local_data, statistic):
@@ -226,6 +227,7 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
     elif graph == 'segmentationTime':
         plt.savefig(f'./graphs/{statistic}_segmentation_time.png')
         
+    plt.close()
         
 def get_no_tc_data(data_path, labels):
     z = 1.96
@@ -256,6 +258,58 @@ def get_no_tc_data(data_path, labels):
     except:
         data = pd.DataFrame(columns= labels)
     return data 
+
+def gen_network_time_graph(offloading_data, statistic):
+    fig, ax = plt.subplots(figsize=(13, 6))  
+    ax.grid(axis='y')
+
+    plt.ylabel('Time(ms)')
+    
+    if statistic == 'rate':
+        plt.xlabel("Bandwidth(Mbps)")
+        horizontal_line_width=10
+    if statistic == 'delay':
+        horizontal_line_width=1
+        plt.xlabel("Delay(ms)")
+    if statistic == 'loss':
+        plt.xlabel("Packetloss(%)")
+        horizontal_line_width=0.05
+    
+    arr_max_top = []
+    
+    offloading_color = '#ff8c00'
+    legend_offloading = 'Offloading'
+    
+    x_offloading = list(offloading_data.keys())
+    y_offloading = [offloading_data[key]['networkTime']['mean'] for key in x_offloading]
+    
+    plt.xticks(x_offloading)
+    
+    xlabels_offloading = []
+    xlabels_offloading.append('Default')
+        
+    for i in range(1, len(x_offloading)):
+        xlabels_offloading.append(str(x_offloading[i]))
+    
+    
+    ax.set_xticklabels(xlabels_offloading, rotation=55)
+
+    ax.plot(x_offloading, y_offloading, marker='o', label=legend_offloading, color = offloading_color, linestyle='--')       
+    
+    
+    for key in x_offloading:
+        left = key - horizontal_line_width/2
+        right = key + horizontal_line_width/2
+        bottom = offloading_data[key]['networkTime']['lower']
+        top = offloading_data[key]['networkTime']['upper']
+        plt.plot([key, key], [top, bottom], color = offloading_color)
+        plt.plot([left, right], [top, top], color = offloading_color)
+        plt.plot([left, right], [bottom, bottom], color = offloading_color)       
+
+        arr_max_top.append(0 if math.isnan(top) else top)
+    
+    plt.savefig(f'./graphs/{statistic}_network.png')
+    plt.close()
 
 def main():
     statistics = ['rate', 'loss', 'delay']
@@ -289,7 +343,9 @@ def main():
         gen_bar_plot(statistic, local_data, 'local', {'slamTime': 'Slam', 'renderTime':'Render','segmentationTime':'Segmentation'})
 
         for graph in graphs:
-            gen_pair_graphs(graph, offloading_data, local_data, statistic)        
+            gen_pair_graphs(graph, offloading_data, local_data, statistic)  
+        
+        gen_network_time_graph(offloading_data,  statistic)      
         
 if __name__ == "__main__":
     main()
