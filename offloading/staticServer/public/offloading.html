@@ -131,7 +131,7 @@
 			let serverInitialized = false
 
             const initializeServer = async (serverUrl, width, height) => {
-                const socket = await io(serverUrl, { reconnection: false });
+                const socket = io(serverUrl, { reconnection: false });
 
                 await new Promise((resolve) => {
                     socket.io.on("error", (error) => {
@@ -144,11 +144,9 @@
 
                 await new Promise((resolve) =>
                     socket.on("connect", () => {
-                        socket.emit("initialize alva", { width, height }, (response) => {
-							serverInitialized = true
-							resolve(response)
+                        socket.emit("initialize alva", { width, height }, () => {
+							resolve()
 						}
-                            
                         );
                     })
                 );
@@ -157,8 +155,50 @@
             };
 
             async function main() {
+                window.dispatchEvent(eventStart);
 
-                const processFrame = async (raw_frame) => {
+                let statistics = [
+                    [
+                        "totalTime",
+                        "slamTime",
+                        "networkTime",
+                        "renderTime",
+                        "segmentationTime",
+                    ],
+                ];
+
+                const $cam = document.getElementById("renderer-cam");
+                const $map = document.getElementById("renderer-map");
+                const ctx = document.getElementById("renderer-video").getContext("2d", {willReadFrequently: true});
+                
+                const width = 480
+                const height = 848
+
+                ctx.canvas.width = width;
+                ctx.canvas.height = height;
+                
+                const socket = await initializeServer(serverUrl, ctx.canvas.width, ctx.canvas.height);
+
+                const mapRenderer = new ARSimpleMap($map, ctx.canvas.width, ctx.canvas.height);
+                const camRenderer = new ARSimpleView($cam, ctx.canvas.width, ctx.canvas.height, mapRenderer);
+
+                $cam.parentElement.style.display = "block";
+
+                let addCube = false;
+
+                let startTotalTime = null;
+
+				const addCubeInterval = setInterval(() => {
+					addCube = true;
+				}, 200);
+				
+                const url = "videos/video-short.mp4";
+                let response = await fetch(url);
+                let blob = await response.blob();
+                let videoUrl = URL.createObjectURL(blob);
+                let frameCount = 0;
+
+                const processFrame = (raw_frame) => {
                     const endTotalTime = performance.now();
 
                     const totalTime = endTotalTime - startTotalTime;
@@ -175,164 +215,89 @@
                     const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
 
                     const startServerTime = performance.now();
-
-                    const [data, totalSlamTime] = await new Promise(
-                        (resolve) => {
-                            const request = {
-                                width: frame.width,
-                                height: frame.height,
-                                data: frame.data,
-                            };
-
-                            socket.emit("frame", request, (response) => resolve(response));
-                        }
-                    );
-
-                    let pose = null;
-                    let planePose = null;
-                    let dots = [];
-
-                    if (data) {
-                        if (data.pose) {
-                            pose = new Float32Array(data.pose);
-                        }
-
-                        if (data.planePose) {
-                            planePose = new Float32Array(data.planePose);
-                        }
-
-                        if (data.dots) {
-                            dots = data.dots;
-                        }
-                    }
-					console.log(pose)
-                    const endServerTime = performance.now();
-
-                    const totalServerTime = endServerTime - startServerTime;
-                    const totalNetworkTime = totalServerTime - totalSlamTime;
-
-                    const startRenderTime = performance.now();
-
                     
-
-                    if (pose) {
-                        document.camRenderer.updateCameraPose(pose);
-
-                        if (addCube && planePose) {
-                            document.camRenderer.createObjectWithPose(planePose);
-                            addCube = false;
-                        }
-                    }
-
-                    for (const dot of dots) {
-                        ctx.fillStyle = "white";
-                        ctx.fillRect(dot.x, dot.y, 2, 2);
-                    }
-
-                    const endRenderTime = performance.now();
-
-                    const totalRenderTime = endRenderTime - startRenderTime;
-
-                    statistics.push([
-                        totalTime,
-                        totalSlamTime,
-                        totalNetworkTime,
-                        totalRenderTime,
-                        totalSegmentationTime,
-                    ]);
-
+                    return new Promise(resolve => {
+                        socket.emit("frame", frame, (data) => {
+                            let pose = null;
+                            let planePose = null;
+                            let dots = [];
+    
+                            if (data) {
+                                if (data.pose) {
+                                    pose = new Float32Array(data.pose);
+                                }
+        
+                                if (data.planePose) {
+                                    planePose = new Float32Array(data.planePose);
+                                }
+        
+                                if (data.dots) {
+                                    dots = data.dots;
+                                }
+                            }
+                            
+                            const endServerTime = performance.now();
+    
+                            const totalServerTime = endServerTime - startServerTime;
+                            const totalNetworkTime = totalServerTime - data.totalSlamTime;
+    
+                            const startRenderTime = performance.now();
+    
+                            if (pose) {
+                                camRenderer.updateCameraPose(pose);
+    
+                                if (addCube && planePose) {
+                                    camRenderer.createObjectWithPose(planePose);
+                                    addCube = false;
+                                }
+                            }
+    
+                            for (const dot of dots) {
+                                ctx.fillStyle = "white";
+                                ctx.fillRect(dot.x, dot.y, 2, 2);
+                            }
+    
+                            const endRenderTime = performance.now();
+    
+                            const totalRenderTime = endRenderTime - startRenderTime;
+    
+                            statistics.push([
+                                totalTime,
+                                data.totalSlamTime,
+                                totalNetworkTime,
+                                totalRenderTime,
+                                totalSegmentationTime,
+                            ]);
+                            
+                            resolve()
+                        });
+                    })
                 };
-
-				window.dispatchEvent(eventStart);
-
-                let statistics = [
-                    [
-                        "totalTime",
-                        "slamTime",
-                        "networkTime",
-                        "renderTime",
-                        "segmentationTime",
-                    ],
-                ];
-
-                const $cam = document.getElementById("renderer-cam");
-                const $map = document.getElementById("renderer-map");
-                const ctx = document.getElementById("renderer-video").getContext("2d", {willReadFrequently: true});
-
-                $cam.parentElement.style.display = "block";
-
-                let videoHasEnded = false;
-                let addCube = false;
-
-                let startTotalTime = null;
-
-				const addCubeInterval = setInterval(() => {
-					addCube = true;
-				}, 200);
-				
-                const url = "videos/video-short.mp4";
-                let response = await fetch(url);
-                let blob = await response.blob();
-                let videoUrl = URL.createObjectURL(blob);
-                let frameCount = 0;
-
-				let socket = null
-
-				let serverInitilizedPromise = new Promise(resolve => {
-					const checkServerInitialization = setInterval(() => {
-						if (serverInitialized) {
-							clearInterval(checkServerInitialization);
-							resolve();
-						}
-					}, 100);
-				});
-
+                
 				startTotalTime = performance.now();
-                await getVideoFrames({
-                    videoUrl,
-                    async onFrame(frame) {
-                        // `frame` is a VideoFrame object: https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame
-                        if (!serverInitialized) {
-                            await serverInitilizedPromise;
-                        }
-
-                        processFrame(frame);
-                        frameCount++;
-
-                        frame.close();
-                    },
-                    async onConfig(config) {
-                        ctx.canvas.width = config.codedWidth;
-                        ctx.canvas.height = config.codedHeight;
-
-						socket = initializeServer(
-                    		serverUrl,
-                    		ctx.canvas.width,
-                    		ctx.canvas.height
-                		);
-
-                        const mapRenderer = new ARSimpleMap(
-                            $map,
-                            ctx.canvas.width,
-                            ctx.canvas.height
-                        );
-                        document.camRenderer = new ARSimpleView(
-                            $cam,
-                            ctx.canvas.width,
-                            ctx.canvas.height,
-                            mapRenderer
-                        );
-                    },
-                    onFinish() {
-                        console.log("finished!");
-                        console.log("frameCount", frameCount);
-                        videoHasEnded = true;
-                        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                        clearInterval(addCubeInterval);
-                        getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file
-                        window.dispatchEvent(eventEnd);
-                    },
-                });
+                
+                if(socket){
+                    await getVideoFrames({
+                        videoUrl,
+                        async onFrame(frame) {
+                            await processFrame(frame);
+                            
+                            frameCount++;
+                            frame.close();
+                        },
+                        onConfig(config) {
+                            
+                        },
+                        onFinish() {
+                            console.log("finished!");
+                            console.log("frameCount", frameCount);
+                            //ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                            clearInterval(addCubeInterval);
+                            getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file
+                            window.dispatchEvent(eventEnd);
+                        },
+                    });
+                }
             }
 
             window.addEventListener("load", main);

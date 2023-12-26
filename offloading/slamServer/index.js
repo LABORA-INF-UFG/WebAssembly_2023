@@ -23,10 +23,10 @@ sockets.on('connection', (socket) => {
     const { width, height } = dimensions;
     alva = await AlvaAR.Initialize(width, height);
     
-    callback(null)
+    callback()
   });
 
-  socket.on('frame', async (frame, callback) => { 
+  socket.on('frame',  (frame, callback) => { 
     
     const start = performance.now();
 

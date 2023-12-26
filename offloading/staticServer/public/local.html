@@ -118,6 +118,9 @@
         const eventEnd = new Event("end");
         
         async function main() {
+            window.dispatchEvent(eventStart);
+
+            
             let statistics = [
                 ['totalTime','slamTime', 'renderTime', 'segmentationTime']
             ];
@@ -125,6 +128,17 @@
             const $cam = document.getElementById('renderer-cam');
             const $map = document.getElementById('renderer-map');
             const ctx = document.getElementById('renderer-video').getContext('2d', {willReadFrequently: true});
+            
+            const width = 480
+            const height = 848
+
+            ctx.canvas.width = width;
+            ctx.canvas.height = height;
+
+            const alva = await AlvaAR.Initialize(width, height)
+
+            const mapRenderer = new ARSimpleMap($map, ctx.canvas.width, ctx.canvas.height);
+            const camRenderer = new ARSimpleView($cam, ctx.canvas.width, ctx.canvas.height, mapRenderer);
             
             let doFindPlane = false;
 
@@ -139,7 +153,13 @@
 
             let startTotalTime = null;
             
-            const processFrame = async (raw_frame) => {
+            const url = 'videos/video-short.mp4'
+            let response = await fetch(url);
+            let blob = await response.blob();
+            let videoUrl = URL.createObjectURL(blob);
+            let frameCount = 0;
+            
+            const processFrame = (raw_frame) => {
                 const endTotalTime = performance.now();
                 const totalTime = endTotalTime - startTotalTime;
                 
@@ -156,9 +176,9 @@
 
                 const startSlamTime = performance.now();
                 
-                const pose = document.alva.findCameraPose(frame);
-                const planePose = document.alva.findPlane();
-                const dots = document.alva.getFramePoints();
+                const pose = alva.findCameraPose(frame);
+                const planePose = alva.findPlane();
+                const dots = alva.getFramePoints();
 
                 const endSlamTime = performance.now();
 
@@ -168,10 +188,10 @@
 
 
                 if (pose) {
-                    document.camRenderer.updateCameraPose(pose);
+                    camRenderer.updateCameraPose(pose);
 
                     if (addCube && planePose) {
-                        document.camRenderer.createObjectWithPose(planePose);
+                        camRenderer.createObjectWithPose(planePose);
                         addCube = false;
                     }
                 }
@@ -191,61 +211,35 @@
                 
             };
 
-            window.dispatchEvent(eventStart);
             
-            const url = 'videos/video-short.mp4'
-            let response = await fetch(url);
-            let blob = await response.blob();
-            let videoUrl = URL.createObjectURL(blob);
-            let frameCount = 0;
-
-            let alvaInitialized = false;
-            let alvaInitializationPromise = new Promise(resolve => {
-                const checkAlvaInitialization = setInterval(() => {
-                    if (document.alva) {
-                        alvaInitialized = true;
-                        clearInterval(checkAlvaInitialization);
-                        resolve();
-                    }
-                }, 100);
-            });
 
             startTotalTime = performance.now();
 
-            await getVideoFrames({
-                videoUrl,
-                async onFrame(frame) {  // `frame` is a VideoFrame object: https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame
-                    if(!alvaInitialized){
-                        await alvaInitializationPromise;
-                    }
+            if(alva){
+                await getVideoFrames({
+                    videoUrl,
+                    onFrame(frame) {  // `frame` is a VideoFrame object: https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame
+                        
+                        processFrame(frame)
+                        frameCount++
                     
-                    processFrame(frame)
-                    frameCount++
-                
-                    frame.close();
-                },
-                async onConfig(config) {
-                    ctx.canvas.width = config.codedWidth;
-                    ctx.canvas.height = config.codedHeight;
-
-                    document.alva = await AlvaAR.Initialize(ctx.canvas.width, ctx.canvas.height);
-
-                    const mapRenderer = new ARSimpleMap($map, ctx.canvas.width, ctx.canvas.height);
-                    document.camRenderer = new ARSimpleView($cam, ctx.canvas.width, ctx.canvas.height, mapRenderer);
-                
-
-                },
-                onFinish() {
-                    console.log("finished!");
-                    console.log("frameCount", frameCount);
-                    videoHasEnded = true;
-                    getCSV(statistics, "local"); // Uncomment to save statistics in CSV file 
-                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                    clearInterval(addCubeInterval);
-                    window.dispatchEvent(eventEnd);
-                },
-            });
-
+                        frame.close();
+                    },
+                    onConfig(config) {
+    
+                    },
+                    onFinish() {
+                        console.log("finished!");
+                        console.log("frameCount", frameCount);
+                        videoHasEnded = true;
+                        getCSV(statistics, "local"); // Uncomment to save statistics in CSV file 
+                        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                        clearInterval(addCubeInterval);
+                        window.dispatchEvent(eventEnd);
+                    },
+                });
+            }
+            
 
         }
 
