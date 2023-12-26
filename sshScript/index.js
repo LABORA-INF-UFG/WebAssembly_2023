@@ -11,26 +11,129 @@ const sshPath = '/home/matheus/.ssh/id_rsa';
 // const sshPath = '/home/matheus-lucas/.ssh/id_rsa';
 // const sshPath = "C:\\Users\\mathe\\.ssh\\id_rsa";
 
-function experiment(client, eventEmitter) {
-    const cmd = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/puppeteer/index.js';
+function experiment(client, eventEmitter, cpuData,  powerData) {
+    const puppeteer = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/puppeteer/index.js';
 
-    client.exec(cmd, (err, stream) => {
-        if (err) throw err;
+    client.exec('~/WebAssembly_2023/sshScript/getPower.sh', (powerErr, powerStream) => {
 
-        stream.on('data', (data) => {
+        if(powerErr) throw powerErr
+        
+        powerStream.stderr.on('data', (data) => {
+            throw new Error(data.toString());
+        });
+
+        powerStream.on('data', async (data) => {
+            const message = data.toString()
+
+            if (message.trim() === "[sudo] senha para wasm:") {
+                powerStream.run("aula123");
+                await sleep(500)
+            }else{
+                if(!fs.existsSync('./power.txt')){
+                    fs.writeFileSync('./power.txt', '')
+                }
+                fs.appendFileSync('./power.txt', message)
+            }
+
+        })
+
+        powerStream.on('close', () => {
+            const data = fs.readFileSync("power.txt", "utf8")
+            // Split the file into lines and take off lines with [Time, ... ,Watts] information
+        
+            const lines = data
+                .split("\n")
+                .map((line) => line.trim())
+                .filter((line) => !line.startsWith("Time"));
+            
+            // Find the lines with the desired data
+            const avgLine = lines.find((line) => line.includes("Average"));
+            const stdDevLine = lines.find((line) => line.includes("StdDev"));
+        
+            // Extract the Watts data
+            const avgWatts = Number(avgLine
+                .split(/\s+/)
+                .filter((item) => item !== "")
+                .pop());
+            const stdDevWatts = Number(stdDevLine
+                .split(/\s+/)
+                .filter((item) => item !== "")
+                .pop());
+            
+            // The number of samples is the number of lines between the headers and the summary
+            const startLine = lines.findIndex((line) => line.length === 0);
+            const endLine = lines.findIndex((line) => line.startsWith("-"));
+
+            const numSamples = endLine - startLine - 1;
+            
+            const watts_upper = avgWatts + 1.96*(stdDevWatts/Math.sqrt(numSamples))
+            const watts_lower = avgWatts - 1.96*(stdDevWatts/Math.sqrt(numSamples))
+
+            powerData.push([avgWatts, watts_upper, watts_lower])
+
+            fs.unlinkSync('./power.txt')
+        })        
+
+    })
+
+    client.exec('~/WebAssembly_2023/sshScript/getCPU.sh', (cpuErr, cpuStream) => {
+        let cpu_squared_sum = 0 
+        let cpu_sum = 0
+        let cpu_values = []
+        let cpu_upper, cpu_lower, cpu_mean, cpu_s, n
+
+        if (cpuErr) throw cpuErr;
+
+        cpuStream.on('data', (data) => {
+            const cpu_num = parseInt(data.toString());
+            cpu_sum += cpu_num
+            cpu_values.push(cpu_num)
+        })
+
+        cpuStream.stderr.on('data', (data) => {
+            throw new Error(data.toString());
+        });
+
+        cpuStream.on('close', () => {
+            n = cpu_values.length
+
+            cpu_mean = cpu_sum/n
+            for(let i=0; i<n; i++){
+                const mean_diference = cpu_values[i] - cpu_mean       
+                cpu_squared_sum += Math.pow(mean_diference, 2)
+            }
+
+            cpu_s = Math.sqrt(cpu_squared_sum/(n-1))
+
+            cpu_upper = cpu_mean + ((1.96*cpu_s)/(Math.sqrt(n)))
+            cpu_lower = cpu_mean - ((1.96*cpu_s)/(Math.sqrt(n)))
+
+            cpuData.push([cpu_mean, cpu_upper, cpu_lower])
+        })        
+
+    })
+
+    client.exec(puppeteer, (puppeteerErr, puppeterStream) => {
+        if (puppeteerErr) throw puppeteerErr;
+
+        puppeterStream.on('data', (data) => {
             process.stdout.write(data.toString());
         })
 
-        stream.stderr.on('data', (data) => {
+        puppeterStream.stderr.on('data', (data) => {
+            throw new Error(data.toString());
+        });
+        
+        puppeterStream.on('error', (data) => {
             throw new Error(data.toString());
         });
 
-        stream.on('error', (data) => {
-            throw new Error(data.toString());
-        });
+        puppeterStream.on('close', () => {
+            client.exec('touch ~/WebAssembly_2023/sshScript/stop-signal-cpu', (err, stream) => { });
+            client.exec('touch ~/WebAssembly_2023/sshScript/stop-signal-power', (err, stream) => { });
 
-        stream.on('close', () => {
             eventEmitter.emit("close server");
+
         })
     });
 }
@@ -100,6 +203,14 @@ function test(numberOfExperiments, networkEvents) {
 
     let experimentIndex = 0;
 
+    let powerData = [
+        ['PowerMean', 'PowerUpper', 'PowerLower']
+    ]
+
+    let cpuData = [
+        ['CpuMean', 'CpuUpper', 'CpuLower']
+    ]
+
     server.on('ready', () => {
         startServer(server, experimentEvents);
         experimentIndex++;
@@ -108,7 +219,7 @@ function test(numberOfExperiments, networkEvents) {
     client.on('ready', () => {
         experimentEvents.on("start client", () => {
             process.stdout.write(`Iniciando experimento número ${experimentIndex}\n`);
-            experiment(client, experimentEvents)});
+            experiment(client, experimentEvents, cpuData, powerData)});
         experimentEvents.on("close connections", () => {
             client.end();
             networkEvents.emit("new network");
@@ -118,14 +229,26 @@ function test(numberOfExperiments, networkEvents) {
     experimentEvents.on("experiment finished", () => {
         experimentIndex++;
 
+
         if (experimentIndex > numberOfExperiments) {
             experimentEvents.emit("close connections");
+            getCSV(powerData)
+            getCSV(cpuData)
             return;
         }
 
         experimentEvents.emit("start server");
     })
 }
+
+
+function getCSV(data) {
+    let csv = data.map(row => row.join(',')).join('\n');
+    fs.writeFileSync('output.csv', csv, (err) => {
+        if (err) throw err;
+    });
+}
+
 
 function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
     const clientConfig = {
