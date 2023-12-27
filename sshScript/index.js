@@ -22,12 +22,15 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
             throw new Error(data.toString());
         });
 
-        powerStream.on('data', async (data) => {
+        powerStream.on('data',  (data) => {
             const message = data.toString()
 
             if (message.trim() === "[sudo] senha para wasm:") {
-                powerStream.run("aula123");
-                await sleep(500)
+                try{
+                    powerStream.write("aula123\n");
+                }catch (err){
+                    console.error('Error writing to stream:', err);
+                }
             }else{
                 if(!fs.existsSync('./power.txt')){
                     fs.writeFileSync('./power.txt', '')
