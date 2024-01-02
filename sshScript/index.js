@@ -9,24 +9,99 @@ async function sleep(time) {
     await new Promise(resolve => setTimeout(resolve, time));
 }
 
-const sshPath = '/home/matheus/.ssh/id_rsa';
-// const sshPath = '/home/matheus-lucas/.ssh/id_rsa';
+// const sshPath = '/home/matheus/.ssh/id_rsa';
+const sshPath = '/home/matheus-lucas/.ssh/id_rsa';
 // const sshPath = "C:\\Users\\mathe\\.ssh\\id_rsa";
 
-function experiment(client, eventEmitter, cpuData,  powerData) {
-    const puppeteer = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/puppeteer/index.js';
+function experiment(client, eventEmitter, cpuData, powerData) {
+    client.shell((cpuErr, cpuStream) => {
+        let cpu_squared_sum = 0
+        let cpu_sum = 0
+        let cpu_values = []
+        let cpu_upper, cpu_lower, cpu_mean, cpu_s, n
 
-    client.exec('~/WebAssembly_2023/sshScript/getPower.sh', (powerErr, powerStream) => {
+        if (cpuErr) throw cpuErr;
 
-        if(powerErr) throw powerErr
-        
-        powerStream.stderr.on('data', (data) => {
+        cpuStream.on('data', (data) => {
+            const message = data.toString().trim();
+            console.log(message)
+
+            const cpu_num = parseInt(message);
+
+            if(cpu_num) {
+                cpu_sum += cpu_num
+                cpu_values.push(cpu_num)
+            }
+        })
+
+        cpuStream.stderr.on('data', (data) => {
             throw new Error(data.toString());
         });
 
+        cpuStream.on('close', () => {
+
+        })
+
+        cpuStream.run = (command) => cpuStream.write(command + '\n')
+
+        cpuStream.run('~/WebAssembly_2023/sshScript/getCPU.sh');
+
+        eventEmitter.on("finish cpu", () => {
+            cpuStream.run('\x03');
+
+            n = cpu_values.length
+
+            cpu_mean = cpu_sum / n
+            for (let i = 0; i < n; i++) {
+                const mean_diference = cpu_values[i] - cpu_mean
+                cpu_squared_sum += Math.pow(mean_diference, 2)
+            }
+
+            cpu_s = Math.sqrt(cpu_squared_sum / (n - 1))
+
+            cpu_upper = cpu_mean + ((1.96 * cpu_s) / (Math.sqrt(n)))
+            cpu_lower = cpu_mean - ((1.96 * cpu_s) / (Math.sqrt(n)))
+
+            cpuData.push([cpu_mean, cpu_upper, cpu_lower]);
+        });
+
+        setTimeout(() => {
+            eventEmitter.emit("finish cpu")
+        }, 6 * 1000);
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const puppeteer = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/puppeteer/index.js';
+
+    /**
+     * 
+    client.exec('~/WebAssembly_2023/sshScript/getPower.sh', (powerErr, powerStream) => {
+        
+        if(powerErr) throw powerErr
+        
+        // powerStream.stderr.on('data', (data) => {
+        //     throw new Error(data.toString());
+        // });
+        
         powerStream.on('data',  (data) => {
             const message = data.toString()
-
+            console.log(message)
+            
             if (message.trim() === "[sudo] senha para wasm:") {
                 try{
                     powerStream.write("aula123\n");
@@ -37,6 +112,7 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
                 if(!fs.existsSync('./power.txt')){
                     fs.writeFileSync('./power.txt', '')
                 }
+                console.log("aqui")
                 fs.appendFileSync('./power.txt', message)
             }
 
@@ -47,80 +123,53 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
             // Split the file into lines and take off lines with [Time, ... ,Watts] information
         
             const lines = data
-                .split("\n")
-                .map((line) => line.trim())
-                .filter((line) => !line.startsWith("Time"));
+            .split("\n")
+            .map((line) => line.trim())
+            .filter((line) => !line.startsWith("Time"));
             
             // Find the lines with the desired data
             const avgLine = lines.find((line) => line.includes("Average"));
+            
+            console.log(avgLine)
+            
             const stdDevLine = lines.find((line) => line.includes("StdDev"));
-        
+            
+            console.log(stdDevLine)
+            
             // Extract the Watts data
             const avgWatts = Number(avgLine
                 .split(/\s+/)
                 .filter((item) => item !== "")
                 .pop());
-            const stdDevWatts = Number(stdDevLine
-                .split(/\s+/)
-                .filter((item) => item !== "")
-                .pop());
-            
-            // The number of samples is the number of lines between the headers and the summary
-            const startLine = lines.findIndex((line) => line.length === 0);
-            const endLine = lines.findIndex((line) => line.startsWith("-"));
+                const stdDevWatts = Number(stdDevLine
+                    .split(/\s+/)
+                    .filter((item) => item !== "")
+                    .pop());
+                    
+                    // The number of samples is the number of lines between the headers and the summary
+                    const startLine = lines.findIndex((line) => line.length === 0);
+                    const endLine = lines.findIndex((line) => line.startsWith("-"));
+                    
+                    const numSamples = endLine - startLine - 1;
+                    
+                    const watts_upper = avgWatts + 1.96*(stdDevWatts/Math.sqrt(numSamples))
+                    const watts_lower = avgWatts - 1.96*(stdDevWatts/Math.sqrt(numSamples))
+                    
+                    powerData.push([avgWatts, watts_upper, watts_lower])
+                    
+                    fs.unlinkSync('./power.txt')
+                })        
+                
+            })
+            */
 
-            const numSamples = endLine - startLine - 1;
-            
-            const watts_upper = avgWatts + 1.96*(stdDevWatts/Math.sqrt(numSamples))
-            const watts_lower = avgWatts - 1.96*(stdDevWatts/Math.sqrt(numSamples))
 
-            powerData.push([avgWatts, watts_upper, watts_lower])
 
-            fs.unlinkSync('./power.txt')
-        })        
-
-    })
-
-    client.exec('~/WebAssembly_2023/sshScript/getCPU.sh', (cpuErr, cpuStream) => {
-        let cpu_squared_sum = 0 
-        let cpu_sum = 0
-        let cpu_values = []
-        let cpu_upper, cpu_lower, cpu_mean, cpu_s, n
-
-        if (cpuErr) throw cpuErr;
-
-        cpuStream.on('data', (data) => {
-            const cpu_num = parseInt(data.toString());
-            cpu_sum += cpu_num
-            cpu_values.push(cpu_num)
-        })
-
-        cpuStream.stderr.on('data', (data) => {
-            throw new Error(data.toString());
-        });
-
-        cpuStream.on('close', () => {
-            n = cpu_values.length
-
-            cpu_mean = cpu_sum/n
-            for(let i=0; i<n; i++){
-                const mean_diference = cpu_values[i] - cpu_mean       
-                cpu_squared_sum += Math.pow(mean_diference, 2)
-            }
-
-            cpu_s = Math.sqrt(cpu_squared_sum/(n-1))
-
-            cpu_upper = cpu_mean + ((1.96*cpu_s)/(Math.sqrt(n)))
-            cpu_lower = cpu_mean - ((1.96*cpu_s)/(Math.sqrt(n)))
-
-            cpuData.push([cpu_mean, cpu_upper, cpu_lower])
-        })        
-
-    })
-
+    /**
+     * 
     client.exec(puppeteer, (puppeteerErr, puppeterStream) => {
         if (puppeteerErr) throw puppeteerErr;
-
+        
         puppeterStream.on('data', (data) => {
             process.stdout.write(data.toString());
         })
@@ -132,15 +181,16 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
         puppeterStream.on('error', (data) => {
             throw new Error(data.toString());
         });
-
+        
         puppeterStream.on('close', () => {
             client.exec('touch ~/WebAssembly_2023/sshScript/stop-signal-cpu', (err, stream) => { });
             client.exec('touch ~/WebAssembly_2023/sshScript/stop-signal-power', (err, stream) => { });
-
+            
             eventEmitter.emit("close server");
-
+            
         })
     });
+    */
 }
 
 function startServer(server, eventEmitter) {
@@ -224,7 +274,8 @@ function test(numberOfExperiments, networkEvents) {
     client.on('ready', () => {
         experimentEvents.on("start client", () => {
             process.stdout.write(`Iniciando experimento número ${experimentIndex}\n`);
-            experiment(client, experimentEvents, cpuData, powerData)});
+            experiment(client, experimentEvents, cpuData, powerData)
+        });
         experimentEvents.on("close connections", () => {
             client.end();
             networkEvents.emit("new network");
