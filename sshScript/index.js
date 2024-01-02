@@ -3,6 +3,8 @@ var events = require('events');
 const { exit } = require('process');
 const fs = require('fs');
 
+let experimentIndex = 0;
+
 async function sleep(time) {
     await new Promise(resolve => setTimeout(resolve, time));
 }
@@ -235,8 +237,9 @@ function test(numberOfExperiments, networkEvents) {
 
         if (experimentIndex > numberOfExperiments) {
             experimentEvents.emit("close connections");
-            getCSV(powerData)
-            getCSV(cpuData)
+            getCSV(powerData, experimentIndex)
+            getCSV(cpuData, experimentIndex)
+            experimentIndex++;
             return;
         }
 
@@ -245,9 +248,9 @@ function test(numberOfExperiments, networkEvents) {
 }
 
 
-function getCSV(data) {
+function getCSV(data, experimentIndex) {
     let csv = data.map(row => row.join(',')).join('\n');
-    fs.writeFileSync('output.csv', csv, (err) => {
+    fs.writeFileSync(`output${experimentIndex}.csv`, csv, (err) => {
         if (err) throw err;
     });
 }
