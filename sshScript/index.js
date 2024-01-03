@@ -15,21 +15,24 @@ const sshPath = '/home/matheus/.ssh/id_rsa';
 
 function experiment(client, eventEmitter, cpuData,  powerData) {
     const puppeteer = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/puppeteer/index.js';
+    
+    //Power
+    /*
+    client.shell((err, stream) => {
+        if (err) throw err
+        stream.run = (command) => stream.write(command + '\n')
 
-    client.exec('~/WebAssembly_2023/sshScript/getPower.sh', (powerErr, powerStream) => {
-
-        if(powerErr) throw powerErr
-        
-        powerStream.stderr.on('data', (data) => {
+        stream.stderr.on('data', (data) => {
             throw new Error(data.toString());
         });
 
-        powerStream.on('data',  (data) => {
+        stream.on('data', async (data) => {
             const message = data.toString()
 
             if (message.trim() === "[sudo] senha para wasm:") {
                 try{
-                    powerStream.write("aula123\n");
+                    stream.run("aula123");
+                    await sleep(500)
                 }catch (err){
                     console.error('Error writing to stream:', err);
                 }
@@ -42,10 +45,12 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
 
         })
 
-        powerStream.on('close', () => {
+        eventEmitter.on('close power', async () => {
+            stream.run('touch ~/WebAssembly_2023/sshScript/stop-signal-power')
+            await sleep(500)
+
             const data = fs.readFileSync("power.txt", "utf8")
             // Split the file into lines and take off lines with [Time, ... ,Watts] information
-        
             const lines = data
                 .split("\n")
                 .map((line) => line.trim())
@@ -77,29 +82,36 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
             powerData.push([avgWatts, watts_upper, watts_lower])
 
             fs.unlinkSync('./power.txt')
-        })        
+        })
 
+        stream.run('~/WebAssembly_2023/sshScript/getPower.sh')
     })
+    */
+    //CPU 
+    client.shell((err, stream) => {
+        if (err) throw err
+        stream.run = (command) => stream.write(command + '\n')
 
-    client.exec('~/WebAssembly_2023/sshScript/getCPU.sh', (cpuErr, cpuStream) => {
         let cpu_squared_sum = 0 
         let cpu_sum = 0
         let cpu_values = []
         let cpu_upper, cpu_lower, cpu_mean, cpu_s, n
 
-        if (cpuErr) throw cpuErr;
+        stream.stderr.on('data', (data) => {
+            throw new Error(data.toString());
+        });
 
-        cpuStream.on('data', (data) => {
+        stream.on('data', (data) => {
             const cpu_num = parseInt(data.toString());
             cpu_sum += cpu_num
             cpu_values.push(cpu_num)
         })
 
-        cpuStream.stderr.on('data', (data) => {
-            throw new Error(data.toString());
-        });
+        eventEmitter.on('close cpu', async () => {
+            //close CPU bash script
+            stream.run('touch ~/WebAssembly_2023/sshScript/stop-signal-cpu');
+            await sleep(500)
 
-        cpuStream.on('close', () => {
             n = cpu_values.length
 
             cpu_mean = cpu_sum/n
@@ -114,8 +126,10 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
             cpu_lower = cpu_mean - ((1.96*cpu_s)/(Math.sqrt(n)))
 
             cpuData.push([cpu_mean, cpu_upper, cpu_lower])
-        })        
-
+            
+        })
+        
+        stream.run('~/WebAssembly_2023/sshScript/getCPU.sh')
     })
 
     client.exec(puppeteer, (puppeteerErr, puppeterStream) => {
@@ -134,9 +148,8 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
         });
 
         puppeterStream.on('close', () => {
-            client.exec('touch ~/WebAssembly_2023/sshScript/stop-signal-cpu', (err, stream) => { });
-            client.exec('touch ~/WebAssembly_2023/sshScript/stop-signal-power', (err, stream) => { });
-
+            eventEmitter.emit("close cpu")
+            eventEmitter.emit("close power")
             eventEmitter.emit("close server");
 
         })
@@ -157,6 +170,10 @@ function startServer(server, eventEmitter) {
             if (message.trim() === "Server running on port 3000") {
                 eventEmitter.emit("start client");
             }
+        });
+
+        stream.stderr.on('data', (data) => {
+            throw new Error(data.toString());
         });
 
         stream.stderr.on('data', (data) => {
