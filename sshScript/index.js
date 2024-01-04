@@ -27,7 +27,7 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
 
         stream.on('data', async (data) => {
             const message = data.toString()
-
+            console.log(message)
             if (message.trim() === "[sudo] senha para wasm:") {
                 try{
                     stream.run("aula123");
