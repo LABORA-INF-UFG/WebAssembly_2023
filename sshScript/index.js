@@ -22,25 +22,13 @@ function experiment(client, eventEmitter, cpuData, powerData) {
 
         if (err) throw err;
 
-        let getNextMessage = false;
-        let cpuPId = undefined;
-
         stream.on('data', (data) => {
             const message = data.toString().trim();
             console.log(message)
 
-            if(getNextMessage) {
-                cpuPId = Number(message.split(" ")[1]);
-                getNextMessage = false;
-            }
-
-            if(message.includes("/wasm/WebAssembly_2023/sshScript/g")) {
-                getNextMessage = true
-            }
-
             const cpu_num = parseInt(message);
 
-            if(cpu_num !== NaN) {
+            if (cpu_num !== NaN) {
                 cpu_sum += cpu_num
                 cpu_values.push(cpu_num)
             }
@@ -51,55 +39,80 @@ function experiment(client, eventEmitter, cpuData, powerData) {
         });
 
         stream.run = (command) => stream.write(command + '\n')
-        
+
         eventEmitter.on("finish cpu", () => {
             stream.run(`fg`);
             stream.run('\x03');
 
-            if(!cpuPId) throw new Error("No pids found");
+            stream.run(`fg`);
+            stream.run('\x03');
 
-            stream.run(`kill -9 ${cpuPId}`);
-            
             n = cpu_values.length
 
             console.log("numero de cpu")
             console.log(n)
-            
+
             cpu_mean = cpu_sum / n
             for (let i = 0; i < n; i++) {
                 const mean_diference = cpu_values[i] - cpu_mean
                 cpu_squared_sum += Math.pow(mean_diference, 2)
             }
-            
+
             cpu_s = Math.sqrt(cpu_squared_sum / (n - 1))
-            
+
             cpu_upper = cpu_mean + ((1.96 * cpu_s) / (Math.sqrt(n)))
             cpu_lower = cpu_mean - ((1.96 * cpu_s) / (Math.sqrt(n)))
-            
+
             cpuData.push([cpu_mean, cpu_upper, cpu_lower]);
         });
 
         eventEmitter.on("start power", () => {
-            stream.run('/home/wasm/WebAssembly_2023/sshScript/getPower.sh > a.txt');
-            stream.run('bg');
-
+            stream.run('/home/wasm/WebAssembly_2023/sshScript/getPower.sh > a.txt &');
+            // stream.run("\x1A")
+            // stream.run('bg');
+            eventEmitter.emit("start puppeteer")
         })
 
-        eventEmitter.on("start cpu", () => {
-            stream.run('nohup /home/wasm/WebAssembly_2023/sshScript/getCPU.sh &');
-            stream.run('');
+        eventEmitter.on("start cpu", async () => {
+            stream.run('/home/wasm/WebAssembly_2023/sshScript/getCPU.sh > b.txt &');
             eventEmitter.emit("start power");
         })
-        
+
+        eventEmitter.on("start puppeteer", () => {
+            const puppeteer = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node /home/wasm/WebAssembly_2023/puppeteer/index.js';
+
+
+            client.exec(puppeteer, (puppeteerErr, puppeterStream) => {
+                if (puppeteerErr) throw puppeteerErr;
+
+                puppeterStream.on('data', (data) => {
+                    process.stdout.write(data.toString());
+                })
+
+                puppeterStream.stderr.on('data', (data) => {
+                    throw new Error(data.toString());
+                });
+
+                puppeterStream.on('error', (data) => {
+                    throw new Error(data.toString());
+                });
+
+                puppeterStream.on('close', () => {
+                    console.log("fechando puppeteer")
+
+                    eventEmitter.emit("finish cpu")
+                    client.exec('touch ~/WebAssembly_2023/sshScript/stop-signal-cpu', (err, stream) => { });
+                    client.exec('touch ~/WebAssembly_2023/sshScript/stop-signal-power', (err, stream) => { });
+
+                    eventEmitter.emit("close server");
+                })
+            });
+        })
+
         stream.run("sudo su");
         stream.run("aula123");
         await sleep(500);
         eventEmitter.emit("start cpu")
-
-
-        setTimeout(() => {
-            eventEmitter.emit("finish cpu")
-        }, 10 * 1000);
     })
 
 
@@ -116,7 +129,6 @@ function experiment(client, eventEmitter, cpuData, powerData) {
 
 
 
-    const puppeteer = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/puppeteer/index.js';
 
     /**
      * 
