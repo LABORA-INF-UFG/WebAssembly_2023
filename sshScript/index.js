@@ -14,63 +14,93 @@ const sshPath = '/home/matheus-lucas/.ssh/id_rsa';
 // const sshPath = "C:\\Users\\mathe\\.ssh\\id_rsa";
 
 function experiment(client, eventEmitter, cpuData, powerData) {
-    client.shell((cpuErr, cpuStream) => {
+    client.shell(async (err, stream) => {
         let cpu_squared_sum = 0
         let cpu_sum = 0
         let cpu_values = []
         let cpu_upper, cpu_lower, cpu_mean, cpu_s, n
 
-        if (cpuErr) throw cpuErr;
+        if (err) throw err;
 
-        cpuStream.on('data', (data) => {
+        let getNextMessage = false;
+        let cpuPId = undefined;
+
+        stream.on('data', (data) => {
             const message = data.toString().trim();
             console.log(message)
 
+            if(getNextMessage) {
+                cpuPId = Number(message.split(" ")[1]);
+                getNextMessage = false;
+            }
+
+            if(message.includes("/wasm/WebAssembly_2023/sshScript/g")) {
+                getNextMessage = true
+            }
+
             const cpu_num = parseInt(message);
 
-            if(cpu_num) {
+            if(cpu_num !== NaN) {
                 cpu_sum += cpu_num
                 cpu_values.push(cpu_num)
             }
         })
 
-        cpuStream.stderr.on('data', (data) => {
+        stream.stderr.on('data', (data) => {
             throw new Error(data.toString());
         });
 
-        cpuStream.on('close', () => {
-
-        })
-
-        cpuStream.run = (command) => cpuStream.write(command + '\n')
-
-        cpuStream.run('~/WebAssembly_2023/sshScript/getCPU.sh');
-
+        stream.run = (command) => stream.write(command + '\n')
+        
         eventEmitter.on("finish cpu", () => {
-            cpuStream.run('\x03');
+            stream.run(`fg`);
+            stream.run('\x03');
 
+            if(!cpuPId) throw new Error("No pids found");
+
+            stream.run(`kill -9 ${cpuPId}`);
+            
             n = cpu_values.length
 
+            console.log("numero de cpu")
+            console.log(n)
+            
             cpu_mean = cpu_sum / n
             for (let i = 0; i < n; i++) {
                 const mean_diference = cpu_values[i] - cpu_mean
                 cpu_squared_sum += Math.pow(mean_diference, 2)
             }
-
+            
             cpu_s = Math.sqrt(cpu_squared_sum / (n - 1))
-
+            
             cpu_upper = cpu_mean + ((1.96 * cpu_s) / (Math.sqrt(n)))
             cpu_lower = cpu_mean - ((1.96 * cpu_s) / (Math.sqrt(n)))
-
+            
             cpuData.push([cpu_mean, cpu_upper, cpu_lower]);
         });
 
+        eventEmitter.on("start power", () => {
+            stream.run('/home/wasm/WebAssembly_2023/sshScript/getPower.sh > a.txt');
+            stream.run('bg');
+
+        })
+
+        eventEmitter.on("start cpu", () => {
+            stream.run('nohup /home/wasm/WebAssembly_2023/sshScript/getCPU.sh &');
+            stream.run('');
+            eventEmitter.emit("start power");
+        })
+        
+        stream.run("sudo su");
+        stream.run("aula123");
+        await sleep(500);
+        eventEmitter.emit("start cpu")
+
+
         setTimeout(() => {
             eventEmitter.emit("finish cpu")
-        }, 6 * 1000);
+        }, 10 * 1000);
     })
-
-
 
 
 
