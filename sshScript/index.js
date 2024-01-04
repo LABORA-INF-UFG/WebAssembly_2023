@@ -3,14 +3,12 @@ var events = require('events');
 const { exit } = require('process');
 const fs = require('fs');
 
-let experimentIndex = 0;
-
 async function sleep(time) {
     await new Promise(resolve => setTimeout(resolve, time));
 }
 
-const sshPath = '/home/matheus/.ssh/id_rsa';
-// const sshPath = '/home/matheus-lucas/.ssh/id_rsa';
+// const sshPath = '/home/matheus/.ssh/id_rsa';
+const sshPath = '/home/matheus-lucas/.ssh/id_rsa';
 // const sshPath = "C:\\Users\\mathe\\.ssh\\id_rsa";
 
 function experiment(client, eventEmitter, cpuData,  powerData) {
@@ -58,10 +56,7 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
             messageCounter = 0
             let watts_mean = watt_sum/n 
             
-            powerData.push([watts_mean])
-            console.log("watts mean: " + watts_mean)
-
-
+            powerData.push(watts_mean)
         })
 
         stream.run('sudo /usr/bin/powerstat -R 1 10000');
@@ -97,9 +92,7 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
         
             cpu_mean = cpu_sum/n
 
-            cpuData.push([cpu_mean])
-            console.log("cpu mean: " + cpu_mean)
-            
+            cpuData.push(cpu_mean)
         })
         
         stream.run('~/WebAssembly_2023/sshScript/getCPU.sh')
@@ -175,7 +168,7 @@ function startServer(server, eventEmitter) {
     });
 }
 
-function test(numberOfExperiments, networkEvents) {
+function test(numberOfExperiments, networkEvents, name, value) {
     if (numberOfExperiments < 1) {
         throw new Error("Number of experiments invalid");
     }
@@ -199,12 +192,12 @@ function test(numberOfExperiments, networkEvents) {
 
     let experimentIndex = 0;
 
-    let powerData = [
-        ['PowerMean']
+    const powerData = [
+        'PowerMean'
     ]
 
-    let cpuData = [
-        ['CpuMean']
+    const cpuData = [
+        'CpuMean'
     ]
 
     server.on('ready', () => {
@@ -216,6 +209,7 @@ function test(numberOfExperiments, networkEvents) {
         experimentEvents.on("start client", () => {
             process.stdout.write(`Iniciando experimento número ${experimentIndex}\n`);
             experiment(client, experimentEvents, cpuData, powerData)});
+
         experimentEvents.on("close connections", () => {
             client.end();
             networkEvents.emit("new network");
@@ -228,9 +222,9 @@ function test(numberOfExperiments, networkEvents) {
 
         if (experimentIndex > numberOfExperiments) {
             experimentEvents.emit("close connections");
-            getCSV(powerData, experimentIndex, 'power')
-            getCSV(cpuData, experimentIndex, 'cpu')
-            
+            getCSV([powerData, cpuData], `${name}_${value}`)
+            clearArray(powerData, 1);
+            clearArray(cpuData, 1);
             return;
         }
 
@@ -238,10 +232,25 @@ function test(numberOfExperiments, networkEvents) {
     })
 }
 
+function clearArray(arr, maxLength) {
+    while (arr.length > maxLength) {
+        arr.pop();
+    }
+}
 
-function getCSV(data, experimentIndex, name) {
-    let csv = data.map(row => row.join(',')).join('\n');
-    fs.writeFileSync(`${name}_${experimentIndex}.csv`, csv, (err) => {
+
+function getCSV(data, name) {
+    let csv = "";
+
+    for (let j = 0; j < data.length; j++) {
+        for (let i = 0; i < data[j].length; i++) {
+            csv += data[i][j];
+
+            csv += i < data.length - 1 ? ", " : "\n";
+        }
+    }
+
+    fs.writeFileSync(`stats/${name}.csv`, csv, (err) => {
         if (err) throw err;
     });
 }
@@ -303,7 +312,7 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
 
 (async () => {
     const networkEvents = new events.EventEmitter();
-    const numberOfExperiments = 1;
+    const numberOfExperiments = 3;
 
     const networkConfig = [
         {
@@ -341,7 +350,9 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
         }
     ]
 
-    networkEvents.on("network configured", () => test(numberOfExperiments, networkEvents));
+    let name, value;
+
+    networkEvents.on("network configured", () => test(numberOfExperiments, networkEvents, name, value));
 
     let networkIndex = 0;
     let networkValueIndex = 0;
@@ -365,15 +376,18 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
             return;
         }
 
-        const { name, values } = networkConfig[networkIndex];
-        const value = values[networkValueIndex];
+        const net = networkConfig[networkIndex];
+        name = net.name
+        value = net.values[networkValueIndex];
         configNetwork(name, value, networkEvents, lastName, lastValue);
         lastName = name;
         lastValue = value;
     });
 
     const initialNetwork = networkConfig[networkIndex];
-    configNetwork(initialNetwork.name, initialNetwork.values[networkValueIndex], networkEvents, lastName, lastValue);
-    lastName = initialNetwork.name;
-    lastValue = initialNetwork.values[networkIndex];
+    name = initialNetwork.name;
+    value = initialNetwork.values[networkValueIndex];
+    configNetwork(name, value, networkEvents, lastName, lastValue);
+    lastName = name;
+    lastValue = value;
 })()
