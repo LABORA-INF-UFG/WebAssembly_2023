@@ -18,6 +18,10 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
     
     //Power
     client.shell((err, stream) => {
+        let messageCounter = 0
+        let watt_sum = 0
+        let n = 0
+
         if (err) throw err
         stream.run = (command) => stream.write(command + '\n')
 
@@ -26,8 +30,10 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
         });
 
         stream.on('data', async (data) => {
-            const message = data.toString()
-            console.log(message)
+            const message = data.toString().trim()
+            messageCounter++
+            
+            console.log("("+message+")")
             if (message.trim() === "[sudo] senha para wasm:") {
                 try{
                     stream.run("aula123");
@@ -36,10 +42,12 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
                     console.error('Error writing to stream:', err);
                 }
             }else{
-                if(!fs.existsSync('./power.txt')){
-                    fs.writeFileSync('./power.txt', '')
+                if(messageCounter > 7 && !message.startsWith("Time")){
+                    const watt = message.split(/\s+/).pop()
+                    watt_sum+=watt
+                    n++
                 }
-                fs.appendFileSync('./power.txt', message)
+                
             }
 
         })
@@ -48,39 +56,11 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
             stream.run('\x03');
             await sleep(500)
 
-            const data = fs.readFileSync("power.txt", "utf8")
-            // Split the file into lines and take off lines with [Time, ... ,Watts] information
-            const lines = data
-                .split("\n")
-                .map((line) => line.trim())
-                .filter((line) => !line.startsWith("Time"));
+            messageCounter = 0
+            let watts_mean = watt_sum/n 
             
-            // Find the lines with the desired data
-            const avgLine = lines.find((line) => line.includes("Average"));
-            const stdDevLine = lines.find((line) => line.includes("StdDev"));
-        
-            // Extract the Watts data
-            const avgWatts = Number(avgLine
-                .split(/\s+/)
-                .filter((item) => item !== "")
-                .pop());
-            const stdDevWatts = Number(stdDevLine
-                .split(/\s+/)
-                .filter((item) => item !== "")
-                .pop());
-            
-            // The number of samples is the number of lines between the headers and the summary
-            const startLine = lines.findIndex((line) => line.length === 0);
-            const endLine = lines.findIndex((line) => line.startsWith("-"));
+            powerData.push([watts_mean, 0, 0])
 
-            const numSamples = endLine - startLine - 1;
-            
-            const watts_upper = avgWatts + 1.96*(stdDevWatts/Math.sqrt(numSamples))
-            const watts_lower = avgWatts - 1.96*(stdDevWatts/Math.sqrt(numSamples))
-
-            powerData.push([avgWatts, watts_upper, watts_lower])
-
-            fs.unlinkSync('./power.txt')
         })
 
         stream.run('sudo /usr/bin/powerstat -R 1 10000');
