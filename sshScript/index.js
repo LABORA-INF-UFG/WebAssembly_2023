@@ -17,7 +17,6 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
     const puppeteer = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/puppeteer/index.js';
     
     //Power
-    /*
     client.shell((err, stream) => {
         if (err) throw err
         stream.run = (command) => stream.write(command + '\n')
@@ -28,6 +27,10 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
 
         stream.on('data', async (data) => {
             const message = data.toString()
+            if (!powerstat && message.match(/^\d+$/)) {
+                powerstat = message;
+                console.log(powerstat)
+            }
 
             if (message.trim() === "[sudo] senha para wasm:") {
                 try{
@@ -46,7 +49,7 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
         })
 
         eventEmitter.on('close power', async () => {
-            stream.run('touch ~/WebAssembly_2023/sshScript/stop-signal-power')
+            stream.run(`kill -INT ${powerstat}`);
             await sleep(500)
 
             const data = fs.readFileSync("power.txt", "utf8")
@@ -83,10 +86,11 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
 
             fs.unlinkSync('./power.txt')
         })
+        let powerstat;
+        stream.run('echo $$; exec sudo /usr/bin/powerstat -R 1 10000');
 
-        stream.run('~/WebAssembly_2023/sshScript/getPower.sh')
     })
-    */
+    // 
     //CPU 
     client.shell((err, stream) => {
         if (err) throw err
@@ -102,9 +106,13 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
         });
 
         stream.on('data', (data) => {
+            
             const cpu_num = parseInt(data.toString());
-            cpu_sum += cpu_num
-            cpu_values.push(cpu_num)
+            if(cpu_num){
+                cpu_sum += cpu_num
+                cpu_values.push(cpu_num)
+            }
+            
         })
 
         eventEmitter.on('close cpu', async () => {
@@ -126,12 +134,14 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
             cpu_lower = cpu_mean - ((1.96*cpu_s)/(Math.sqrt(n)))
 
             cpuData.push([cpu_mean, cpu_upper, cpu_lower])
+            console.log("cpu mean: " + cpu_mean)
             
         })
         
         stream.run('~/WebAssembly_2023/sshScript/getCPU.sh')
     })
 
+    
     client.exec(puppeteer, (puppeteerErr, puppeterStream) => {
         if (puppeteerErr) throw puppeteerErr;
 
