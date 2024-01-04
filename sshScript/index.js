@@ -29,21 +29,21 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
             throw new Error(data.toString());
         });
 
-        stream.on('data', async (data) => {
+        stream.on('data', (data) => {
             const message = data.toString().trim()
             messageCounter++
             
-            console.log("("+message+")")
+            //console.log("("+message+")")
             if (message.trim() === "[sudo] senha para wasm:") {
                 try{
                     stream.run("aula123");
-                    await sleep(500)
+                    //await sleep(500)
                 }catch (err){
                     console.error('Error writing to stream:', err);
                 }
             }else{
                 if(messageCounter > 7 && !message.startsWith("Time")){
-                    const watt = message.split(/\s+/).pop()
+                    const watt = parseFloat(message.split(/\s+/).pop())
                     watt_sum+=watt
                     n++
                 }
@@ -54,28 +54,28 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
 
         eventEmitter.on('close power', async () => {
             stream.run('\x03');
-            await sleep(500)
 
             messageCounter = 0
             let watts_mean = watt_sum/n 
             
-            powerData.push([watts_mean, 0, 0])
+            powerData.push([watts_mean])
+            console.log("watts mean: " + watts_mean)
+
 
         })
 
         stream.run('sudo /usr/bin/powerstat -R 1 10000');
 
     })
-    // 
+     
     //CPU 
     client.shell((err, stream) => {
         if (err) throw err
         stream.run = (command) => stream.write(command + '\n')
 
-        let cpu_squared_sum = 0 
         let cpu_sum = 0
-        let cpu_values = []
-        let cpu_upper, cpu_lower, cpu_mean, cpu_s, n
+        let cpu_mean  
+        let n =0
 
         stream.stderr.on('data', (data) => {
             throw new Error(data.toString());
@@ -86,30 +86,18 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
             const cpu_num = parseInt(data.toString());
             if(cpu_num){
                 cpu_sum += cpu_num
-                cpu_values.push(cpu_num)
+                n++
             }
             
         })
 
         eventEmitter.on('close cpu', async () => {
             //close CPU bash script
-            stream.run('touch ~/WebAssembly_2023/sshScript/stop-signal-cpu');
-            await sleep(500)
-
-            n = cpu_values.length
-
+            stream.run('\x03');
+        
             cpu_mean = cpu_sum/n
-            for(let i=0; i<n; i++){
-                const mean_diference = cpu_values[i] - cpu_mean       
-                cpu_squared_sum += Math.pow(mean_diference, 2)
-            }
 
-            cpu_s = Math.sqrt(cpu_squared_sum/(n-1))
-
-            cpu_upper = cpu_mean + ((1.96*cpu_s)/(Math.sqrt(n)))
-            cpu_lower = cpu_mean - ((1.96*cpu_s)/(Math.sqrt(n)))
-
-            cpuData.push([cpu_mean, cpu_upper, cpu_lower])
+            cpuData.push([cpu_mean])
             console.log("cpu mean: " + cpu_mean)
             
         })
@@ -212,11 +200,11 @@ function test(numberOfExperiments, networkEvents) {
     let experimentIndex = 0;
 
     let powerData = [
-        ['PowerMean', 'PowerUpper', 'PowerLower']
+        ['PowerMean']
     ]
 
     let cpuData = [
-        ['CpuMean', 'CpuUpper', 'CpuLower']
+        ['CpuMean']
     ]
 
     server.on('ready', () => {
@@ -240,9 +228,9 @@ function test(numberOfExperiments, networkEvents) {
 
         if (experimentIndex > numberOfExperiments) {
             experimentEvents.emit("close connections");
-            getCSV(powerData, experimentIndex)
-            getCSV(cpuData, experimentIndex)
-            experimentIndex++;
+            getCSV(powerData, experimentIndex, 'power')
+            getCSV(cpuData, experimentIndex, 'cpu')
+            
             return;
         }
 
@@ -251,9 +239,9 @@ function test(numberOfExperiments, networkEvents) {
 }
 
 
-function getCSV(data, experimentIndex) {
+function getCSV(data, experimentIndex, name) {
     let csv = data.map(row => row.join(',')).join('\n');
-    fs.writeFileSync(`output${experimentIndex}.csv`, csv, (err) => {
+    fs.writeFileSync(`${name}_${experimentIndex}.csv`, csv, (err) => {
         if (err) throw err;
     });
 }
