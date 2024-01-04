@@ -27,10 +27,6 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
 
         stream.on('data', async (data) => {
             const message = data.toString()
-            if (!powerstat && message.match(/^\d+$/)) {
-                powerstat = message;
-                console.log(powerstat)
-            }
 
             if (message.trim() === "[sudo] senha para wasm:") {
                 try{
@@ -49,7 +45,7 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
         })
 
         eventEmitter.on('close power', async () => {
-            stream.run(`kill -INT ${powerstat}`);
+            stream.run('\x03');
             await sleep(500)
 
             const data = fs.readFileSync("power.txt", "utf8")
@@ -86,8 +82,8 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
 
             fs.unlinkSync('./power.txt')
         })
-        let powerstat;
-        stream.run('echo $$; exec sudo /usr/bin/powerstat -R 1 10000');
+
+        stream.run('sudo /usr/bin/powerstat -R 1 10000');
 
     })
     // 
