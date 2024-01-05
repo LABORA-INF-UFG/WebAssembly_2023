@@ -41,6 +41,7 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
                 }
             }else{
                 if(messageCounter > 7 && !message.startsWith("Time")){
+                    console.log(message.split(/\s+/).pop());
                     const watt = parseFloat(message.split(/\s+/).pop())
                     watt_sum+=watt
                     n++
@@ -77,8 +78,10 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
         });
 
         stream.on('data', (data) => {
-            
-            const cpu_num = parseInt(data.toString());
+            const message = data.toString();
+            console.log(message);
+    
+            const cpu_num = parseInt(message);
             if(cpu_num){
                 cpu_sum += cpu_num
                 n++
