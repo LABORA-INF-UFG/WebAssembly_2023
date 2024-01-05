@@ -41,10 +41,13 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
                 }
             }else{
                 if(messageCounter > 7 && !message.startsWith("Time")){
-                    console.log(message.split(/\s+/).pop());
+                    // console.log(message.split(/\s+/).pop());
                     const watt = parseFloat(message.split(/\s+/).pop())
-                    watt_sum+=watt
-                    n++
+
+                    if(watt !== NaN) {
+                        watt_sum+=watt
+                        n++
+                    }
                 }
                 
             }
@@ -82,7 +85,7 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
             console.log(message);
     
             const cpu_num = parseInt(message);
-            if(cpu_num){
+            if(cpu_num !== NaN){
                 cpu_sum += cpu_num
                 n++
             }
