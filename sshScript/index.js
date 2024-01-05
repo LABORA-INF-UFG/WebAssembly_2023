@@ -242,8 +242,8 @@ function clearArray(arr, maxLength) {
 function getCSV(data, name) {
     let csv = "";
 
-    for (let j = 0; j < data.length; j++) {
-        for (let i = 0; i < data[j].length; i++) {
+    for (let j = 0; j < data[0].length; j++) {
+        for (let i = 0; i < data.length; i++) {
             csv += data[i][j];
 
             csv += i < data.length - 1 ? ", " : "\n";
