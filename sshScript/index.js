@@ -256,7 +256,7 @@ function getCSV(data, name) {
         for (let i = 0; i < data.length; i++) {
             csv += data[i][j];
 
-            csv += i < data.length - 1 ? ", " : "\n";
+            csv += i < data.length - 1 ? "," : "\n";
         }
     }
 
