@@ -296,7 +296,8 @@ def gen_network_time_graph(offloading_data, statistic):
 
     ax.plot(x_offloading, y_offloading, marker='o', label=legend_offloading, color = offloading_color, linestyle='--')       
     
-    
+    ax.legend() 
+
     for key in x_offloading:
         left = key - horizontal_line_width/2
         right = key + horizontal_line_width/2
