@@ -7,8 +7,8 @@ async function sleep(time) {
     await new Promise(resolve => setTimeout(resolve, time));
 }
 
-// const sshPath = '/home/matheus/.ssh/id_rsa';
-const sshPath = '/home/matheus-lucas/.ssh/id_rsa';
+const sshPath = '/home/matheus/.ssh/id_rsa';
+// const sshPath = '/home/matheus-lucas/.ssh/id_rsa';
 // const sshPath = "C:\\Users\\mathe\\.ssh\\id_rsa";
 
 function experiment(client, eventEmitter, cpuData,  powerData) {
@@ -44,7 +44,8 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
                     // console.log(message.split(/\s+/).pop());
                     const watt = parseFloat(message.split(/\s+/).pop())
 
-                    if(watt !== NaN) {
+                    
+                    if(!isNaN(watt)) {
                         watt_sum+=watt
                         n++
                     }
@@ -56,6 +57,7 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
 
         eventEmitter.on('close power', async () => {
             stream.run('\x03');
+            stream.run("exit");
 
             messageCounter = 0
             let watts_mean = watt_sum/n 
@@ -82,10 +84,10 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
 
         stream.on('data', (data) => {
             const message = data.toString();
-            console.log(message);
+            // console.log(message);
     
             const cpu_num = parseInt(message);
-            if(cpu_num !== NaN){
+            if(!isNaN(cpu_num)){
                 cpu_sum += cpu_num
                 n++
             }
@@ -95,6 +97,7 @@ function experiment(client, eventEmitter, cpuData,  powerData) {
         eventEmitter.on('close cpu', async () => {
             //close CPU bash script
             stream.run('\x03');
+            stream.run("exit");
         
             cpu_mean = cpu_sum/n
 
@@ -218,6 +221,7 @@ function test(numberOfExperiments, networkEvents, name, value) {
 
         experimentEvents.on("close connections", () => {
             client.end();
+            console.log("\nCONEXÃO COM O CLIENTE ENCERRADA\n")
             networkEvents.emit("new network");
         });
     }).connect(clientConfig);
@@ -318,7 +322,7 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
 
 (async () => {
     const networkEvents = new events.EventEmitter();
-    const numberOfExperiments = 3;
+    const numberOfExperiments = 5;
 
     const networkConfig = [
         {
