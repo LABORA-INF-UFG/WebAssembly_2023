@@ -1,2 +1,5 @@
 dataLocal/
 dataOffloading/
+graphs/
+CPU_Power_local/
+CPU_Power_offloading/
