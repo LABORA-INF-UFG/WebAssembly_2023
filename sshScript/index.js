@@ -11,26 +11,123 @@ const sshPath = '/home/matheus/.ssh/id_rsa';
 // const sshPath = '/home/matheus-lucas/.ssh/id_rsa';
 // const sshPath = "C:\\Users\\mathe\\.ssh\\id_rsa";
 
-function experiment(client, eventEmitter) {
-    const cmd = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/puppeteer/index.js';
+function experiment(client, eventEmitter, cpuData,  powerData) {
+    const puppeteer = '/home/wasm/.nvm/versions/node/v17.9.1/bin/node ~/WebAssembly_2023/puppeteer/index.js';
+    
+    //Power
+    client.shell((err, stream) => {
+        let messageCounter = 0
+        let watt_sum = 0
+        let n = 0
 
-    client.exec(cmd, (err, stream) => {
-        if (err) throw err;
-
-        stream.on('data', (data) => {
-            process.stdout.write(data.toString());
-        })
+        if (err) throw err
+        stream.run = (command) => stream.write(command + '\n')
 
         stream.stderr.on('data', (data) => {
             throw new Error(data.toString());
         });
 
-        stream.on('error', (data) => {
+        stream.on('data', (data) => {
+            const message = data.toString().trim()
+            messageCounter++
+            
+            //console.log("("+message+")")
+            if (message.trim() === "[sudo] senha para wasm:") {
+                try{
+                    stream.run("aula123");
+                    //await sleep(500)
+                }catch (err){
+                    console.error('Error writing to stream:', err);
+                }
+            }else{
+                if(messageCounter > 7 && !message.startsWith("Time")){
+                    // console.log(message.split(/\s+/).pop());
+                    const watt = parseFloat(message.split(/\s+/).pop())
+
+                    
+                    if(!isNaN(watt)) {
+                        watt_sum+=watt
+                        n++
+                    }
+                }
+                
+            }
+
+        })
+
+        eventEmitter.on('close power', async () => {
+            stream.run('\x03');
+            stream.run("exit");
+
+            messageCounter = 0
+            let watts_mean = watt_sum/n 
+            
+            powerData.push(watts_mean)
+        })
+
+        stream.run('sudo /usr/bin/powerstat -R 1 10000');
+
+    })
+     
+    //CPU 
+    client.shell((err, stream) => {
+        if (err) throw err
+        stream.run = (command) => stream.write(command + '\n')
+
+        let cpu_sum = 0
+        let cpu_mean  
+        let n =0
+
+        stream.stderr.on('data', (data) => {
             throw new Error(data.toString());
         });
 
-        stream.on('close', () => {
+        stream.on('data', (data) => {
+            const message = data.toString();
+            // console.log(message);
+    
+            const cpu_num = parseInt(message);
+            if(!isNaN(cpu_num)){
+                cpu_sum += cpu_num
+                n++
+            }
+            
+        })
+
+        eventEmitter.on('close cpu', async () => {
+            //close CPU bash script
+            stream.run('\x03');
+            stream.run("exit");
+        
+            cpu_mean = cpu_sum/n
+
+            cpuData.push(cpu_mean)
+        })
+        
+        stream.run('~/WebAssembly_2023/sshScript/getCPU.sh')
+    })
+
+    
+    client.exec(puppeteer, (puppeteerErr, puppeterStream) => {
+        if (puppeteerErr) throw puppeteerErr;
+
+        puppeterStream.on('data', (data) => {
+            process.stdout.write(data.toString());
+        })
+
+        puppeterStream.stderr.on('data', (data) => {
+            throw new Error(data.toString());
+        });
+        
+        puppeterStream.on('error', (data) => {
+            throw new Error(data.toString());
+        });
+
+        puppeterStream.on('close', () => {
+            eventEmitter.emit("close cpu")
+            eventEmitter.emit("close power")
             eventEmitter.emit("close server");
+
         })
     });
 }
@@ -49,6 +146,10 @@ function startServer(server, eventEmitter) {
             if (message.trim() === "Server running on port 3000") {
                 eventEmitter.emit("start client");
             }
+        });
+
+        stream.stderr.on('data', (data) => {
+            throw new Error(data.toString());
         });
 
         stream.stderr.on('data', (data) => {
@@ -76,7 +177,7 @@ function startServer(server, eventEmitter) {
     });
 }
 
-function test(numberOfExperiments, networkEvents) {
+function test(numberOfExperiments, networkEvents, name, value) {
     if (numberOfExperiments < 1) {
         throw new Error("Number of experiments invalid");
     }
@@ -100,6 +201,14 @@ function test(numberOfExperiments, networkEvents) {
 
     let experimentIndex = 0;
 
+    const powerData = [
+        'PowerMean'
+    ]
+
+    const cpuData = [
+        'CpuMean'
+    ]
+
     server.on('ready', () => {
         startServer(server, experimentEvents);
         experimentIndex++;
@@ -108,9 +217,11 @@ function test(numberOfExperiments, networkEvents) {
     client.on('ready', () => {
         experimentEvents.on("start client", () => {
             process.stdout.write(`Iniciando experimento número ${experimentIndex}\n`);
-            experiment(client, experimentEvents)});
+            experiment(client, experimentEvents, cpuData, powerData)});
+
         experimentEvents.on("close connections", () => {
             client.end();
+            console.log("\nCONEXÃO COM O CLIENTE ENCERRADA\n")
             networkEvents.emit("new network");
         });
     }).connect(clientConfig);
@@ -118,14 +229,42 @@ function test(numberOfExperiments, networkEvents) {
     experimentEvents.on("experiment finished", () => {
         experimentIndex++;
 
+
         if (experimentIndex > numberOfExperiments) {
             experimentEvents.emit("close connections");
+            getCSV([powerData, cpuData], `${name}_${value}`)
+            clearArray(powerData, 1);
+            clearArray(cpuData, 1);
             return;
         }
 
         experimentEvents.emit("start server");
     })
 }
+
+function clearArray(arr, maxLength) {
+    while (arr.length > maxLength) {
+        arr.pop();
+    }
+}
+
+
+function getCSV(data, name) {
+    let csv = "";
+
+    for (let j = 0; j < data[0].length; j++) {
+        for (let i = 0; i < data.length; i++) {
+            csv += data[i][j];
+
+            csv += i < data.length - 1 ? "," : "\n";
+        }
+    }
+
+    fs.writeFileSync(`stats/${name}.csv`, csv, (err) => {
+        if (err) throw err;
+    });
+}
+
 
 function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
     const clientConfig = {
@@ -183,7 +322,7 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
 
 (async () => {
     const networkEvents = new events.EventEmitter();
-    const numberOfExperiments = 1;
+    const numberOfExperiments = 5;
 
     const networkConfig = [
         {
@@ -221,7 +360,9 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
         }
     ]
 
-    networkEvents.on("network configured", () => test(numberOfExperiments, networkEvents));
+    let name, value;
+
+    networkEvents.on("network configured", () => test(numberOfExperiments, networkEvents, name, value));
 
     let networkIndex = 0;
     let networkValueIndex = 0;
@@ -245,15 +386,18 @@ function configNetwork(config, value, networkEvents, lastConfig, lastValue) {
             return;
         }
 
-        const { name, values } = networkConfig[networkIndex];
-        const value = values[networkValueIndex];
+        const net = networkConfig[networkIndex];
+        name = net.name
+        value = net.values[networkValueIndex];
         configNetwork(name, value, networkEvents, lastName, lastValue);
         lastName = name;
         lastValue = value;
     });
 
     const initialNetwork = networkConfig[networkIndex];
-    configNetwork(initialNetwork.name, initialNetwork.values[networkValueIndex], networkEvents, lastName, lastValue);
-    lastName = initialNetwork.name;
-    lastValue = initialNetwork.values[networkIndex];
+    name = initialNetwork.name;
+    value = initialNetwork.values[networkValueIndex];
+    configNetwork(name, value, networkEvents, lastName, lastValue);
+    lastName = name;
+    lastValue = value;
 })()
