@@ -122,8 +122,8 @@
             import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
             import { Video, onFrame, getCSV } from "/scripts/utils.js";
 
-            //const serverUrl = "192.168.10.2:3000";
-            const serverUrl = "localhost:3000";
+            const serverUrl = "192.168.10.2:3000";
+            //const serverUrl = "localhost:3000";
             const eventStart = new Event("start");
             const eventEnd = new Event("end");
 
@@ -131,7 +131,7 @@
             const height = 848;
 
             const maxFrames = 1800;
-            const skipFrames = 1;
+            const skipFrames = 10;
             let frameCount = 1;
             let totalFrames = 1;
 
