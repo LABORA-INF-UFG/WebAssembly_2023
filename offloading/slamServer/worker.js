@@ -1,23 +1,24 @@
-const { workerData, parentPort } = require('worker_threads')
+import { workerData, parentPort } from 'worker_threads';
+import { AlvaAR } from './alva_ar.js';
 
-const { alva } = workerData;
 
-parentPort.once('message', (message) => {
-    const frame = message;
+parentPort.on('message', async (message) => {
+  const frame = message;
+  const alva = await AlvaAR.Initialize(frame.width, frame.height);
 
-    const start = performance.now();
+  const start = performance.now();
 
-    const pose = alva.findCameraPose(frame);
-    const planePose = alva.findPlane();
-    const dots = alva.getFramePoints();
+  const pose = alva.findCameraPose(frame);
+  const planePose = alva.findPlane();
+  const dots = alva.getFramePoints();
 
-    const end = performance.now();
+  const end = performance.now();
 
-    const data = {
-        pose: pose ? pose : null,
-        planePose: planePose ? planePose : null,
-        dots: dots,
-      };
+  const data = {
+    pose: pose ? pose : null,
+    planePose: planePose ? planePose : null,
+    dots: dots,
+  };
 
-    parentPort.postMessage([data, end - start]);
+  parentPort.postMessage([data, end - start]);
 })

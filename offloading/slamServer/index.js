@@ -1,6 +1,11 @@
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
+import { Worker } from 'worker_threads';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { AlvaAR } from './alva_ar.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const port = 3000;
 
@@ -18,6 +23,7 @@ const sockets = new Server(server, {
 
 sockets.on('connection', (socket) => {
   let alva;
+  const worker = new Worker(__dirname + '/worker.js');
 
   socket.on('initialize alva', async (dimensions, callback) => {
     const { width, height } = dimensions;
@@ -25,25 +31,13 @@ sockets.on('connection', (socket) => {
     callback();
   });
 
-  socket.on('frame', async (frame, callback) => { 
+  socket.on('frame', async (frame, callback) => {
     if (!alva) {
       return callback([undefined, 0]);
     }
-    
-    const start = performance.now();
 
-    const pose = alva.findCameraPose(frame);
-    const planePose = alva.findPlane();
-    const dots = alva.getFramePoints();
-    
-    const end = performance.now();
+    worker.once('message', (message) => callback(message));
 
-    const data = {
-      pose: pose ? pose : null,
-      planePose: planePose ? planePose : null,
-      dots: dots,
-    };
-
-    callback([data, end - start]);
+    worker.postMessage(frame);
   });
 });
