@@ -3,7 +3,7 @@ import { createCanvas, loadImage } from 'canvas';
 import { exec }from 'child_process';
 import { AlvaAR } from './public/scripts/alva_ar.js';
 
-const videoPath = './public/videos/video-short.mp4';
+const videoPath = './public/videos/wasm.mp4';
 const outputDirectory = './frames';
 let count = 0;
 let totalTime = 0;
@@ -32,35 +32,34 @@ function extractFrames(videoPath, outputDirectory) {
 async function processFrames() {
     const frameFiles = fs.readdirSync(outputDirectory);
     const firstImage = await loadImage('./frames/frame-0001.png');
+    
     const alva = await AlvaAR.Initialize(firstImage.width, firstImage.height)
+    const canvas = createCanvas(firstImage.width, firstImage.height);
+    const ctx = canvas.getContext('2d');
 
     for (const frameFile of frameFiles) {
         const framePath = `${outputDirectory}/${frameFile}`;
         const image = await loadImage(framePath);
-        const canvas = createCanvas(image.width, image.height);
-        const ctx = canvas.getContext('2d');
         ctx.drawImage(image, 0, 0);
         
         // Use getImageData to get pixel data
-        const frame = await ctx.getImageData(0, 0, canvas.width, canvas.height);
-        
+        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
         let startSlam, endSlam
                     
-        await new Promise (async resolve =>  {
-            startSlam = await performance.now()
+        await new Promise (resolve =>  {
+            startSlam = performance.now()
 
-            const pose = await alva.findCameraPose(frame);
-            const planePose = await alva.findPlane();
-            const dots =  await alva.getFramePoints();
+            const pose =  alva.findCameraPose(frame);
+            const planePose = alva.findPlane();
+            const dots =  alva.getFramePoints();
 
-            endSlam = await performance.now()
+            endSlam = performance.now()
 
             count++;
 
             resolve()
         })
                                 
-
         totalTime += (endSlam-startSlam)
        
   }
@@ -75,9 +74,6 @@ async function main() {
         const timeAverage = totalTime / count;
         const totalFrames = count;
 
-        //console.log("Time average: " + totalTime / count);
-        //console.log("Total frames: " + count);
-
         const csvData = `${timeAverage},${totalFrames}\n`;
         fs.appendFileSync(`./inNodeResults/experimet_results_node.csv`, csvData);
         // Delete all PNG files in the output directory
@@ -89,7 +85,6 @@ async function main() {
             
         }
 
-        //console.log('All PNG files deleted.');
 
     } catch (error) {
         console.error(error);
@@ -98,7 +93,7 @@ async function main() {
 
 // Run the main function sequentially using async/await
 async function runExperiments() {
-    let numberExperiments = 30;
+    let numberExperiments = 3;
     while (numberExperiments) {
         await main();
         numberExperiments--;
