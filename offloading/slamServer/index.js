@@ -22,22 +22,24 @@ const sockets = new Server(server, {
 });
 
 sockets.on('connection', (socket) => {
-  let alva;
-  const worker = new Worker(__dirname + '/worker.js');
+  let alva, worker;
 
   socket.on('initialize alva', async (dimensions, callback) => {
     const { width, height } = dimensions;
-    alva = await AlvaAR.Initialize(width, height);
+    worker = new Worker(__dirname + '/worker.js', {
+      workerData: { width, height }
+    });
     callback();
   });
 
   socket.on('frame', async (frame, callback) => {
-    if (!alva) {
-      return callback([undefined, 0]);
-    }
+    // if (!alva) {
+    //   return callback([undefined, 0]);
+    // }
 
     worker.once('message', (message) => callback(message));
 
+    // console.log("oi")
     worker.postMessage(frame);
   });
 });

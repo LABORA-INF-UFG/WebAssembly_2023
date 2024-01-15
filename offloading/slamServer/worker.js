@@ -1,10 +1,15 @@
 import { workerData, parentPort } from 'worker_threads';
 import { AlvaAR } from './alva_ar.js';
 
+const { width, height } = workerData;
+
+const alva = await AlvaAR.Initialize(width, height);
+
 
 parentPort.on('message', async (message) => {
   const frame = message;
-  const alva = await AlvaAR.Initialize(frame.width, frame.height);
+
+// console.log("aqui")
 
   const start = performance.now();
 
@@ -19,6 +24,8 @@ parentPort.on('message', async (message) => {
     planePose: planePose ? planePose : null,
     dots: dots,
   };
+
+  // console.log(data);
 
   parentPort.postMessage([data, end - start]);
 })
