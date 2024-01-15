@@ -1,12 +1,10 @@
 import fs from 'fs';
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, Image } from 'canvas';
 import { AlvaAR } from './public/scripts/alva_ar.js';
-
 
 let count = 0;
 let totalTime = 0;
 
-// Function to process each frame and get image data using canvas
 async function processFrames() {
     const frameFiles = fs.readdirSync('./public/photos');
 
@@ -17,35 +15,37 @@ async function processFrames() {
         return aNumber - bNumber;
     });
 
-    const firstImage = await loadImage('./public/photos/1.png');
-    
-    const alva = await AlvaAR.Initialize(firstImage.width, firstImage.height)
-    const canvas = createCanvas(firstImage.width, firstImage.height);
+    const width = 480;
+    const height = 848;
+
+    const alva = await AlvaAR.Initialize(width, height)
+    const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
     for (const frameFile of frameFiles) {
         const framePath = `./public/photos/${frameFile}`;
-        const image = await loadImage(framePath);
-        ctx.drawImage(image, 0, 0);
-        // Use getImageData to get pixel data
-        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        let startSlam, endSlam
-                    
-        await new Promise (resolve =>  {
-            startSlam = performance.now()
+        //console.log(frameFiles)
+        const image = new Image();
+        
+        image.onload = () => {
+            ctx.clearRect(0, 0, width, height)
+            ctx.drawImage(image, 0, 0, width, height);
+            const frame = ctx.getImageData(0, 0, width, height);
+            //console.log(frame)
+            const startSlam = performance.now()
 
             const pose =  alva.findCameraPose(frame);
             const planePose = alva.findPlane();
             const dots =  alva.getFramePoints();
 
-            endSlam = performance.now()
+            const endSlam = performance.now()
+            
+            totalTime += (endSlam-startSlam)
 
             count++;
-
-            resolve()
-        })
-                                
-        totalTime += (endSlam-startSlam)
+        }
+        
+        image.src = framePath    
        
   }
 }
@@ -56,7 +56,6 @@ async function main() {
 
         const timeAverage = totalTime / count;
         const totalFrames = count;
-
         const csvData = `${timeAverage},${totalFrames}\n`;
         fs.appendFileSync(`./inNodeResults/experimet_results_node.csv`, csvData);        
         
@@ -67,8 +66,7 @@ async function main() {
         console.error(error);
     }
 }
-
-// Run the main function sequentially using async/await
+ 
 async function runExperiments() {
     let numberExperiments = 30;
     fs.appendFileSync(`./inNodeResults/experimet_results_node.csv`, 'Node Average Slam Time,Total Frames\n');        
