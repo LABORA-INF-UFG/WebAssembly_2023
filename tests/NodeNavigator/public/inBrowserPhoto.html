@@ -9,16 +9,6 @@
         <script type="module">
             import { AlvaAR } from "/scripts/alva_ar.js";
 
-            const eventEnd = new Event("end");
-
-            const width = 480;
-            const height = 848;
-
-            const maxFrames = 1800;
-            const skipFrames = 1;
-            let frameCount = 1;
-            let totalFrames = 1;
-
             function saveResultsToCSV(data) {
                 const csvContent =
                     "data:text/csv;charset=utf-8," +
@@ -34,6 +24,16 @@
             }
 
             async function main() {
+                const eventEnd = new Event("end");
+
+                const width = 480;
+                const height = 848;
+
+                const maxFrames = 1800;
+                const skipFrames = 1;
+                let frameCount = 1;
+                let totalFrames = 1;
+                
                 let totalSlamTime = 0;
                 const alva = await AlvaAR.Initialize(width, height);
 
@@ -78,17 +78,17 @@
                     const result = [
                         {
                             averageSlamTime: totalSlamTime / frameCount,
-                            totalFrames: frameCount,
+                            totalFrames: frameCount - 1,
                         },
                     ];
 
                     console.log(result)
-                    saveResultsToCSV(result); // Uncomment to save statistics in CSV file
+                    saveResultsToCSV(result); 
                     ctx.clearRect(0, 0, width, height);
                     window.dispatchEvent(eventEnd);
                 };
 
-                processFrame();
+                await processFrame();
             }
             window.addEventListener("load", main);
         </script>

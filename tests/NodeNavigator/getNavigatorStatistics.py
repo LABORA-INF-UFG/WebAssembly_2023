@@ -14,7 +14,7 @@ for file_name in os.listdir(navigator_dir):
     navigator_data = pd.concat([navigator_data, df], ignore_index=True)
     
 navigator_data.rename(columns={'Average Slam Time': 'Navigator_Slam_Time', 'Total Frames':'Total_Frames'}, inplace=True)
-node_data.rename(columns={'Node Average Slam Time': 'Node_Slam_Time', ' Total Frames':'Total_Frames'}, inplace=True)
+node_data.rename(columns={'Node Average Slam Time': 'Node_Slam_Time', 'Total Frames':'Total_Frames'}, inplace=True)
 navigator_statistics = navigator_data.describe()
 node_statistics = node_data.describe()
 
