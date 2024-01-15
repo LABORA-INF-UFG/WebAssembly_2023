@@ -70,7 +70,7 @@ async function main() {
 
 // Run the main function sequentially using async/await
 async function runExperiments() {
-    let numberExperiments = 5;
+    let numberExperiments = 30;
     fs.appendFileSync(`./inNodeResults/experimet_results_node.csv`, 'Node Average Slam Time,Total Frames\n');        
 
     while (numberExperiments--) {

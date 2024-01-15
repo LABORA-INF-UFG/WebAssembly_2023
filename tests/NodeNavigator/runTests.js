@@ -9,9 +9,9 @@ async function doExperiment (browser) {
 
     // Create a Promise that resolves when the 'end' event is fired
     const downloadComplete = new Promise(resolve => {
-        page.exposeFunction('onDownloadComplete', () => {
+        page.exposeFunction('onDownloadComplete', async () => {
             console.log('Download complete. Closing the page...');
-            sleep(1000)
+            await sleep(1000)
             page.close();
             resolve();
         });
@@ -24,19 +24,19 @@ async function doExperiment (browser) {
         });
     });
 
-    await page.goto('http://localhost:3000/scripts/inBrowser.html');
+    await page.goto('http://localhost:3000/inBrowserPhoto.html');
 
     // Wait for the download to complete before returning
     await downloadComplete;
 };
 
 (async () => {
-    const browser = await puppeteer.launch({headless: false});
-    let numberExperiments = 30;
+    const browser = await puppeteer.launch({headless: 'new'});
+    let numberExperiments = 2;
     while(numberExperiments){
         await doExperiment(browser);
         numberExperiments--;
     }
-    sleep(2000)
+    await sleep(2000)
     await browser.close();
 })();
