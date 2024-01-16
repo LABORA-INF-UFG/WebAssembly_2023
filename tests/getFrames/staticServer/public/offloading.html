@@ -193,7 +193,6 @@
                         if ((totalFrames - 1) % skipFrames === 0) {
                             const image = new Image();
                             const framePath = `photos/${totalFrames}.png`;
-                            image.src = framePath;
 
                             await new Promise((resolve) => {
                                 image.onload = async () => {

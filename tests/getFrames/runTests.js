@@ -24,7 +24,7 @@ async function doExperiment (browser) {
         });
     });
 
-    await page.goto('http://localhost:3001/offloading.html');
+    await page.goto('http://localhost:3001/local.html');
 
     // Wait for the download to complete before returning
     await downloadComplete;

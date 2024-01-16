@@ -169,7 +169,8 @@
                         if ((totalFrames - 1) % skipFrames === 0) {
                             const image = new Image();
                             const framePath = `photos/${totalFrames}.png`;
-                            
+                            //console.log(framePath)
+
                             await new Promise((resolve) => {
                                 image.onload = () => {
                                     ctx.clearRect(0, 0, width, height);
@@ -180,7 +181,6 @@
                                         width,
                                         height
                                     );
-
                                     const startSlamTime = performance.now();
                                     const pose = alva.findCameraPose(frame);
                                     const planePose = alva.findPlane();
@@ -212,8 +212,9 @@
 
                                     resolve();
                                 };
+                                image.src = framePath;
+
                             });
-                            image.src = framePath;
 
                         }
 
