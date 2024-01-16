@@ -37,7 +37,7 @@ def gen_formated_data(statistics_path, labels):
         except:
             data = pd.DataFrame(columns= labels)
 
-        cases[case] = data
+        cases[int(case)] = data
         
     cases = dict(sorted(cases.items()))  
     
