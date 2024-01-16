@@ -7,19 +7,24 @@ const alva = await AlvaAR.Initialize(width, height);
 
 
 parentPort.on('message', async (message) => {
-  const frame = message;
+  // console.log(message[0])
+  const frameData = {
+    data: message
+  };
 
 // console.log("aqui")
 
   const start = performance.now();
 
-  const pose = alva.findCameraPose(frame);
+  const pose = alva.findCameraPose(frameData);
   const planePose = alva.findPlane();
   const dots = alva.getFramePoints();
 
   const end = performance.now();
 
-  const data = {
+  // console.log(frameData)
+
+  const dat = {
     pose: pose ? pose : null,
     planePose: planePose ? planePose : null,
     dots: dots,
@@ -27,5 +32,5 @@ parentPort.on('message', async (message) => {
 
   // console.log(data);
 
-  parentPort.postMessage([data, end - start]);
+  parentPort.postMessage([dat, end - start]);
 })

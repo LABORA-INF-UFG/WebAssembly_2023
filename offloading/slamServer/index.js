@@ -3,7 +3,6 @@ import { Server } from 'socket.io';
 import { Worker } from 'worker_threads';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { AlvaAR } from './alva_ar.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -22,7 +21,7 @@ const sockets = new Server(server, {
 });
 
 sockets.on('connection', (socket) => {
-  let alva, worker;
+  let worker;
 
   socket.on('initialize alva', async (dimensions, callback) => {
     const { width, height } = dimensions;
@@ -33,13 +32,31 @@ sockets.on('connection', (socket) => {
   });
 
   socket.on('frame', async (frame, callback) => {
-    // if (!alva) {
-    //   return callback([undefined, 0]);
+
+    const threadStart = performance.now()
+
+    worker.once('message', (message) => {
+      const threadEnd = performance.now();
+      const slamTime = message[1];
+
+      const threadTime = (threadEnd - threadStart - slamTime).toFixed(2);
+
+      console.log(`threadTime: ${threadTime}ms`);
+      // console.log(`slamTime: ${slamTime}ms`);
+
+      callback(message)
+    });
+
+    // const memory = new SharedArrayBuffer(1024 * 1024 * 100)
+    const arr = new Uint8ClampedArray(frame.data);
+
+    // for(let i = 0; i < frame.data.byteLength; i++) {
+    //   arr[i] = frame.data[i]
+
     // }
+    // console.log(...b)
 
-    worker.once('message', (message) => callback(message));
-
-    // console.log("oi")
-    worker.postMessage(frame);
+    // worker.postMessage(b, [b.buffer]);
+    worker.postMessage(arr)
   });
 });
