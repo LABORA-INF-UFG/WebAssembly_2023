@@ -26,27 +26,28 @@ async function processFrames() {
         const framePath = `./public/photos/${frameFile}`;
         //console.log(frameFiles)
         const image = new Image();
-        
-        image.onload = () => {
-            ctx.clearRect(0, 0, width, height)
-            ctx.drawImage(image, 0, 0, width, height);
-            const frame = ctx.getImageData(0, 0, width, height);
-            //console.log(frame)
-            const startSlam = performance.now()
+        await new Promise(resolve => {
+            image.onload = () => {
+                ctx.clearRect(0, 0, width, height)
+                ctx.drawImage(image, 0, 0, width, height);
+                const frame = ctx.getImageData(0, 0, width, height);
+                //console.log(frame)
+                const startSlam = performance.now()
+    
+                const pose =  alva.findCameraPose(frame);
+                const planePose = alva.findPlane();
+                const dots =  alva.getFramePoints();
+    
+                const endSlam = performance.now()
+                
+                totalTime += (endSlam-startSlam)
+    
+                count++;
+                resolve()
+            }
+            image.src = framePath    
 
-            const pose =  alva.findCameraPose(frame);
-            const planePose = alva.findPlane();
-            const dots =  alva.getFramePoints();
-
-            const endSlam = performance.now()
-            
-            totalTime += (endSlam-startSlam)
-
-            count++;
-        }
-        
-        image.src = framePath    
-       
+        })    
   }
 }
 
