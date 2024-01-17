@@ -1,19 +1,1 @@
-node:internal/errors:465
-    ErrorCaptureStackTrace(err);
-    ^
-
-Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'express' imported from /home/wasm/WebAssembly_2023/offloading/staticServer/index.js
-    at new NodeError (node:internal/errors:372:5)
-    at packageResolve (node:internal/modules/esm/resolve:908:9)
-    at moduleResolve (node:internal/modules/esm/resolve:957:20)
-    at defaultResolve (node:internal/modules/esm/resolve:1173:11)
-    at ESMLoader.resolve (node:internal/modules/esm/loader:604:30)
-    at ESMLoader.getModuleJob (node:internal/modules/esm/loader:318:18)
-    at ModuleWrap.<anonymous> (node:internal/modules/esm/module_job:80:40)
-    at link (node:internal/modules/esm/module_job:78:36) {
-  code: 'ERR_MODULE_NOT_FOUND'
-}
-
-Node.js v17.9.1
-Serving static files on port 8080
 Serving static files on port 8080
