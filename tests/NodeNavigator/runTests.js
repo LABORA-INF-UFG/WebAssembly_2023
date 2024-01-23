@@ -32,7 +32,7 @@ async function doExperiment (browser) {
 
 (async () => {
     const browser = await puppeteer.launch({headless: 'new'});
-    let numberExperiments = 2;
+    let numberExperiments = 3;
     while(numberExperiments){
         await doExperiment(browser);
         numberExperiments--;

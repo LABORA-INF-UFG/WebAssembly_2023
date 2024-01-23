@@ -99,14 +99,18 @@ def gen_bar_plot(statistic, offloading_data, local_data,  legend):
     horizontal_line_width=0.1
 
     if statistic == 'rate':
-        plt.xlabel("Bandwidth(Mbps)")
+        plt.xlabel("Largura de Banda(Mbps)")
+        xlabels = ['25', '50', '100', '200', '400', '800']
+
         
     if statistic == 'delay':
-        plt.xlabel("Delay(ms)")    
+        plt.xlabel("Atraso(ms)")    
+        xlabels = ['2.5', '5', '10','20', '40', '80']
 
     if statistic == 'loss':
-        plt.xlabel("Packetloss(%)")
-        
+        plt.xlabel("Perda de Pacotes(%)")
+        xlabels = ['1', '2', '3', '4', '5', '6']
+
     
     for key in raw_data.keys():    
         data[key] = raw_data[key].copy(deep= True)
@@ -143,11 +147,9 @@ def gen_bar_plot(statistic, offloading_data, local_data,  legend):
         
         plt.xticks(x_fake)
     
-        xlabels = []
-        xlabels.append('Low Offloading')
+        if 'Low Offloading' not in xlabels:
+            xlabels.insert(0 ,'Low Offloading')
         
-        for i in range(1, len(x)):
-            xlabels.append(str(x[i]))
         
         ax.set_xticklabels(xlabels, rotation=0)
         
@@ -168,11 +170,11 @@ def gen_bar_plot(statistic, offloading_data, local_data,  legend):
         bottom += y
     
     plt.ylim([0, max(upper_limit) + 5])    
-    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+    #ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
     
     ax.legend() 
 
-    plt.ylabel("Time(ms)")
+    plt.ylabel("Tempo(ms)")
     
     plt.savefig(f'./graphs/{statistic}.png')
     plt.close()
@@ -184,21 +186,28 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
 
     if graph == 'FPS':
         plt.ylabel('FPS')
+        
     elif graph == 'slamTime':
-        plt.ylabel('SLAM time(ms)')
+        plt.ylabel('Tempo de SLAM(ms)')
     else:
-        plt.ylabel('Time(ms)')
+        plt.ylabel('Tempo(ms)')
 
     
     if statistic == 'rate':
-        plt.xlabel("Bandwidth(Mbps)")
+        plt.xlabel("Largura de Banda(Mbps)")
         horizontal_line_width=0.05
+        xlabels = ['25', '50', '100', '200', '400', '800']
+
     if statistic == 'delay':
         horizontal_line_width=0.05
-        plt.xlabel("Delay(ms)")
+        xlabels = ['2.5', '5', '10','20', '40', '80']
+
+        plt.xlabel("Atraso(ms)")
     if statistic == 'loss':
-        plt.xlabel("Packetloss(%)")
+        plt.xlabel("Perda de Pacotes(%)")
         horizontal_line_width=0.05
+        xlabels = ['1', '2', '3', '4', '5', '6']
+
     
     arr_max_top = []
     
@@ -210,15 +219,6 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
     y_offloading = [offloading_data[key][graph]['mean'] for key in x_offloading]
     
     plt.xticks(x_fake)
-    
-    # xlabels_offloading = []
-    # xlabels_offloading.append('Default')
-        
-    # for i in range(1, len(x_offloading)):
-    #     xlabels_offloading.append(str(x_offloading[i]))
-    
-    
-    #ax.set_xticklabels(xlabels_offloading, rotation=55)
 
     ax.plot(x_fake, y_offloading, marker='o', label=legend_offloading, color = offloading_color, linestyle='--')       
     
@@ -244,15 +244,7 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
     y_local = [local_data[graph]['mean'] for key in x_local]
     
     plt.xticks(x_fake)
-   
-    # xlabels_local = []
-    # xlabels_local.append('Default')
-        
-    # for i in range(1, len(xlabels_local)):
-    #     xlabels_local.append(str(xlabels_local[i]))
-        
-    #ax.set_xticklabels(xlabels_local)
-    
+
     ax.plot(x_fake, y_local, marker='o', label=local_legend, color = local_color, linestyle='--')       
     
     i = 1
@@ -270,11 +262,11 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
         i += 1
     
     plt.ylim([0, max(arr_max_top) + 0.5])    
-    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+    #ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
     
     ax.legend() 
     
-    ax.set_xticklabels(x_offloading, rotation=0)
+    ax.set_xticklabels(xlabels, rotation=0)
 
    
     if graph == 'FPS':

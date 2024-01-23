@@ -69,7 +69,7 @@ async function main() {
 }
  
 async function runExperiments() {
-    let numberExperiments = 30;
+    let numberExperiments = 15;
     fs.appendFileSync(`./inNodeResults/experimet_results_node.csv`, 'Node Average Slam Time,Total Frames\n');        
 
     while (numberExperiments--) {

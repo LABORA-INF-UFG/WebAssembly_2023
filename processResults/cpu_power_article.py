@@ -24,7 +24,7 @@ def get_formated_data(statistic_path, labels):
                 
                 PowerData = df[['PowerMean']].dropna().describe().T
                 
-                CpuData = df[[' CpuMean']].dropna().describe().T
+                CpuData = df[['CpuMean']].dropna().describe().T
                  
                 PowerData = PowerData[['mean', 'std', 'count']]
                 CpuData = CpuData[['mean', 'std', 'count']]
@@ -63,12 +63,17 @@ def gen_graph(data_offloading, data_local, statistic, label, graph):
     horizontal_line_width=0.05
     
     if statistic == 'rate':
-        plt.xlabel("Bandwidth(Mbps)")
+        plt.xlabel("Largura de Banda(Mbps)")
+        xlabels = ['25', '50', '100', '200', '400', '800']
+    
     if statistic == 'delay':
-        plt.xlabel("Delay(ms)")
+        plt.xlabel("Atraso(ms)")
+        xlabels = ['2.5', '5', '10','20', '40', '80']
+
     if statistic == 'loss':
-        plt.xlabel("Packetloss(%)")
-        
+        plt.xlabel("Perda de Pacotes(%)")
+        xlabels = ['1', '2', '3', '4', '5', '6']
+
         
     arr_max_top = []
     
@@ -119,14 +124,14 @@ def gen_graph(data_offloading, data_local, statistic, label, graph):
         i += 1
         
     plt.ylim([0, max(arr_max_top) + 0.5])    
-    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+    #ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
     
     ax.legend() 
     
-    ax.set_xticklabels(x_offloading, rotation=0)
+    ax.set_xticklabels(xlabels, rotation=0)
 
     
-    if label == 'Power(Watts)':
+    if label == 'Consumo Energético(Watts)':
         plt.savefig(f'./graphs/{statistic}_Power.png')
     else:
         plt.savefig(f'./graphs/{statistic}_CPU.png')
@@ -145,8 +150,8 @@ def main():
         cpu_local_data, power_local_data  = get_formated_data(local_statistic_path, labels)    
         cpu_offloading_data, power_offloading_data= get_formated_data(offloading_statistic_path, labels)
         
-        gen_graph(power_offloading_data, power_local_data, statistic, 'Power(Watts)', 'PowerMean')
-        gen_graph(cpu_offloading_data, cpu_local_data, statistic, 'CPU Usage(%)', ' CpuMean')
+        gen_graph(power_offloading_data, power_local_data, statistic, 'Consumo Energético(Watts)', 'PowerMean')
+        gen_graph(cpu_offloading_data, cpu_local_data, statistic, 'Uso de CPU(%)', 'CpuMean')
         
 if __name__ == "__main__":
     main()
