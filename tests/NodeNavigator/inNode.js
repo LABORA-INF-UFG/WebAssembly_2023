@@ -21,6 +21,9 @@ async function processFrames() {
     const alva = await AlvaAR.Initialize(width, height)
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
+    
+    ctx.canvas.width = width
+    ctx.canvas.height = height
 
     for (const frameFile of frameFiles) {
         const framePath = `./public/photos/${frameFile}`;
@@ -31,7 +34,7 @@ async function processFrames() {
                 ctx.clearRect(0, 0, width, height)
                 ctx.drawImage(image, 0, 0, width, height);
                 const frame = ctx.getImageData(0, 0, width, height);
-                //console.log(frame)
+                
                 const startSlam = performance.now()
     
                 const pose =  alva.findCameraPose(frame);
