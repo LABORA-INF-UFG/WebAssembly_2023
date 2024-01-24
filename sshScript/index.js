@@ -165,7 +165,7 @@ function startServer(server, eventEmitter) {
 
         eventEmitter.on("start server", () => {
             process.stdout.write("Iniciando servidor\n");
-            stream.run('/home/wasm/.nvm/versions/node/v21.0.0/bin/node Documents/WebAssembly_2023/offloading/slamServer/index.js');
+            stream.run('/home/wasm/.nvm/versions/node/v21.0.0/bin/node Documents/WebAssembly_2023/offloading/slamServer/index.js --experimental-wasm-relaxed-simd --experimental-wasm-gc --experimental-wasm-extended-const --experimental-wasm-return-call');
         });
 
         eventEmitter.on("close server", () => {

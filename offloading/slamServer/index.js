@@ -30,7 +30,7 @@ sockets.on('connection', (socket) => {
     }
     
     const start = performance.now();
-
+    
     const pose = alva.findCameraPose(frame);
     const planePose = alva.findPlane();
     const dots = alva.getFramePoints();
@@ -38,9 +38,9 @@ sockets.on('connection', (socket) => {
     const end = performance.now();
 
     const data = {
-      pose: pose ? pose : null,
-      planePose: planePose ? planePose : null,
-      dots: dots,
+      pose,
+      planePose,
+      dots,
     };
 
     callback([data, end - start]);
