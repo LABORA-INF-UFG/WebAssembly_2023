@@ -13,7 +13,7 @@ const sockets = new Server(server, {
   cors: {
     origin: "*"
   },
-  maxHttpBufferSize: 2 * 1024 * 1024
+  maxHttpBufferSize: 20 * 1024 * 1024
 });
 
 sockets.on('connection', (socket) => {

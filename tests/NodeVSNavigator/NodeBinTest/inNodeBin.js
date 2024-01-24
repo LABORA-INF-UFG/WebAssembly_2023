@@ -39,7 +39,7 @@ async function processFrames() {
 
         const endSlam = performance.now()
         
-        console.log(pose)
+        //console.log(pose)
 
         totalTime += (endSlam-startSlam)
 

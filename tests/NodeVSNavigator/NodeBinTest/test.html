@@ -196,9 +196,9 @@
 
             startTotalTime = performance.now();
             
-            let jump = 2;
+            let jump = 1;
 
-            for(let i = 1; i < 941; i += jump) {
+            for(let i = 1; i <= 1800; i += jump) {
                 try {
                     const res = await fetch(`http://localhost:8080/${i}.bin`)
 

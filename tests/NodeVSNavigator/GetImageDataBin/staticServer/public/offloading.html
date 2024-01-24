@@ -119,34 +119,74 @@
             crossorigin="anonymous"
         ></script>
         <script type="module">
+            import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
+            import { Video, onFrame, getCSV } from "/scripts/utils.js";
 
             const serverUrl = "localhost:3000";
+            const eventStart = new Event("start");
+            const eventEnd = new Event("end");
+
+            const width = 480;
+            const height = 848;
+
+            const maxFrames = 1800;
+            const skipFrames = 1;
+            let frameCount = 1;
+            let totalFrames = 1;
+
+            const initializeServer = async (serverUrl, width, height) => {
+                const socket = io(serverUrl, { reconnection: false });
+
+                await new Promise((resolve) => {
+                    socket.io.on("error", (error) => {
+                        error = new Error("Could not connect to " + serverUrl);
+                        window.alert("Não foi possível conectar ao servidor");
+                        console.error(error);
+                    });
+                    resolve();
+                });
 
 
-			async function main(){
-				const socket = io(serverUrl, { reconnection: false });
-				
-				const width = 480;
-                const height = 848;
+                return socket;
+            };
 
-                const maxFrames = 1800;
-                const skipFrames = 1;
-                let frameCount = 1;
-                let totalFrames = 1;
-                
-				
-				const canvas = document.createElement("canvas");
-                const ctx = canvas.getContext("2d");
+            async function main() {
+                const socketPromise = initializeServer(
+                    serverUrl,
+                    width,
+                    height
+                );
 
-                const processFrame = async () => {
+                const $cam = document.getElementById("renderer-cam");
+                const $map = document.getElementById("renderer-map");
+                const ctx = document
+                    .getElementById("renderer-video")
+                    .getContext("2d");
+
+                ctx.canvas.width = width;
+                ctx.canvas.height = height;
+
+                const mapRenderer = new ARSimpleMap($map, width, height);
+                const camRenderer = new ARSimpleView(
+                    $cam,
+                    width,
+                    height,
+                    mapRenderer
+                );
+                $cam.parentElement.style.display = "block";
+
+
+                const socket = await socketPromise;
+
+                const processFrame = async (now, frameMetadata) => {
                     while (totalFrames - 1 < maxFrames) {
                         if ((totalFrames - 1) % skipFrames === 0) {
                             const image = new Image();
                             const framePath = `photos/${totalFrames}.png`;
 
                             await new Promise((resolve) => {
-                                image.onload = () => {
-                                    ctx.clearRect(0, 0, width, height);               
+                                image.onload = async () => {
+                                    ctx.clearRect(0, 0, width, height);
                                     ctx.drawImage(image, 0, 0, width, height);
                                     const frame = ctx.getImageData(
                                         0,
@@ -154,12 +194,17 @@
                                         width,
                                         height
                                     );
-                                    console.log(frame)
-                                    socket.emit('frame', frame, () => {
-                                    	frameCount++;                                    
-                                    	resolve();
-									})
-           
+
+                                    await new Promise((resolve) => {
+                                        socket.emit(
+                                            "frame",
+                                            frame,
+                                            () => resolve()
+                                        );
+                                    });
+
+                                    frameCount++;
+                                    resolve();
                                 };
                                 image.src = framePath;
 
@@ -169,14 +214,16 @@
                         totalFrames++;
                     }
 
-                   
-
                     ctx.clearRect(0, 0, width, height);
+                    window.dispatchEvent(eventEnd);
                 };
-				if(socket){
-					await processFrame()
-				}
-			}
+
+                if (socket) {
+                    
+                    window.dispatchEvent(eventStart);
+                    processFrame();
+                }
+            }
 
             window.addEventListener("load", main);
         </script>
