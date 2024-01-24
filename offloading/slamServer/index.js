@@ -32,31 +32,35 @@ sockets.on('connection', (socket) => {
   });
 
   socket.on('frame', async (frame, callback) => {
-
-    const threadStart = performance.now()
-
+    let threadStart;
+    
     worker.once('message', (message) => {
       const threadEnd = performance.now();
-      const slamTime = message[1];
+      // console.log(`threadEnd: ${threadEnd}ms`);
 
-      const threadTime = (threadEnd - threadStart - slamTime).toFixed(2);
-
-      console.log(`threadTime: ${threadTime}ms`);
+      // const slamTime = message[1];
+      
+      // const threadTime = (threadEnd - threadStart - slamTime).toFixed(2);
+      
+      // console.log(`threadTime: ${threadTime}ms`);
       // console.log(`slamTime: ${slamTime}ms`);
-
-      callback(message)
+      
+      callback([undefined, message])
     });
-
+    
     // const memory = new SharedArrayBuffer(1024 * 1024 * 100)
     const arr = new Uint8ClampedArray(frame.data);
-
+    
     // for(let i = 0; i < frame.data.byteLength; i++) {
     //   arr[i] = frame.data[i]
-
+    
     // }
     // console.log(...b)
-
+    
     // worker.postMessage(b, [b.buffer]);
+
+    threadStart = performance.now()
+    // console.log(`threadStart: ${threadStart}ms`);
     worker.postMessage(arr)
   });
 });
