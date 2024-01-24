@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <script type="module">
+            import { AlvaAR } from "/scripts/alva_ar.js";
+
+            function saveResultsToCSV(data) {
+                const csvContent =
+                    "data:text/csv;charset=utf-8," +
+                    "Average Slam Time,Total Frames\n" +
+                    data.map((row) => Object.values(row).join(",")).join("\n");
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "experiment_results.csv");
+                document.body.appendChild(link);
+                link.click();
+            }
+
+            async function main() {
+                const eventEnd = new Event("end");
+
+                const width = 480;
+                const height = 848;
+
+                const maxFrames = 1800;
+                const skipFrames = 1;
+                let frameCount = 1;
+                let totalFrames = 1;
+                
+                let totalSlamTime = 0;
+                const alva = await AlvaAR.Initialize(width, height);
+
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+
+                const processFrame = async () => {
+                    while (totalFrames - 1 < maxFrames) {
+                        if ((totalFrames - 1) % skipFrames === 0) {
+                            const image = new Image();
+                            const framePath = `photos/${totalFrames}.png`;
+
+                            await new Promise((resolve) => {
+                                image.onload = () => {
+                                    ctx.clearRect(0, 0, width, height);               
+                                    ctx.drawImage(image, 0, 0, width, height);
+                                    const frame = ctx.getImageData(
+                                        0,
+                                        0,
+                                        width,
+                                        height
+                                    );
+                                    //console.log(frame)
+                                    const startSlamTime = performance.now();
+                                    const pose = alva.findCameraPose(frame);
+                                    const planePose = alva.findPlane();
+                                    const dots = alva.getFramePoints();
+                                    const endSlamTime = performance.now();
+
+                                    totalSlamTime += (endSlamTime - startSlamTime);
+                                    frameCount++;
+                                    
+                                    resolve();
+                                };
+                                image.src = framePath;
+
+                            });
+                        }
+
+                        totalFrames++;
+                    }
+
+                    const result = [
+                        {
+                            averageSlamTime: totalSlamTime / frameCount,
+                            totalFrames: frameCount - 1,
+                        },
+                    ];
+
+                    saveResultsToCSV(result); 
+                    ctx.clearRect(0, 0, width, height);
+                    window.dispatchEvent(eventEnd);
+                };
+
+                await processFrame();
+            }
+            window.addEventListener("load", main);
+        </script>
+    </body>
+</html>

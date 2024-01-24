@@ -1,0 +1,17 @@
+{
+  "name": "slamServer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "serve": "node index.js",
+    "start": "nodemon node index.js"
+  },
+  "author": "Matheus e Gabriel",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^3.0.1",
+    "socket.io": "^4.7.2"
+  }
+}
