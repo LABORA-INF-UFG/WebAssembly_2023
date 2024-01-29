@@ -125,13 +125,13 @@ def gen_bar_plot(statistic, offloading_data, local_data,  legend):
     
     for label in legend.values():
         
-        if label == 'Slam':
+        if label == 'SLAM':
             label_color = 'blue'
-        elif label == 'Render':
+        elif label == 'Renderização':
             label_color = 'orange'
-        elif label == 'Network':
+        elif label == 'Rede':
             label_color = 'red'
-        elif label == 'Segmentation':
+        elif label == 'Segmentação':
             label_color = 'green'
         
         x_fake = [1,2,3,4,5,6,7]
@@ -147,8 +147,8 @@ def gen_bar_plot(statistic, offloading_data, local_data,  legend):
         
         plt.xticks(x_fake)
     
-        if 'Low Offloading' not in xlabels:
-            xlabels.insert(0 ,'Low Offloading')
+        if 'low-offload' not in xlabels:
+            xlabels.insert(0 ,'low-offload')
         
         
         ax.set_xticklabels(xlabels, rotation=0)
@@ -212,7 +212,7 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
     arr_max_top = []
     
     offloading_color = '#ff8c00'
-    legend_offloading = 'Offloading'
+    legend_offloading = 'mid-offload'
     
     x_fake = [1,2,3,4,5,6]
     x_offloading = list(offloading_data.keys())
@@ -238,7 +238,7 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
 
     
     local_color = '#2b35af'
-    local_legend = 'Local'
+    local_legend = 'low-offload'
     
     x_local = x_offloading
     y_local = [local_data[graph]['mean'] for key in x_local]
@@ -329,7 +329,7 @@ def gen_network_time_graph(offloading_data, statistic):
     arr_max_top = []
     
     offloading_color = '#ff8c00'
-    legend_offloading = 'Offloading'
+    legend_offloading = 'mid-offload'
     
     x_offloading = list(offloading_data.keys())
     y_offloading = [offloading_data[key]['networkTime']['mean'] for key in x_offloading]
@@ -391,7 +391,7 @@ def main():
         offloading_data = gen_formated_data(offloading_statistic_path, offloading_labels)
         local_data = gen_local_data(local_path, local_labels)         
         
-        gen_bar_plot(statistic, offloading_data, local_data,  {'slamTime': 'Slam', 'renderTime':'Render','segmentationTime':'Segmentation', 'networkTime':'Network'})
+        gen_bar_plot(statistic, offloading_data, local_data,  {'slamTime': 'SLAM', 'renderTime':'Renderização','segmentationTime':'Segmentação', 'networkTime':'Rede'})
 
         for graph in graphs:
             gen_pair_graphs(graph, offloading_data, local_data, statistic)  
