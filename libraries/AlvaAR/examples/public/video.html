@@ -125,9 +125,6 @@
         const $map = document.getElementById( 'renderer-map' );
         const ctx = document.getElementById( 'renderer-video' ).getContext( '2d' );
 
-        console.log($map);
-        console.log($cam);
-
         ctx.canvas.width = media.width;
         ctx.canvas.height = media.height;
 
@@ -178,18 +175,18 @@
                     }
                 }
             }
-            
-            
+            else
+            {
                 camRenderer.lostCamera();
 
                 const dots = alva.getFramePoints();
-                console.log(dots);
+
                 for( const p of dots )
                 {
                     ctx.fillStyle = 'white';
                     ctx.fillRect( p.x, p.y, 2, 2 );
                 }
-            
+            }
 
             Stats.stop( 'total' );
             Stats.render();

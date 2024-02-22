@@ -1,11 +1,10 @@
 import fs from 'fs';
 import https from 'https';
-import http from 'http';
 import express from 'express';
 import ip from 'ip';
 import { Server } from 'socket.io';
 
-const SERVER_PORT = 8080;
+const SERVER_PORT = 443;
 const STATIC_FOLDER = './public/';
 
 const app = express();
@@ -25,17 +24,17 @@ app.use( ( req, response, next ) =>
 
 app.use( express.static( STATIC_FOLDER ) );
 
-const httpsServer = http.createServer(
-    // {
-    //     key: fs.readFileSync( 'ssl/key.pem' ),
-    //     cert: fs.readFileSync( 'ssl/cert.pem' )
-    // },
+const httpsServer = https.createServer(
+    {
+        key: fs.readFileSync( 'ssl/key.pem' ),
+        cert: fs.readFileSync( 'ssl/cert.pem' )
+    },
     app
 );
 
 httpsServer.listen( SERVER_PORT, () =>
 {
-    const url = `http://${ ip.address() }:${ SERVER_PORT }`;
+    const url = `https://${ ip.address() }:${ SERVER_PORT }`;
     console.log( `Server running at: \x1b[36m${ url }\x1b[0m` );
 } );
 
