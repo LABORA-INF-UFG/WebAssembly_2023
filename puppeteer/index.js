@@ -18,6 +18,6 @@ async function sleep(time) {
         });
     });
 
-    await page.goto('http://localhost:8080/offloading.html');
-    // await page.goto('http://localhost:8080/local.html');
+   await page.goto('http://localhost:8080/offloading.html');
+   // await page.goto('http://localhost:8080/local.html');
 })();
