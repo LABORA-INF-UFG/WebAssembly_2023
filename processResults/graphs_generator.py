@@ -5,7 +5,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 import math
     
-def gen_formated_data(statistics_path,  labels): 
+def gen_formated_data(statistics_path, no_tc ,labels): 
     cases = {}
     z= 1.96
     
@@ -47,7 +47,7 @@ def gen_formated_data(statistics_path,  labels):
             case = case.replace('Mbps', '')    
         cases[float(case)] = data
         
-    #cases[0] = no_tc
+    cases[0] = no_tc
     cases = dict(sorted(cases.items()))  
     
     return cases
@@ -101,13 +101,13 @@ def gen_bar_plot(statistic, raw_data, case, legend):
         
         plt.xticks(x)
     
-        # xlabels = []
-        # xlabels.append('Default')
+        xlabels = []
+        xlabels.append('Default')
         
-        # for i in range(1, len(x)):
-        #     xlabels.append(str(x[i]))
+        for i in range(1, len(x)):
+            xlabels.append(str(x[i]))
         
-        # ax.set_xticklabels(xlabels, rotation=55)
+        ax.set_xticklabels(xlabels, rotation=55)
         
         ax.bar(x, y , label=label, bottom= bottom, width= column_width, align='center', color = label_color, alpha=0.6)
         plt.plot(x, y + bottom,  marker="o", markersize=3,linestyle="", alpha=0.8, color=label_color)
@@ -158,14 +158,14 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
     
     plt.xticks(x_offloading)
     
-    # xlabels_offloading = []
-    # xlabels_offloading.append('Default')
+    xlabels_offloading = []
+    xlabels_offloading.append('Default')
         
-    # for i in range(1, len(x_offloading)):
-    #     xlabels_offloading.append(str(x_offloading[i]))
+    for i in range(1, len(x_offloading)):
+        xlabels_offloading.append(str(x_offloading[i]))
     
     
-    #ax.set_xticklabels(xlabels_offloading, rotation=55)
+    ax.set_xticklabels(xlabels_offloading, rotation=55)
 
     ax.plot(x_offloading, y_offloading, marker='o', label=legend_offloading, color = offloading_color, linestyle='--')       
     
@@ -190,11 +190,11 @@ def gen_pair_graphs(graph, offloading_data, local_data, statistic):
     
     plt.xticks(x_local)
    
-    # xlabels_local = []
-    # xlabels_local.append('Default')
+    xlabels_local = []
+    xlabels_local.append('Default')
         
-    # for i in range(1, len(xlabels_local)):
-    #     xlabels_local.append(str(xlabels_local[i]))
+    for i in range(1, len(xlabels_local)):
+        xlabels_local.append(str(xlabels_local[i]))
         
     #ax.set_xticklabels(xlabels_local)
     
@@ -285,14 +285,13 @@ def gen_network_time_graph(offloading_data, statistic):
     
     plt.xticks(x_offloading)
     
-    # xlabels_offloading = []
-    # xlabels_offloading.append('Default')
+    xlabels_offloading = []
+    xlabels_offloading.append('Default')
         
-    # for i in range(1, len(x_offloading)):
-    #     xlabels_offloading.append(str(x_offloading[i]))
+    for i in range(1, len(x_offloading)):
+        xlabels_offloading.append(str(x_offloading[i]))
     
-    
-    #ax.set_xticklabels(xlabels_offloading, rotation=55)
+    ax.set_xticklabels(xlabels_offloading, rotation=55)
 
     ax.plot(x_offloading, y_offloading, marker='o', label=legend_offloading, color = offloading_color, linestyle='--')       
     
@@ -329,16 +328,16 @@ def main():
             'segmentationTime'
             ]
     
-    #no_tc_offlaoding_data = get_no_tc_data(os.path.join(offloading_path, 'default'), offloading_labels)
-    #no_tc_local_data = get_no_tc_data(os.path.join(local_path, 'default'), local_labels)
+    no_tc_offlaoding_data = get_no_tc_data(os.path.join(offloading_path, 'default'), offloading_labels)
+    no_tc_local_data = get_no_tc_data(os.path.join(local_path, 'default'), local_labels)
 
     for statistic in statistics:
         
         offloading_statistic_path = os.path.join(offloading_path, statistic)
         local_statistic_path = os.path.join(local_path, statistic)
         
-        offloading_data = gen_formated_data(offloading_statistic_path, offloading_labels)
-        local_data = gen_formated_data(local_statistic_path, local_labels)
+        offloading_data = gen_formated_data(offloading_statistic_path, no_tc_offlaoding_data, offloading_labels)
+        local_data = gen_formated_data(local_statistic_path, no_tc_local_data, local_labels)
        
         gen_bar_plot(statistic, offloading_data, 'offloading', {'slamTime': 'Slam', 'renderTime':'Render','segmentationTime':'Segmentation', 'networkTime':'Network'})
         gen_bar_plot(statistic, local_data, 'local', {'slamTime': 'Slam', 'renderTime':'Render','segmentationTime':'Segmentation'})
