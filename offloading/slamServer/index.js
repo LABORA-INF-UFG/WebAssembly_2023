@@ -40,7 +40,7 @@ sockets.on("connection", (socket) => {
             const slamTime = message[1];
 
             const threadTime = (threadEnd - threadStart - slamTime).toFixed(2);
-            console.log(threadTime);
+            //console.log(threadTime);
             callback([data, slamTime]);
         });
 
