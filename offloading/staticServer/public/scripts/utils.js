@@ -13,6 +13,36 @@ function getCSV(statistics, fileName) {
     document.body.removeChild(link);
 }
 
+class Queue {
+    constructor() {
+        this.items = {}
+        this.frontIndex = 0
+        this.backIndex = 0
+    }
+    enqueue(item) {
+        this.items[this.backIndex] = item
+        this.backIndex++
+    }
+    dequeue() {
+        const item = this.items[this.frontIndex]
+        delete this.items[this.frontIndex]
+        this.frontIndex++
+        return item
+    }
+    peek() {
+        return this.items[this.frontIndex]
+    }
+    get printQueue() {
+        return this.items;
+    }
+    size() {
+        return this.backIndex - this.frontIndex;
+    }
+    isEmpty() {
+        return this.size() === 0;
+    }
+}
+
 function onFrame(frameTickFn, fps = 30) {
     const fpsInterval = ~~(1000 / fps);
 
@@ -299,30 +329,6 @@ class Video {
         }
 
         return this._imageData;
-    }
-}
-
-class Queue {
-    constructor() {
-        this.items = {}
-        this.frontIndex = 0
-        this.backIndex = 0
-    }
-    enqueue(item) {
-        this.items[this.backIndex] = item
-        this.backIndex++
-    }
-    dequeue() {
-        const item = this.items[this.frontIndex]
-        delete this.items[this.frontIndex]
-        this.frontIndex++
-        return item
-    }
-    peek() {
-        return this.items[this.frontIndex]
-    }
-    get printQueue() {
-        return this.items;
     }
 }
 

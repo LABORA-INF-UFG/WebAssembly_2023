@@ -34,7 +34,7 @@ class Queue {
         return this.backIndex - this.frontIndex;
     }
     isEmpty() {
-        return this.size === 0;
+        return this.size() === 0;
     }
 }
 
@@ -53,7 +53,7 @@ sockets.on("connection", (socket) => {
     let worker;
     const queue = new Queue();
 
-    socket.on("initialize alva", async (dimensions, callback) => {
+    socket.on("initialize alva", (dimensions, callback) => {
         const { width, height } = dimensions;
         worker = new Worker(__dirname + "/worker.js", {
             workerData: { width, height },
@@ -68,15 +68,16 @@ sockets.on("connection", (socket) => {
             }
         });
 
-        callback();
+        setTimeout(() => callback(), 3000);
     });
 
-    socket.on("frame", async (frame) => {
+    socket.on("frame", (frame) => {
         if(queue.isEmpty()) {
             worker.postMessage(frame);
-        } else {
-            queue.enqueue(frame);
-        } 
+            return;
+        }
+        
+        queue.enqueue(frame);
     });
 
 });

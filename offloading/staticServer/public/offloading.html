@@ -165,15 +165,7 @@
 
 			const socket = await socketPromise;
 
-			let startTotalTime = null;
-
 			const processFrame = () => {
-				const endTotalTime = performance.now();
-
-				const totalTime = endTotalTime - startTotalTime;
-
-				startTotalTime = endTotalTime;
-
 				const startSegmentationTime = performance.now();
 				const frame = media.getImageData();
 				const endSegmentationTime = performance.now();
@@ -187,7 +179,7 @@
 				};
 
 				const startServerTime = performance.now();
-				queue.enqueue({ frame, startServerTime });
+				queue.enqueue({ frame, totalSegmentationTime, startServerTime });
 				socket.emit('frame', request);
 
 				if (!videoHasEnded) {
@@ -195,9 +187,12 @@
 				}
 			}
 
+			let addCubeInterval = null;
+
 			socket.on('responseFrame', (message) => {
-				const { frame, startServerTime } = queue.dequeue();
-        		const [data, slamTime] = message;
+				const { frame, totalSegmentationTime, startServerTime } = queue.dequeue();
+        		const [data, totalSlamTime] = message;
+
 				
 				const endServerTime = performance.now();
 				const totalServerTime = endServerTime - startServerTime;
@@ -245,6 +240,8 @@
 
 				const totalRenderTime = endRenderTime - startRenderTime;
 
+				const totalTime = totalSegmentationTime + totalNetworkTime + totalRenderTime + totalSlamTime;
+
 				statistics.push([
 					totalTime,
 					totalSlamTime,
@@ -252,27 +249,26 @@
 					totalRenderTime,
 					totalSegmentationTime
 				]);
+
+				if(queue.isEmpty() && videoHasEnded){
+					console.log("entrou")
+					ctx.clearRect(0, 0, media.width, media.height);
+					addCubeInterval && clearInterval(addCubeInterval);
+					getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file 
+					window.dispatchEvent(eventEnd);
+				}
 			})
 
 			if (socket) {
 				media.el.play();
 				media.el.loop = false;
 
-				const addCubeInterval = setInterval(() => {
+				addCubeInterval = setInterval(() => {
 					addCube = true;
 				}, 200);
 
-				const endVideo = () => {
-					videoHasEnded = true;
-					ctx.clearRect(0, 0, media.width, media.height);
-					clearInterval(addCubeInterval);
-					getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file 
-					window.dispatchEvent(eventEnd);
-				}
-
-				media.el.onended = endVideo;
+				media.el.onended = () => videoHasEnded = true;
 				window.dispatchEvent(eventStart);
-				startTotalTime = performance.now();
 				media.el.requestVideoFrameCallback(processFrame);
 			}
 		}
