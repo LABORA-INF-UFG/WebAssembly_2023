@@ -51,7 +51,6 @@ const sockets = new Server(server, {
 
 sockets.on("connection", (socket) => {
     let worker;
-    console.log("oi")
     const queue = new Queue();
 
     socket.on("initialize alva", async (dimensions, callback) => {
@@ -61,23 +60,22 @@ sockets.on("connection", (socket) => {
         });
         callback();
     });
+    
+    worker.on("message", (message) => {
+        socket.emit('responseFrame', message);
+
+        if(!queue.isEmpty()) {
+            const frame = queue.dequeue();
+            worker.postMessage(frame);
+        }
+    });
 
     socket.on("frame", async (frame) => {
         if(queue.isEmpty()) {
             worker.postMessage(frame);
         } else {
             queue.enqueue(frame);
-        }
-
-        
-        worker.once("message", (message) => {
-            socket.emit('responseFrame', message);
-
-            if(!queue.isEmpty()) {
-                const frame = queue.dequeue();
-                worker.postMessage(frame);
-            }
-        });
+        } 
     });
 
 });
