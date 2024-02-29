@@ -8,6 +8,36 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const port = 3000;
 
+class Queue {
+    constructor() {
+        this.items = {}
+        this.frontIndex = 0
+        this.backIndex = 0
+    }
+    enqueue(item) {
+        this.items[this.backIndex] = item
+        this.backIndex++
+    }
+    dequeue() {
+        const item = this.items[this.frontIndex]
+        delete this.items[this.frontIndex]
+        this.frontIndex++
+        return item
+    }
+    peek() {
+        return this.items[this.frontIndex]
+    }
+    get printQueue() {
+        return this.items;
+    }
+    size() {
+        return this.backIndex - this.frontIndex;
+    }
+    isEmpty() {
+        return this.size === 0;
+    }
+}
+
 const server = createServer().listen(port, () =>
     console.log(`Server running on port ${port}`)
 );
@@ -21,6 +51,8 @@ const sockets = new Server(server, {
 
 sockets.on("connection", (socket) => {
     let worker;
+    console.log("oi")
+    const queue = new Queue();
 
     socket.on("initialize alva", async (dimensions, callback) => {
         const { width, height } = dimensions;
@@ -30,22 +62,22 @@ sockets.on("connection", (socket) => {
         callback();
     });
 
-    socket.on("frame", async (frame, callback) => {
-        let threadStart;
+    socket.on("frame", async (frame) => {
+        if(queue.isEmpty()) {
+            worker.postMessage(frame);
+        } else {
+            queue.enqueue(frame);
+        }
 
+        
         worker.once("message", (message) => {
-            const threadEnd = performance.now();
+            socket.emit('responseFrame', message);
 
-            const data = message[0];
-            const slamTime = message[1];
-
-            const threadTime = (threadEnd - threadStart - slamTime).toFixed(2);
-            //console.log(threadTime);
-            callback([data, slamTime]);
+            if(!queue.isEmpty()) {
+                const frame = queue.dequeue();
+                worker.postMessage(frame);
+            }
         });
-
-        threadStart = performance.now();
-
-        worker.postMessage(frame);
     });
+
 });
