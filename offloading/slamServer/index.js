@@ -58,16 +58,17 @@ sockets.on("connection", (socket) => {
         worker = new Worker(__dirname + "/worker.js", {
             workerData: { width, height },
         });
-        callback();
-    });
-    
-    worker.on("message", (message) => {
-        socket.emit('responseFrame', message);
 
-        if(!queue.isEmpty()) {
-            const frame = queue.dequeue();
-            worker.postMessage(frame);
-        }
+        worker.on("message", (message) => {
+            socket.emit('responseFrame', message);
+    
+            if(!queue.isEmpty()) {
+                const frame = queue.dequeue();
+                worker.postMessage(frame);
+            }
+        });
+
+        callback();
     });
 
     socket.on("frame", async (frame) => {
