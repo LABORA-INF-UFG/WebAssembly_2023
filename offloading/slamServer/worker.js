@@ -39,7 +39,7 @@ function makeSLAM(message) {
         dots: dots,
     };
 
-    parentPort.postMessage([data, end - start, message.frameIndex]);
+    parentPort.postMessage({data, totalSlamTime: end - start, frameIndex: message.frameIndex, receivedTime: message.receivedTime});
     // console.log("processei frame - " + message.frameIndex);
     // console.log('end make slam - ' + performance.now().toFixed(2))
 }

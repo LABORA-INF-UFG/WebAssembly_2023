@@ -29,15 +29,19 @@ sockets.on("connection", (socket) => {
         });
 
         worker.on("message", (message) => {
+            const queueTime = performance.now() - message.receivedTime;
+            delete message.receivedTime;
+            message.queueTime = queueTime;
             socket.emit('responseFrame', message);
         });
 
         setTimeout(() => callback(), 3000);
     });
 
-    socket.on("frame", (frame) => {
+    socket.on("frame", (message) => {
+        message.receivedTime = performance.now();
         // console.log('start receive frame - ' + performance.now().toFixed(2))
-        worker.postMessage(frame);
+        worker.postMessage(message);
         // console.log('end receive frame - ' + performance.now().toFixed(2))
     });
 

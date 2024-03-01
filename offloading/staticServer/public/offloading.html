@@ -167,7 +167,7 @@
 
 			let frameIndex = 0;
 
-			const processFrame = () => {
+			const saveFrame = () => {
 				const startSegmentationTime = performance.now();
 				const frame = media.getImageData();
 				const endSegmentationTime = performance.now();
@@ -188,13 +188,13 @@
 				frameIndex++;
 
 				if (!videoHasEnded) {
-					media.el.requestVideoFrameCallback(processFrame);
+					media.el.requestVideoFrameCallback(saveFrame);
 				}
 			}
 
 			let addCubeInterval = null;
 
-			socket.on('responseFrame', (message) => {
+			const receiveFrame = (message) => {
 				const item = queue.dequeue();
 
 				if(!item) {
@@ -202,17 +202,20 @@
 					return;
 				}
 
+        		const {data, totalSlamTime, queueTime } = message;
 				const { frame, totalSegmentationTime, startServerTime, frameIndex } = item;
-        		const [data, totalSlamTime, frameIndex2] = message;
+				const frameIndex2 = message.frameIndex;
 
 				// console.log('frameIndex - ' + frameIndex);
 				// console.log('frameIndex2 - ' + frameIndex2);
 
 				// console.log(queue.size());
-				console.log( frameIndex === frameIndex2);
+				// console.log( frameIndex === frameIndex2);
+				console.log(totalSlamTime);
 				
 				const endServerTime = performance.now();
 				const totalServerTime = endServerTime - startServerTime;
+				const totalNetworkTime = totalServerTime - queueTime;
 
 				let pose = null;
 				let planePose = null;
@@ -231,8 +234,6 @@
 						dots = data.dots
 					}
 				}
-
-				const totalNetworkTime = totalServerTime - totalSlamTime;
 
 				const startRenderTime = performance.now();
 
@@ -273,19 +274,20 @@
 					getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file 
 					window.dispatchEvent(eventEnd);
 				}
-			})
-
+			}
+			
 			if (socket) {
 				media.el.play();
 				media.el.loop = false;
-
+				
 				addCubeInterval = setInterval(() => {
 					addCube = true;
 				}, 200);
-
+				
 				media.el.onended = () => videoHasEnded = true;
 				window.dispatchEvent(eventStart);
-				media.el.requestVideoFrameCallback(processFrame);
+				media.el.requestVideoFrameCallback(saveFrame);
+				socket.on('responseFrame', (message) => receiveFrame(message));
 			}
 		}
 
