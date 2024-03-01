@@ -24,6 +24,8 @@ class Queue {
         this.backIndex++
     }
     dequeue() {
+        if(this.isEmpty()) return undefined;
+
         const item = this.items[this.frontIndex]
         delete this.items[this.frontIndex]
         this.frontIndex++

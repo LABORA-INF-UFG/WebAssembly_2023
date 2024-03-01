@@ -165,6 +165,8 @@
 
 			const socket = await socketPromise;
 
+			let frameIndex = 0;
+
 			const processFrame = () => {
 				const startSegmentationTime = performance.now();
 				const frame = media.getImageData();
@@ -176,11 +178,14 @@
 					width: frame.width,
 					height: frame.height,
 					data: frame.data,
+					frameIndex
 				};
 
 				const startServerTime = performance.now();
-				queue.enqueue({ frame, totalSegmentationTime, startServerTime });
+				queue.enqueue({ frame, totalSegmentationTime, startServerTime, frameIndex });
 				socket.emit('frame', request);
+
+				frameIndex++;
 
 				if (!videoHasEnded) {
 					media.el.requestVideoFrameCallback(processFrame);
@@ -190,9 +195,21 @@
 			let addCubeInterval = null;
 
 			socket.on('responseFrame', (message) => {
-				const { frame, totalSegmentationTime, startServerTime } = queue.dequeue();
-        		const [data, totalSlamTime] = message;
+				const item = queue.dequeue();
 
+				if(!item) {
+					console.log("fila vazia")
+					return;
+				}
+
+				const { frame, totalSegmentationTime, startServerTime, frameIndex } = item;
+        		const [data, totalSlamTime, frameIndex2] = message;
+
+				// console.log('frameIndex - ' + frameIndex);
+				// console.log('frameIndex2 - ' + frameIndex2);
+
+				// console.log(queue.size());
+				console.log( frameIndex === frameIndex2);
 				
 				const endServerTime = performance.now();
 				const totalServerTime = endServerTime - startServerTime;
@@ -251,7 +268,6 @@
 				]);
 
 				if(queue.isEmpty() && videoHasEnded){
-					console.log("entrou")
 					ctx.clearRect(0, 0, media.width, media.height);
 					addCubeInterval && clearInterval(addCubeInterval);
 					getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file 
