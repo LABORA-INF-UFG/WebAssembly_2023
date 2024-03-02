@@ -282,7 +282,7 @@
 
 				if (queue.isEmpty() && videoHasEnded) {
 					const time = (performance.now() - fpsTimer) / 1000;
-					const fps = statistics.length / time;
+					const fps = (statistics.length - 1) / time;
 					statistics[0].push('fps');
 					statistics[1].push(fps);
 					ctx.clearRect(0, 0, media.width, media.height);
