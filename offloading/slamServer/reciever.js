@@ -20,28 +20,26 @@ const sockets = new Server(server, {
 });
 
 sockets.on("connection", (socket) => {
-    let worker;
+    let slam;
 
     socket.on("initialize alva", (dimensions, callback) => {
         const { width, height } = dimensions;
-        worker = new Worker(__dirname + "/worker.js", {
+        slam = new Worker(__dirname + "/slam.js", {
             workerData: { width, height },
-        });
-
-        worker.on("message", (message) => {
-            const queueTime = performance.now() - message.receivedTime;
-            delete message.receivedTime;
-            message.queueTime = queueTime;
-            socket.emit('responseFrame', message);
         });
 
         setTimeout(() => callback(), 3000);
     });
 
     socket.on("frame", (message) => {
-        message.receivedTime = performance.now();
+        message.totalClientServerTime = Date.now() - message.startClientServerTime;
+        delete message.startClientServerTime;
+        
+        // const time = new Date(Date.now());
+        // console.log(`frame ${message.frameIndex} recebido as ${time.toISOString()}`)
+        
         // console.log('start receive frame - ' + performance.now().toFixed(2))
-        worker.postMessage(message);
+        slam.postMessage(message);
         // console.log('end receive frame - ' + performance.now().toFixed(2))
     });
 

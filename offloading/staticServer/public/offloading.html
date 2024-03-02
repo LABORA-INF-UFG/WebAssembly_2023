@@ -116,37 +116,51 @@
 		import { Video, onFrame, getCSV, Queue } from "/scripts/utils.js";
 
 		//const serverUrl = "192.168.10.2:3000";
-		const serverUrl = "localhost:3000";
+		const senderUrl= "localhost:3000";
+		const recieverUrl =  "localhost:3001";
+
 		const eventStart = new Event("start");
 		const eventEnd = new Event("end");
 
-		const initializeServer = async (serverUrl, width, height) => {
-			const socket = io(serverUrl, { reconnection: false });
+		const initializeServer = async (senderUrl, recieverUrl,width, height) => {
+			const socketSender = io(senderUrl, { reconnection: false });
 
 			await new Promise(resolve => {
-				socket.io.on("error", (error) => {
-					error = new Error("Could not connect to " + serverUrl);
+				socketSender.io.on("error", (error) => {
+					error = new Error("Could not connect to " + senderUrl);
 					window.alert("Não foi possível conectar ao servidor");
 					console.error(error);
 				});
 				resolve();
 			});
 
-			await new Promise((resolve) => socket.on('connect', () => {
-				socket.emit('initialize alva', { width, height }, () => resolve());
+			const socketReciever = await new Promise((resolve) => socketSender.on('connect', () => {
+				socketSender.emit('initialize alva', { width, height }, () => {
+					const socketReciever = io(recieverUrl, { reconnection: false });
+					socketReciever.on('connect', () => resolve(socketReciever));
+				});
 			}));
 
-			return socket;
+			return [socketSender, socketReciever];
 		}
 
 		async function main() {
 			const media = await Video.Initialize('/videos/wasm.mp4');
 			const queue = new Queue();
 
-			const socketPromise = initializeServer(serverUrl, media.width, media.height);
+			const socketPromise = initializeServer(senderUrl, recieverUrl, media.width, media.height);
 
-			let statistics = [
-				['totalTime', 'slamTime', 'networkTime', 'renderTime', 'segmentationTime']
+			let statistics = 
+			[
+				[
+					'totalTime', 
+					'slamTime', 
+					'networkTime',
+					'renderTime', 
+					'segmentationTime',
+					'totalClientServerTime',
+					'totalServerClientTime'
+				]
 			];
 
 			const $cam = document.getElementById('renderer-cam');
@@ -163,7 +177,7 @@
 			let videoHasEnded = false;
 			let addCube = false;
 
-			const socket = await socketPromise;
+			const [socketSender, socketReciever] = await socketPromise;
 
 			let frameIndex = 0;
 
@@ -174,16 +188,22 @@
 
 				const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
 
+				const startServerTime = performance.now();
+
+				queue.enqueue({ frame, totalSegmentationTime, startServerTime, frameIndex });
+				
 				const request = {
 					width: frame.width,
 					height: frame.height,
 					data: frame.data,
-					frameIndex
+					frameIndex,
+					startClientServerTime: Date.now()
 				};
 
-				const startServerTime = performance.now();
-				queue.enqueue({ frame, totalSegmentationTime, startServerTime, frameIndex });
-				socket.emit('frame', request);
+				socketSender.emit('frame', request);
+				
+				//const time = new Date(Date.now());
+				//console.log(`frame ${frameIndex} enviado as ${time.toISOString()}`)
 
 				frameIndex++;
 
@@ -195,6 +215,10 @@
 			let addCubeInterval = null;
 
 			const receiveFrame = (message) => {
+				
+				message.totalServerClientTime = Date.now() - message.startServerClientTime;
+				delete message.startServerClientTime;
+
 				const item = queue.dequeue();
 
 				if(!item) {
@@ -202,21 +226,22 @@
 					return;
 				}
 
-        		const {data, totalSlamTime, queueTime } = message;
-				const { frame, totalSegmentationTime, startServerTime, frameIndex } = item;
+        		const {data, totalSlamTime, totalServerClientTime, totalClientServerTime } = message;
 				const frameIndex2 = message.frameIndex;
 
+				const { frame, totalSegmentationTime, startServerTime, frameIndex } = item;
+				
 				// console.log('frameIndex - ' + frameIndex);
 				// console.log('frameIndex2 - ' + frameIndex2);
 
 				// console.log(queue.size());
 				// console.log( frameIndex === frameIndex2);
-				console.log(totalSlamTime);
+				//console.log(totalSlamTime);
 				
 				const endServerTime = performance.now();
 				const totalServerTime = endServerTime - startServerTime;
-				const totalNetworkTime = totalServerTime - queueTime;
-
+				const totalNetworkTime = totalServerClientTime + totalClientServerTime;
+				
 				let pose = null;
 				let planePose = null;
 				let dots = [];
@@ -264,6 +289,8 @@
 					totalTime,
 					totalSlamTime,
 					totalNetworkTime,
+					totalClientServerTime,
+					totalServerClientTime,
 					totalRenderTime,
 					totalSegmentationTime
 				]);
@@ -276,7 +303,7 @@
 				}
 			}
 			
-			if (socket) {
+			if (socketReciever && socketSender) {
 				media.el.play();
 				media.el.loop = false;
 				
@@ -287,7 +314,7 @@
 				media.el.onended = () => videoHasEnded = true;
 				window.dispatchEvent(eventStart);
 				media.el.requestVideoFrameCallback(saveFrame);
-				socket.on('responseFrame', (message) => receiveFrame(message));
+				socketReciever.on('responseFrame', (message) => receiveFrame(message));
 			}
 		}
 

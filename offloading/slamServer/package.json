@@ -2,7 +2,7 @@
   "name": "slamServer",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "reciever.js",
   "type": "module",
   "scripts": {
     "serve": "node index.js",
