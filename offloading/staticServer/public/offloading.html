@@ -146,7 +146,7 @@
 			const socketPromise = initializeServer(serverUrl, media.width, media.height);
 
 			let statistics = [
-				['totalTime', 'slamTime', 'networkTime', 'renderTime', 'segmentationTime']
+				['slamTime', 'networkTime', 'renderTime', 'segmentationTime']
 			];
 
 			const $cam = document.getElementById('renderer-cam');
@@ -166,8 +166,13 @@
 			const socket = await socketPromise;
 
 			let frameIndex = 0;
+			let fpsTimer = 0;
 
 			const saveFrame = () => {
+				if(frameIndex === 0) {
+					fpsTimer = performance.now();
+				}
+
 				const startSegmentationTime = performance.now();
 				const frame = media.getImageData();
 				const endSegmentationTime = performance.now();
@@ -211,7 +216,6 @@
 
 				// console.log(queue.size());
 				// console.log( frameIndex === frameIndex2);
-				console.log(totalSlamTime);
 				
 				const endServerTime = performance.now();
 				const totalServerTime = endServerTime - startServerTime;
@@ -258,10 +262,7 @@
 
 				const totalRenderTime = endRenderTime - startRenderTime;
 
-				const totalTime = totalSegmentationTime + totalNetworkTime + totalRenderTime + totalSlamTime;
-
 				statistics.push([
-					totalTime,
 					totalSlamTime,
 					totalNetworkTime,
 					totalRenderTime,
@@ -269,6 +270,10 @@
 				]);
 
 				if(queue.isEmpty() && videoHasEnded){
+					const time = (performance.now() - fpsTimer) / 1000;
+					const fps = (statistics.length - 1) / time;
+					statistics[0].push('fps');
+					statistics[1].push(fps);
 					ctx.clearRect(0, 0, media.width, media.height);
 					addCubeInterval && clearInterval(addCubeInterval);
 					getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file 
