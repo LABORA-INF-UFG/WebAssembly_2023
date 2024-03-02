@@ -152,8 +152,7 @@
 
 			let statistics = 
 			[
-				[
-					'totalTime', 
+				[ 
 					'slamTime', 
 					'networkTime',
 					'renderTime', 
@@ -180,8 +179,13 @@
 			const [socketSender, socketReciever] = await socketPromise;
 
 			let frameIndex = 0;
+			let fpsTimer = 0;
 
 			const saveFrame = () => {
+				if(frameIndex === 0) {
+					fpsTimer = performance.now();
+				}
+
 				const startSegmentationTime = performance.now();
 				const frame = media.getImageData();
 				const endSegmentationTime = performance.now();
@@ -281,12 +285,9 @@
 
 				const endRenderTime = performance.now();
 
-				const totalRenderTime = endRenderTime - startRenderTime;
-
-				const totalTime = totalSegmentationTime + totalNetworkTime + totalRenderTime + totalSlamTime;
+				const totalRenderTime = endRenderTime - startRenderTime;	
 
 				statistics.push([
-					totalTime,
 					totalSlamTime,
 					totalNetworkTime,
 					totalRenderTime,
@@ -296,6 +297,10 @@
 				]);
 
 				if(queue.isEmpty() && videoHasEnded){
+					const time = (performance.now() - fpsTimer) / 1000;
+					const fps = (statistics.length -  1) / time;
+					statistics[0].push('fps');
+					statistics[1].push(fps);
 					ctx.clearRect(0, 0, media.width, media.height);
 					addCubeInterval && clearInterval(addCubeInterval);
 					getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file 
