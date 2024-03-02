@@ -117,33 +117,40 @@
 
 		//const serverUrl = "192.168.10.2:3000";
 		const serverUrl = "localhost:3000";
+		const serverUrl2 = "localhost:3001";
 		const eventStart = new Event("start");
 		const eventEnd = new Event("end");
 
-		const initializeServer = async (serverUrl, width, height) => {
+		const initializeServer = async (serverUrl, serverUrl2, width, height) => {
 			const socket = io(serverUrl, { reconnection: false });
 
-			await new Promise(resolve => {
-				socket.io.on("error", (error) => {
-					error = new Error("Could not connect to " + serverUrl);
-					window.alert("Não foi possível conectar ao servidor");
-					console.error(error);
-				});
-				resolve();
+			socket.io.on("error", (error) => {
+				error = new Error("Could not connect to " + serverUrl);
+				window.alert("Não foi possível conectar ao servidor");
+				console.error(error);
 			});
 
-			await new Promise((resolve) => socket.on('connect', () => {
-				socket.emit('initialize alva', { width, height }, () => resolve());
-			}));
+			const socket2 = await new Promise((resolve) => socket.on('connect', () =>
+				socket.emit('initialize alva', { width, height }, () => {
+					const socket2 = io(serverUrl2, { reconnection: false });
+					socket2.on('connect', () => resolve(socket2));
+				})
+			));
 
-			return socket;
+			socket2.io.on("error", (error) => {
+				error = new Error("Could not connect to " + serverUrl2);
+				window.alert("Não foi possível conectar ao segundo servidor");
+				console.error(error);
+			});
+
+			return [socket, socket2];
 		}
 
 		async function main() {
 			const media = await Video.Initialize('/videos/wasm.mp4');
 			const queue = new Queue();
 
-			const socketPromise = initializeServer(serverUrl, media.width, media.height);
+			const socketPromise = initializeServer(serverUrl, serverUrl2, media.width, media.height);
 
 			let statistics = [
 				['totalTime', 'slamTime', 'networkTime', 'renderTime', 'segmentationTime']
@@ -163,7 +170,7 @@
 			let videoHasEnded = false;
 			let addCube = false;
 
-			const socket = await socketPromise;
+			const [socket, socket2] = await socketPromise;
 
 			let frameIndex = 0;
 
@@ -185,6 +192,9 @@
 				queue.enqueue({ frame, totalSegmentationTime, startServerTime, frameIndex });
 				socket.emit('frame', request);
 
+				// const time = new Date(Date.now());
+				// console.log(`frame ${frameIndex} enviado as ${time.toISOString()}`)
+
 				frameIndex++;
 
 				if (!videoHasEnded) {
@@ -197,12 +207,12 @@
 			const receiveFrame = (message) => {
 				const item = queue.dequeue();
 
-				if(!item) {
+				if (!item) {
 					console.log("fila vazia")
 					return;
 				}
 
-        		const {data, totalSlamTime, queueTime } = message;
+				const { data, totalSlamTime, queueTime } = message;
 				const { frame, totalSegmentationTime, startServerTime, frameIndex } = item;
 				const frameIndex2 = message.frameIndex;
 
@@ -211,8 +221,8 @@
 
 				// console.log(queue.size());
 				// console.log( frameIndex === frameIndex2);
-				console.log(totalSlamTime);
-				
+				// console.log(totalSlamTime);
+
 				const endServerTime = performance.now();
 				const totalServerTime = endServerTime - startServerTime;
 				const totalNetworkTime = totalServerTime - queueTime;
@@ -268,26 +278,26 @@
 					totalSegmentationTime
 				]);
 
-				if(queue.isEmpty() && videoHasEnded){
+				if (queue.isEmpty() && videoHasEnded) {
 					ctx.clearRect(0, 0, media.width, media.height);
 					addCubeInterval && clearInterval(addCubeInterval);
 					getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file 
 					window.dispatchEvent(eventEnd);
 				}
 			}
-			
-			if (socket) {
+
+			if (socket && socket2) {
 				media.el.play();
 				media.el.loop = false;
-				
+
 				addCubeInterval = setInterval(() => {
 					addCube = true;
 				}, 200);
-				
+
 				media.el.onended = () => videoHasEnded = true;
 				window.dispatchEvent(eventStart);
 				media.el.requestVideoFrameCallback(saveFrame);
-				socket.on('responseFrame', (message) => receiveFrame(message));
+				socket2.on('responseFrame', (message) => receiveFrame(message));
 			}
 		}
 

@@ -28,21 +28,18 @@ sockets.on("connection", (socket) => {
             workerData: { width, height },
         });
 
-        worker.on("message", (message) => {
-            const queueTime = performance.now() - message.receivedTime;
-            delete message.receivedTime;
-            message.queueTime = queueTime;
-            socket.emit('responseFrame', message);
-        });
-
         setTimeout(() => callback(), 3000);
     });
 
+    
     socket.on("frame", (message) => {
+        // const time = new Date(Date.now());
+        // console.log(`frame ${message.frameIndex} recebido as ${time.toISOString()}`)
+        
         message.receivedTime = performance.now();
+        
         // console.log('start receive frame - ' + performance.now().toFixed(2))
         worker.postMessage(message);
         // console.log('end receive frame - ' + performance.now().toFixed(2))
     });
-
 });
