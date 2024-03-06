@@ -1,5 +1,5 @@
-import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/build/three.module.js';
-import { OrbitControls } from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
+import * as THREE from '/scripts/three.module.js';
+import { OrbitControls } from '/scripts/OrbitControls.js'
 import { AlvaARConnectorTHREE } from './alva_ar_three.js'
 
 class ARCamView
@@ -150,14 +150,14 @@ class ARCamIMUView
 
 class ARSimpleView
 {
-    constructor( container, width, height, mapView = null )
+    constructor( canvas, width, height,  devicePixelRatio, mapView = null, )
     {
         this.applyPose = AlvaARConnectorTHREE.Initialize( THREE );
 
-        this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+        this.renderer = new THREE.WebGLRenderer( { canvas:canvas ,antialias: true, alpha: true } );
         this.renderer.setClearColor( 0, 0 );
         this.renderer.setSize( width, height );
-        this.renderer.setPixelRatio( window.devicePixelRatio );
+        this.renderer.setPixelRatio( devicePixelRatio );
 
         this.camera = new THREE.PerspectiveCamera( 75, width / height, 0.1, 1000 );
         this.camera.rotation.reorder( 'YXZ' );
@@ -168,9 +168,9 @@ class ARSimpleView
         this.scene.add( new THREE.HemisphereLight( 0x404040, 0xf0f0f0, 1 ) );
         this.scene.add( this.camera );
 
-        this.body = document.body;
+        //this.body = document.body;
 
-        container.appendChild( this.renderer.domElement );
+        //container.appendChild( this.renderer.domElement );
 
         if( mapView )
         {
@@ -186,12 +186,12 @@ class ARSimpleView
 
         this.renderer.render( this.scene, this.camera );
 
-        this.body.classList.add( "tracking" );
+        //this.body.classList.add( "tracking" );
     }
 
     lostCamera()
     {
-        this.body.classList.remove( "tracking" );
+        //this.body.classList.remove( "tracking" );
     }
 
     createObjectWithPose( pose, scale = 1.0 )
@@ -233,11 +233,11 @@ class ARSimpleView
 
 class ARSimpleMap
 {
-    constructor( container, width, height )
+    constructor( canvas, width, height, devicePixelRatio )
     {
-        this.renderer = new THREE.WebGLRenderer( { antialias: false } );
+        this.renderer = new THREE.WebGLRenderer( {canvas: canvas, antialias: false } );
         this.renderer.setClearColor( new THREE.Color( 'rgb(255, 255, 255)' ) );
-        this.renderer.setPixelRatio( window.devicePixelRatio );
+        this.renderer.setPixelRatio( devicePixelRatio );
         this.renderer.setSize( width, height, false );
         this.renderer.domElement.style.width = width + 'px';
         this.renderer.domElement.style.height = height + 'px';
@@ -264,7 +264,7 @@ class ARSimpleMap
         this.scene.add( this.gridHelper );
         this.scene.add( this.axisHelper );
 
-        container.appendChild( this.renderer.domElement );
+        //container.appendChild( this.renderer.domElement );
 
         const render = () =>
         {

@@ -1,56 +1,161 @@
+import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
-import getVideoFrames from "https://deno.land/x/get_video_frames@v0.0.10/mod.js"
+const recieverUrl= "localhost:3001";
 
-const senderUrl= "localhost:3000";
-let socket;
-const width = 480;
-const height = 848;
+let statistics = 
+			[
+				[ 
+					'slamTime', 
+					'networkTime',
+					'renderTime', 
+					'segmentationTime',
+					'totalClientServerTime',
+					'totalServerClientTime'
+				]
+			];
 
-self.onmessage = async (message) => {
+let addCube = false;
+let totalFrames = 0;
+const addCubeInterval = setInterval(() => {
+    addCube = true;
+}, 200);
 
-    if(message.data === "getFrames"){
-        for(let frameIndex = 1; frameIndex <= 1800; frameIndex++){
-            const res = await fetch(`/imageData/${frameIndex}.bin`);
-            const buffer = await res.arrayBuffer();
-            const data = new Uint8ClampedArray(buffer);
-            const frame = new ImageData(data, width, height);
-        
-            const totalSegmentationTime = 0;
-            
-            const startServerTime = performance.now();
+let camRenderer = null;
+let mapRenderer = null;
+let ctx = null;
+let socket = null;
 
-            const request = {
-                width: frame.width,
-                height: frame.height,
-                data: frame.data,
-                frameIndex,
-                startClientServerTime: Date.now(),
-                totalSegmentationTime,
-                startServerTime
-            };
+const receiveFrame = (message) => {
+				
+    message.totalServerClientTime = Date.now() - message.startServerClientTime;
+    delete message.startServerClientTime;
 
-            socket.emit('frame', request);
+    const { 
+        frame, 
+        width, 
+        height, 
+        totalSegmentationTime, 
+        startServerTime, 
+        frameIndex,
+        data, 
+        totalSlamTime, 
+        totalServerClientTime, 
+        totalClientServerTime
+    } = message;
+    
+    const endServerTime = performance.now();
+    const totalServerTime = endServerTime - startServerTime;
+    const totalNetworkTime = totalServerClientTime + totalClientServerTime;
+    
+    let pose = null;
+    let planePose = null;
+    let dots = [];
+
+    if (data) {
+        if (data.pose) {
+            pose = new Float32Array(data.pose)
         }
-           
-    }else{
 
-        //const canvas = message.data.canvas;
+        if (data.planePose) {
+            planePose = new Float32Array(data.planePose)
+        }
 
-        //canvas.width = width;
-        //canvas.height = height;
-
-        //const ctx = canvas.getContext("2d", { willReadFrequently: true });
-        
-        socket = io(senderUrl, { reconnection: false });
-        
-        socket.on('connect',  () => {
-            socket.emit('initialize alva', {width, height}, () => {
-                self.postMessage("inicializou servidor")
-            })    
-        });
-
+        if (data.dots) {
+            dots = data.dots
+        }
     }
- 
+    
+    const frameImageData = new ImageData(new Uint8ClampedArray(frame), width, height);
+
+    const startRenderTime = performance.now();
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.putImageData(frameImageData, 0, 0);
+
+    if (pose) {
+        camRenderer.updateCameraPose(pose);
+
+        if (addCube && planePose) {
+            camRenderer.createObjectWithPose(planePose);
+            addCube = false;
+        }
+    }
+
+    for (const dot of dots) {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(dot.x, dot.y, 2, 2);
+    }
+
+    const endRenderTime = performance.now();
+
+    const totalRenderTime = endRenderTime - startRenderTime;	
+
+    statistics.push([
+        totalSlamTime,
+        totalNetworkTime,
+        totalRenderTime,
+        totalSegmentationTime,
+        totalClientServerTime,
+        totalServerClientTime,
+    ]);
+
+    if(message.frameIndex  === totalFrames - 1 ){
+        
+        console.log("entrou");
+        self.postMessage(statistics);
+        
+        ctx.clearRect(0, 0, width, height);
+        addCubeInterval && clearInterval(addCubeInterval);
+    }
 }
+
+self.onmessage = (message) => {
+    
+    if(message.data.messageId === "canvas-3d-map"){
+        const mapCanvas3d = message.data.canvas;
+        mapCanvas3d.style = {width: mapCanvas3d.width, height: mapCanvas3d.height};
+        
+        mapRenderer = new ARSimpleMap(
+            mapCanvas3d, 
+            mapCanvas3d.width, 
+            mapCanvas3d.height, 
+            message.data.devicePixelRatio
+            );
+
+
+    }else if( message.data.messageId === "canvas-3d-video"){
+        const videoCanvas3d = message.data.canvas;
+        videoCanvas3d.style = {width: videoCanvas3d.width, height: videoCanvas3d.height};
+        camRenderer = new ARSimpleView(
+            videoCanvas3d, 
+            videoCanvas3d.width, 
+            videoCanvas3d.height, 
+            message.data.devicePixelRatio,
+            mapRenderer
+            );
+
+    }else if(message.data.messageId === "renderer-video"){
+        const videoCanvas = message.data.canvas;
+        videoCanvas.style = {width: videoCanvas.width + "px", height: videoCanvas.height + "px"};
+        ctx = videoCanvas.getContext('2d');
+
+
+    }else if(message.data.messageId  === "connect to server"){
+        socket = io(recieverUrl, { reconnection: false });
+        socket.on('connect', () => {
+            
+            socket.on("responseFrame", (message) => {
+                receiveFrame(message);
+            });
+            
+            self.postMessage("worker connected to server")
+                
+        })
+
+    }else if(message.data.messageId === "ended video"){
+        totalFrames = message.data.totalFrames;
+    }
+}
+
 
 

@@ -32,9 +32,6 @@ function makeSLAM(message) {
     };
 
     sender.postMessage({
-        frame: message.data,
-        width: message.width,
-        height: message.height,
         data, 
         totalSlamTime: end - start, 
         frameIndex: message.frameIndex, 

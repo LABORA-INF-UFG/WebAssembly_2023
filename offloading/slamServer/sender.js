@@ -19,7 +19,6 @@ sockets.on("connection", (socket) => {
     
     parentPort.on("message", (message) => {
         message.startServerClientTime = Date.now();
-        
         socket.emit('responseFrame', message)
     })
 

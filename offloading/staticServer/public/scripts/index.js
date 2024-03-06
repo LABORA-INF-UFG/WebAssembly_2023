@@ -1,28 +1,9 @@
-import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
-import { getCSV } from "/scripts/utils.js";
+import { Video, getCSV } from "/scripts/utils.js";
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
+const senderUrl= "localhost:3000";
 
-const recieverUrl = "localhost:3001";
-const width = 480;
-const height = 848;
-
-
-const InitializeAll = async () => {
-    //const canvas = document.createElement('canvas');
-    //const offscreen = canvas.transferControlToOffscreen();
-    
-    const worker = new Worker('/scripts/worker.js',  {type: "module"})
-    //worker.postMessage({ canvas: offscreen }, [offscreen]);
-    worker.postMessage("nothing");
-
-    const socket = await new Promise((resolve) => {
-        worker.onmessage = (message) => {
-            const socket = io(recieverUrl, { reconnection: false });
-            socket.on("connect", () => {
-                resolve(socket);
-            })
-        }
-    })
+const initializeAll = async (width, height) => {
+    const socket = io(senderUrl, { reconnection: false });
     
     await new Promise(resolve => {
         socket.io.on("error", (error) => {
@@ -33,154 +14,107 @@ const InitializeAll = async () => {
         resolve();
     });
 
+    const worker =  await new Promise(resolve => {
+        socket.on('connect', () => {
+            socket.emit('initialize alva', {width, height}, () => {
+
+                const $cam = document.getElementById('renderer-cam');
+                $cam.parentElement.style.display = 'block';
+
+                const videoCanvas3d = document.getElementById('canvas-3d-video').transferControlToOffscreen();
+                videoCanvas3d.height = height;
+                videoCanvas3d.width = width;
+
+                const mapCanvas3d = document.getElementById('canvas-3d-map').transferControlToOffscreen();
+                mapCanvas3d.height = height;
+                mapCanvas3d.width = width;
+                
+                const videoCanvas = document.getElementById('renderer-video').transferControlToOffscreen();
+                videoCanvas.height = height;
+                videoCanvas.width = width;
+
+                const worker = new Worker('/scripts/worker.js', {type: 'module'});        
+                
+                worker.postMessage({canvas: mapCanvas3d, messageId:"canvas-3d-map", devicePixelRatio: window.devicePixelRatio}, [mapCanvas3d]);
+                worker.postMessage({canvas: videoCanvas3d, messageId:"canvas-3d-video", devicePixelRatio: window.devicePixelRatio}, [videoCanvas3d]);
+                worker.postMessage({canvas: videoCanvas, messageId:"renderer-video"}, [videoCanvas]);
+                worker.postMessage({messageId:"connect to server"});
+
+                worker.onmessage = (message) => {
+                    resolve(worker);
+                }
+            })
+        })
+    });
+
     return [socket, worker];
-};
+}
 
-async function main() {
-    let totalFrames = 1800; 
 
-    let statistics = [
-        [
-            "slamTime",
-            "networkTime",
-            "renderTime",
-            "segmentationTime",
-            "totalClientServerTime",
-            "totalServerClientTime",
-        ],
-    ];
+async function main(){
+    const media = await Video.Initialize('/videos/wasm.mp4');
+    let videoHasEnded = false;
 
-    const $cam = document.getElementById("renderer-cam");
-    const $map = document.getElementById("renderer-map");
-    const ctx = document.getElementById("renderer-video").getContext("2d");
-
-    ctx.canvas.width = width;
-    ctx.canvas.height = height;
-
-    const mapRenderer = new ARSimpleMap($map, width, height);
-    const camRenderer = new ARSimpleView($cam, width, height, mapRenderer);
-    $cam.parentElement.style.display = "block";
-
-    let addCube = false;
+    const initializeAllPromisse = initializeAll(media.width, media.height);
+    const [socket, worker] = await initializeAllPromisse;
+    
+    let frameIndex = 1;
     let fpsTimer = 0;
-    let addCubeInterval = null;
 
-    const receiveFrame = (message) => {
-        message.totalServerClientTime = Date.now() - message.startServerClientTime;
-        delete message.startServerClientTime;
+    const saveFrame = () => {
+        if(frameIndex === 0) {
+            fpsTimer = performance.now();
+        }
 
-        const {
-            frame,
-            width,
-            height,
-            totalSegmentationTime,
-            startServerTime,
+        const startSegmentationTime = performance.now();
+        const frame = media.getImageData();
+        const endSegmentationTime = performance.now();
+
+        const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
+
+        const startServerTime = performance.now();
+        
+        const request = {
+            width: frame.width,
+            height: frame.height,
+            data: frame.data,
             frameIndex,
-            data,
-            totalSlamTime,
-            totalServerClientTime,
-            totalClientServerTime,
-        } = message;
-
-        // console.log('frameIndex - ' + frameIndex);
-        // console.log('frameIndex2 - ' + frameIndex2);
-
-        // console.log(queue.size());
-        // console.log( frameIndex === frameIndex2);
-        //console.log(totalSlamTime);
-
-        const endServerTime = performance.now();
-        const totalServerTime = endServerTime - startServerTime;
-        const totalNetworkTime = totalServerClientTime + totalClientServerTime;
-
-        let pose = null;
-        let planePose = null;
-        let dots = [];
-
-        if (data) {
-            if (data.pose) {
-                pose = new Float32Array(data.pose);
-            }
-
-            if (data.planePose) {
-                planePose = new Float32Array(data.planePose);
-            }
-
-            if (data.dots) {
-                dots = data.dots;
-            }
-        }
-
-        const frameImageData = new ImageData(
-            new Uint8ClampedArray(frame),
-            width,
-            height
-        );
-
-        const startRenderTime = performance.now();
-
-        ctx.clearRect(0, 0, width, height);
-        ctx.putImageData(frameImageData, 0, 0);
-
-        if (pose) {
-            camRenderer.updateCameraPose(pose);
-
-            if (addCube && planePose) {
-                camRenderer.createObjectWithPose(planePose);
-                addCube = false;
-            }
-        }
-
-        for (const dot of dots) {
-            ctx.fillStyle = "white";
-            ctx.fillRect(dot.x, dot.y, 2, 2);
-        }
-
-        const endRenderTime = performance.now();
-
-        const totalRenderTime = endRenderTime - startRenderTime;
-
-        statistics.push([
-            totalSlamTime,
-            totalNetworkTime,
-            totalRenderTime,
+            startClientServerTime: Date.now(),
             totalSegmentationTime,
-            totalClientServerTime,
-            totalServerClientTime,
-        ]);
+            startServerTime
+        };
 
-        if (message.frameIndex  === totalFrames) {
-            const time = (performance.now() - fpsTimer) / 1000;
-            const fps = (statistics.length - 1) / time;
-            statistics[0].push("fps");
-            statistics[1].push(fps);
-            ctx.clearRect(0, 0, width, height);
-            addCubeInterval && clearInterval(addCubeInterval);
-            getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file
-            window.dispatchEvent(eventEnd);
+        socket.emit('frame', request);        
+        frameIndex++;
+
+        if (!videoHasEnded) {
+            media.el.requestVideoFrameCallback(saveFrame);
         }
-    };
-
-    const ininitializePromisse = InitializeAll();
-    const [socket, worker] =  await ininitializePromisse;
+    }
 
     if (socket && worker) {
-
-        socket.on('responseFrame', (message) => receiveFrame(message));
-
-        //Quando acabar o video faça ...
-        // worker.onmessage = (message) => {
-        //     totalFrames = message;
-
-        // }
-
-        addCubeInterval = setInterval(() => {
-            addCube = true;
-        }, 200);
+        media.el.play();
+        media.el.loop = false;
         
-        worker.postMessage("getFrames");
+        worker.onmessage = (statistics) => {
+            const time = (performance.now() - fpsTimer) / 1000;
+            const fps = (statistics.data.length -  1) / time;
+            statistics.data[0].push('fps');
+            statistics.data[1].push(fps);
 
+            getCSV(statistics.data, "offloading"); 
+        };
+
+        media.el.onended = () => {
+            const totalFrames = frameIndex;
+            console.log("Ultimo frame: "+ totalFrames)
+            videoHasEnded = true;
+
+            worker.postMessage({messageId:"ended video", totalFrames: totalFrames})
+        };
+
+        media.el.requestVideoFrameCallback(saveFrame);
     }
 }
 
-window.addEventListener("load", main);
+window.addEventListener('load', main);
