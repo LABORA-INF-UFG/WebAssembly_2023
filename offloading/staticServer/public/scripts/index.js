@@ -8,18 +8,17 @@ const height = 848;
 
 
 const InitializeAll = async () => {
-    const canvas = document.createElement('canvas');
-    const offscreen = canvas.transferControlToOffscreen();
+    //const canvas = document.createElement('canvas');
+    //const offscreen = canvas.transferControlToOffscreen();
     
     const worker = new Worker('/scripts/worker.js',  {type: "module"})
-    worker.postMessage({ canvas: offscreen }, [offscreen]);
+    //worker.postMessage({ canvas: offscreen }, [offscreen]);
+    worker.postMessage("nothing");
 
     const socket = await new Promise((resolve) => {
         worker.onmessage = (message) => {
             const socket = io(recieverUrl, { reconnection: false });
-    
             socket.on("connect", () => {
-
                 resolve(socket);
             })
         }
@@ -38,7 +37,7 @@ const InitializeAll = async () => {
 };
 
 async function main() {
-    let totalFrames = 0; 
+    let totalFrames = 1800; 
 
     let statistics = [
         [
@@ -150,7 +149,6 @@ async function main() {
             totalServerClientTime,
         ]);
 
-
         if (message.frameIndex  === totalFrames) {
             const time = (performance.now() - fpsTimer) / 1000;
             const fps = (statistics.length - 1) / time;
@@ -171,10 +169,10 @@ async function main() {
         socket.on('responseFrame', (message) => receiveFrame(message));
 
         //Quando acabar o video faça ...
-        worker.onmessage = (message) => {
-            totalFrames = message;
+        // worker.onmessage = (message) => {
+        //     totalFrames = message;
 
-        }
+        // }
 
         addCubeInterval = setInterval(() => {
             addCube = true;
