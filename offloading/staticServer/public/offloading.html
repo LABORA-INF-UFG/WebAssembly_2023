@@ -146,7 +146,7 @@
 		}
 
 		async function main() {
-			const media = await Video.Initialize('/videos/wasm.mp4');
+			const media = await Video.Initialize('/videos/wasm2.mp4');
 			const queue = new Queue();
 
 			const socketPromise = initializeServer(senderUrl, recieverUrl, media.width, media.height);
@@ -206,9 +206,6 @@
 				};
 
 				socketSender.emit('frame', request);
-				
-				//const time = new Date(Date.now());
-				//console.log(`frame ${frameIndex} enviado as ${time.toISOString()}`)
 
 				frameIndex++;
 
@@ -235,13 +232,6 @@
 				const frameIndex2 = message.frameIndex;
 
 				const { frame, totalSegmentationTime, startServerTime, frameIndex } = item;
-				
-				// console.log('frameIndex - ' + frameIndex);
-				// console.log('frameIndex2 - ' + frameIndex2);
-
-				// console.log(queue.size());
-				// console.log( frameIndex === frameIndex2);
-				//console.log(totalSlamTime);
 				
 				const endServerTime = performance.now();
 				const totalServerTime = endServerTime - startServerTime;
