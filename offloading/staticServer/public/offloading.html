@@ -146,7 +146,7 @@
 		}
 
 		async function main() {
-			const media = await Video.Initialize('/videos/wasm.mp4');
+			const media = await Video.Initialize('/videos/wasm2.mp4');
 
 			const socketPromise = initializeServer(senderUrl, recieverUrl, media.width, media.height);
 
@@ -239,13 +239,7 @@
                     totalClientServerTime
                 } = message;
 
-				
-				// console.log('frameIndex - ' + frameIndex);
-				// console.log('frameIndex2 - ' + frameIndex2);
-
-				// console.log(queue.size());
-				// console.log( frameIndex === frameIndex2);
-				//console.log(totalSlamTime);
+				console.log(frameIndex);
 				
 				const endServerTime = performance.now();
 				const totalServerTime = endServerTime - startServerTime;
