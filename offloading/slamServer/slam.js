@@ -32,10 +32,14 @@ function makeSLAM(message) {
     };
 
     sender.postMessage({
+        frame: message.data,
+        width: message.width,
+        height: message.height,
         data, 
         totalSlamTime: end - start, 
         frameIndex: message.frameIndex, 
-        totalClientServerTime: message.totalClientServerTime
+        totalClientServerTime: message.totalClientServerTime,
+        totalSegmentationTime: message.totalSegmentationTime
     });
     // console.log("processei frame - " + message.frameIndex);
     // console.log('end make slam - ' + performance.now().toFixed(2))

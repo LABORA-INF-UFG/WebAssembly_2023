@@ -146,7 +146,7 @@ async function main() {
             totalRenderTime,
             totalSegmentationTime,
             totalClientServerTime,
-            totalServerClientTime,
+            totalServerClientTime
         ]);
 
         if (message.frameIndex  === totalFrames) {
