@@ -1,6 +1,7 @@
 import { Video, getCSV } from "/scripts/utils.js";
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
-const senderUrl= "localhost:3000";
+// const senderUrl= "localhost:3000";
+const senderUrl= "192.168.10.2:3000";
 
 const initializeAll = async (width, height) => {
     const socket = io(senderUrl, { reconnection: false });
@@ -50,7 +51,6 @@ const initializeAll = async (width, height) => {
     return [socket, worker];
 }
 
-
 async function main(){
     const media = await Video.Initialize('/videos/wasm.mp4');
     let videoHasEnded = false;
@@ -71,9 +71,7 @@ async function main(){
         const endSegmentationTime = performance.now();
 
         const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
-
-        const startServerTime = performance.now();
-        
+  
         const request = {
             width: frame.width,
             height: frame.height,
@@ -81,7 +79,6 @@ async function main(){
             frameIndex,
             startClientServerTime: Date.now(),
             totalSegmentationTime,
-            startServerTime
         };
 
         socket.emit('frame', request);        
