@@ -1,4 +1,5 @@
 import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
+import {Queue} from "/scripts/utils.js"
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
 const recieverUrl= "localhost:3001";
 
@@ -14,8 +15,12 @@ let statistics =
 				]
 			];
 
+let queue = new Queue();
+
 let addCube = false;
+let videoHasEnded = false;
 let totalFrames = 0;
+
 const addCubeInterval = setInterval(() => {
     addCube = true;
 }, 200);
@@ -24,27 +29,33 @@ let camRenderer = null;
 let mapRenderer = null;
 let ctx = null;
 let socket = null;
+let videoCanvas = null;
 
-const receiveFrame = (message) => {
-				
-    message.totalServerClientTime = Date.now() - message.startServerClientTime;
-    delete message.startServerClientTime;
 
-    const { 
-        frame, 
-        width, 
-        height, 
-        totalSegmentationTime, 
-        startServerTime, 
-        frameIndex,
-        data, 
-        totalSlamTime, 
-        totalServerClientTime, 
-        totalClientServerTime
-    } = message;
+const receiveFrame = (queueData, serverData) => {
     
+    serverData.totalServerClientTime = Date.now() - serverData.startServerClientTime;
+    delete serverData.startServerClientTime;
+
+    const {  
+        data, 
+        totalSlamTime,  
+        frameIndex,
+        totalServerClientTime,
+        totalClientServerTime
+    } = serverData;
+
+    const {
+        frame,
+        totalSegmentationTime,
+        startServerTime
+    } = queueData;
+    
+    const frameIndex2 = queueData.frameIndex;
+    //console.log(frameIndex2 === frameIndex)
     const endServerTime = performance.now();
     const totalServerTime = endServerTime - startServerTime;
+
     const totalNetworkTime = totalServerClientTime + totalClientServerTime;
     
     let pose = null;
@@ -65,12 +76,10 @@ const receiveFrame = (message) => {
         }
     }
     
-    const frameImageData = new ImageData(new Uint8ClampedArray(frame), width, height);
-
     const startRenderTime = performance.now();
 
-    ctx.clearRect(0, 0, width, height);
-    ctx.putImageData(frameImageData, 0, 0);
+    ctx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
+    ctx.putImageData(frame, 0, 0);
 
     if (pose) {
         camRenderer.updateCameraPose(pose);
@@ -98,13 +107,13 @@ const receiveFrame = (message) => {
         totalClientServerTime,
         totalServerClientTime,
     ]);
-
-    if(message.frameIndex  === totalFrames - 1 ){
+    //console.log(frameIndex)
+    if(videoHasEnded && queue.isEmpty()){
         
-        console.log("entrou");
+	    console.log("terminou");
         self.postMessage(statistics);
         
-        ctx.clearRect(0, 0, width, height);
+        ctx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
         addCubeInterval && clearInterval(addCubeInterval);
     }
 }
@@ -114,7 +123,7 @@ self.onmessage = (message) => {
     if(message.data.messageId === "canvas-3d-map"){
         const mapCanvas3d = message.data.canvas;
         mapCanvas3d.style = {width: mapCanvas3d.width, height: mapCanvas3d.height};
-        
+
         mapRenderer = new ARSimpleMap(
             mapCanvas3d, 
             mapCanvas3d.width, 
@@ -134,8 +143,9 @@ self.onmessage = (message) => {
             mapRenderer
             );
 
+
     }else if(message.data.messageId === "renderer-video"){
-        const videoCanvas = message.data.canvas;
+        videoCanvas = message.data.canvas;
         videoCanvas.style = {width: videoCanvas.width + "px", height: videoCanvas.height + "px"};
         ctx = videoCanvas.getContext('2d');
 
@@ -143,17 +153,23 @@ self.onmessage = (message) => {
     }else if(message.data.messageId  === "connect to server"){
         socket = io(recieverUrl, { reconnection: false });
         socket.on('connect', () => {
-            
-            socket.on("responseFrame", (message) => {
-                receiveFrame(message);
-            });
-            
-            self.postMessage("worker connected to server")
-                
-        })
+            self.onmessage =  (message) => {
+                if(message.data.messageId === "ended video"){
+                    totalFrames = message.data.totalFrames;
+                    videoHasEnded = message.data.videoHasEnded;
+                }else{
+                    queue.enqueue(message);
+                }
+            }
 
-    }else if(message.data.messageId === "ended video"){
-        totalFrames = message.data.totalFrames;
+            socket.on("responseFrame", (serverData) => {
+                const queueData = queue.dequeue().data;
+                receiveFrame(queueData, serverData);
+            })
+
+            self.postMessage("worker connected to server");
+                            
+        })
     }
 }
 

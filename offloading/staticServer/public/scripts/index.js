@@ -75,16 +75,13 @@ async function main(){
         const startServerTime = performance.now();
         
         const request = {
-            width: frame.width,
-            height: frame.height,
             data: frame.data,
             frameIndex,
             startClientServerTime: Date.now(),
-            totalSegmentationTime,
-            startServerTime
         };
+        worker.postMessage({frame, totalSegmentationTime, frameIndex, startServerTime})
+        socket.emit('frame', request);
 
-        socket.emit('frame', request);        
         frameIndex++;
 
         if (!videoHasEnded) {
@@ -110,7 +107,7 @@ async function main(){
             console.log("Ultimo frame: "+ totalFrames)
             videoHasEnded = true;
 
-            worker.postMessage({messageId:"ended video", totalFrames: totalFrames})
+            worker.postMessage({messageId:"ended video", totalFrames: totalFrames, videoHasEnded})
         };
 
         media.el.requestVideoFrameCallback(saveFrame);
