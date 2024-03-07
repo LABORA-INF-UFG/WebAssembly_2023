@@ -33,5 +33,5 @@ while :; do
   #echo "CPU user usage at $cpu_user_usage%"
   #echo "================================="
   # Wait a second before the next read 
-  sleep 1 
+  sleep 1
 done
