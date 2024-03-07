@@ -31,14 +31,13 @@ function makeSLAM(message) {
         dots: dots,
     };
 
+    const {data: frame} = message;
+
     sender.postMessage({
-        frame: message.data,
-        width: message.width,
-        height: message.height,
+        frame,
+        ...message,
         data, 
         totalSlamTime: end - start, 
-        frameIndex: message.frameIndex, 
-        totalClientServerTime: message.totalClientServerTime
     });
     // console.log("processei frame - " + message.frameIndex);
     // console.log('end make slam - ' + performance.now().toFixed(2))
