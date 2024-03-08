@@ -1,6 +1,6 @@
 import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
-// const recieverUrl= "localhost:3001";
+// const receiverUrl= "localhost:3001";
 const receiverUrl = "192.168.10.2:3001";
 
 let statistics = [[
@@ -9,7 +9,8 @@ let statistics = [[
     'renderTime',
     'segmentationTime',
     'totalClientServerTime',
-    'totalServerClientTime'
+    'totalServerClientTime',
+    'screenTime'
 ]];
 
 let addCube = false;
@@ -22,6 +23,7 @@ let camRenderer = null;
 let mapRenderer = null;
 let ctx = null;
 let socket = null;
+let screenTimeStart = performance.now();
 
 const receiveFrame = (message) => {
 
@@ -64,8 +66,10 @@ const receiveFrame = (message) => {
 
     const startRenderTime = performance.now();
 
+    const screenTime = performance.now() - screenTimeStart;
     ctx.clearRect(0, 0, width, height);
     ctx.putImageData(frameImageData, 0, 0);
+    screenTimeStart = performance.now();
 
     if (pose) {
         camRenderer.updateCameraPose(pose);
@@ -92,6 +96,7 @@ const receiveFrame = (message) => {
         totalSegmentationTime,
         totalClientServerTime,
         totalServerClientTime,
+        screenTime
     ]);
 
     if (message.frameIndex === totalFrames - 1) {
