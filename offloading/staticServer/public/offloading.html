@@ -115,10 +115,10 @@
 		import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
 		import { Video, onFrame, getCSV, Queue } from "/scripts/utils.js";
 
-		//const senderUrl= "localhost:3000";
-		const senderUrl = "192.168.10.2:3000";
-		//const recieverUrl = "localhost:3001";
-		const recieverUrl = "192.168.10.2:3001";
+		const senderUrl= "localhost:3000";
+		//const senderUrl = "192.168.10.2:3000";
+		const recieverUrl = "localhost:3001";
+		//const recieverUrl = "192.168.10.2:3001";
 
 		const eventStart = new Event("start");
 		const eventEnd = new Event("end");
@@ -146,7 +146,7 @@
 		}
 
 		async function main() {
-			const media = await Video.Initialize('/videos/wasm2.mp4');
+			const media = await Video.Initialize('/videos/wasm.mp4');
 			const queue = new Queue();
 
 			const socketPromise = initializeServer(senderUrl, recieverUrl, media.width, media.height);
@@ -159,7 +159,8 @@
 					'renderTime', 
 					'segmentationTime',
 					'totalClientServerTime',
-					'totalServerClientTime'
+					'totalServerClientTime',
+					'screenTime'
 				]
 			];
 
@@ -215,6 +216,7 @@
 			}
 
 			let addCubeInterval = null;
+			let startScreenTime = performance.now();
 
 			const receiveFrame = (message) => {
 				
@@ -256,9 +258,10 @@
 				}
 
 				const startRenderTime = performance.now();
-
+				const screenTime = performance.now() - startScreenTime;
 				ctx.clearRect(0, 0, media.width, media.height);
 				ctx.putImageData(frame, 0, 0);
+				startScreenTime = performance.now();
 
 				if (pose) {
 					camRenderer.updateCameraPose(pose);
@@ -285,6 +288,7 @@
 					totalSegmentationTime,
 					totalClientServerTime,
 					totalServerClientTime,
+					screenTime
 				]);
 
 				if(queue.isEmpty() && videoHasEnded){
