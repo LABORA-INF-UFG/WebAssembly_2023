@@ -1,7 +1,10 @@
 import { Video, getCSV } from "/scripts/utils.js";
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
-// const senderUrl= "localhost:3000";
-const senderUrl= "192.168.10.2:3000";
+const senderUrl= "localhost:3000";
+//const senderUrl= "192.168.10.2:3000";
+
+const eventStart = new Event("start");
+const eventEnd = new Event("end");
 
 const initializeAll = async (width, height) => {
     const socket = io(senderUrl, { reconnection: false });
@@ -100,6 +103,7 @@ async function main(){
             statistics.data[1].push(fps);
 
             getCSV(statistics.data, "offloading"); 
+            window.dispatchEvent(eventEnd);
         };
 
         media.el.onended = () => {
@@ -110,6 +114,7 @@ async function main(){
             worker.postMessage({messageId:"ended video", totalFrames: totalFrames})
         };
 
+        window.dispatchEvent(eventStart);
         media.el.requestVideoFrameCallback(saveFrame);
     }
 }
