@@ -1,7 +1,7 @@
 import { Video, getCSV } from "/scripts/utils.js";
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
-const senderUrl= "localhost:3000";
-//const senderUrl= "192.168.10.2:3000";
+//const senderUrl= "localhost:3000";
+const senderUrl= "192.168.10.2:3000";
 
 const eventStart = new Event("start");
 const eventEnd = new Event("end");

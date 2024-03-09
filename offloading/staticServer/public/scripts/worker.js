@@ -1,7 +1,7 @@
 import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
-const receiverUrl= "localhost:3001";
-//const receiverUrl = "192.168.10.2:3001";
+//const receiverUrl= "localhost:3001";
+const receiverUrl = "192.168.10.2:3001";
 
 let statistics = [[
     'slamTime',
