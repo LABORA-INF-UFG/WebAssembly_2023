@@ -21,15 +21,16 @@ const sockets = new Server(server, {
 const alva = await AlvaAR.Initialize(width, height);
 
 sockets.on("connection", (socket) => {
-    const makeSLAM = (slamData) => {
+    const makeSLAM = (message) => {
         // console.log('start make slam - ' + performance.now().toFixed(2))
         
         const start = performance.now();
         // console.log('start - ' + start)
         
-        const pose = alva.findCameraPose(slamData);
+        const pose = alva.findCameraPose(message);
         const planePose = alva.findPlane();
         const dots = alva.getFramePoints();
+        
         const end = performance.now();
         
         // console.log('end - ' + end)
@@ -40,14 +41,14 @@ sockets.on("connection", (socket) => {
             dots: dots,
         };
         
-        const queueTime = performance.now() - slamData.receivedTime;
 
         const response = {
             data,
             totalSlamTime: end - start,
-            frameIndex: slamData.frameIndex,
-            receivedTime: slamData.receivedTime,
-            queueTime
+            frameIndex: message.frameIndex,
+            totalClientServerTime: message.totalClientServerTime,
+            startServerClientTime: Date.now()
+            
         }
         
         socket.emit('responseFrame', response);
