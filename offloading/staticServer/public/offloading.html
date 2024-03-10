@@ -146,7 +146,7 @@
 		}
 
 		async function main() {
-			const media = await Video.Initialize('/videos/video-short.mp4');
+			const media = await Video.Initialize('/videos/wasm.mp4');
 			const queue = new Queue();
 
 			const socketPromise = initializeServer(senderUrl, recieverUrl, media.width, media.height);
