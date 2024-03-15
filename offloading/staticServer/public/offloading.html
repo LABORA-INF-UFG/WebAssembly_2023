@@ -115,13 +115,14 @@
 		import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
 		import { Video, onFrame, getCSV, Queue } from "/scripts/utils.js";
 
-		//const senderUrl= "localhost:3000";
-		const senderUrl = "192.168.10.2:3000";
-		//const recieverUrl = "localhost:3001";
-		const recieverUrl = "192.168.10.2:3001";
+		const senderUrl= "localhost:3000";
+		//const senderUrl = "16.10.1.3:3000";
+		const recieverUrl = "localhost:3001";
+		//const recieverUrl = "16.10.1.3:3001";
 
 		const eventStart = new Event("start");
 		const eventEnd = new Event("end");
+
 
 		const initializeServer = async (senderUrl, recieverUrl,width, height) => {
 			const socketSender = io(senderUrl, { reconnection: false });
@@ -215,6 +216,7 @@
 				}
 			}
 
+			let finishExperimentInterval;
 			let addCubeInterval = null;
 			let startScreenTime = performance.now();
 
@@ -291,16 +293,6 @@
 					screenTime
 				]);
 
-				if(queue.isEmpty() && videoHasEnded){
-					const time = (performance.now() - fpsTimer) / 1000;
-					const fps = (statistics.length -  1) / time;
-					statistics[0].push('fps');
-					statistics[1].push(fps);
-					ctx.clearRect(0, 0, media.width, media.height);
-					addCubeInterval && clearInterval(addCubeInterval);
-					getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file 
-					window.dispatchEvent(eventEnd);
-				}
 			}
 			
 			if (socketReciever && socketSender) {
@@ -311,6 +303,19 @@
 					addCube = true;
 				}, 200);
 				
+				finishExperimentInterval = setInterval(() => {
+					if(queue.isEmpty() && videoHasEnded){
+						const time = (performance.now() - fpsTimer) / 1000;
+						const fps = (statistics.length -  1) / time;
+						statistics[0].push('fps');
+						statistics[1].push(fps);
+						ctx.clearRect(0, 0, media.width, media.height);
+						addCubeInterval && clearInterval(addCubeInterval);
+						getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file 
+						window.dispatchEvent(eventEnd);
+					}
+				}, 1000)
+
 				media.el.onended = () => videoHasEnded = true;
 				window.dispatchEvent(eventStart);
 				media.el.requestVideoFrameCallback(saveFrame);
