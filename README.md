@@ -70,7 +70,7 @@ npm run start
 ```
 No navegador Chrome[^4] acesse http://localhost:8080/local.html
 
-[^4]: Por hora, funciona somente no Chrome pois a biblioteca AlvaAR utiliza a engine V8 do navegador)
+[^4]: Por hora, funciona somente no Chrome pois a biblioteca AlvaAR utiliza a engine V8 do navegador.
 
 ### Com offloading
  
