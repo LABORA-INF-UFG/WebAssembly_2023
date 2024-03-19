@@ -9,13 +9,27 @@ The **staticServer** can run in two ways: fully local or by offloading to the sl
 [^1]: Requesting a server to perform resource-intensive processing tasks (e.g., performing heavy mathematical calculations).
 
 ## How to Set Up
+### Install dependencies
 
 [Install Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) (Node Package Manager)
 
 Run `npm i` in both **offloading/slamServer** and **offloading/staticServer** folders.
 
-## How to Run
+### Setup and Build Offloading Server Libraries
 
+IMPORTANT: if you're on Windows, you will need to run these configurations in WSL, because the steps described here are meant to be run on Linux
+
+[Install and setup](https://emscripten.org/docs/getting_started/downloads.html) emscripten
+
+Install cmake with `sudo apt install cmake`
+
+Update `EMSCRIPTEN_DIR` variable with the emscripten scripts folder in your machine `<YOUR_MACHINE_PATH>/emsdk/upstream/emscripten` through Nano
+
+Create folder `build_threads` in `libraries\AlvaAR\src\libs\` 
+
+Run `./build.sh` to build AlvaAR libraries
+
+## How to Run
 ### Without Offloading:
 
 Run:
@@ -53,11 +67,19 @@ O `staticServer` pode rodar de duas maneiras: totalmente local ou realizando off
 
 [^3]: Requisitar a um servidor para realizar processamento que demandam muitos recursos (e.g., realizar cálculos matemáticos pesados).
 
-## Como Configurar
+### Configuração e Compilação de Bibliotecas do Servidor de Deslocamento
 
-[Instale o node e o npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) (node package manager)
+**IMPORTANTE:** Se estiver utilizando o Windows, você precisará executar estas configurações no WSL, pois os passos descritos aqui são destinados a serem executados no Linux.
 
-- Execute npm i em ambas as pastas offloading/slamServer e offloading/staticServer
+[Instale e configure](https://emscripten.org/docs/getting_started/downloads.html) o emscripten.
+
+Instale o cmake com `sudo apt install cmake`.
+
+Atualize a variável `EMSCRIPTEN_DIR` com a pasta de scripts do emscripten em sua máquina `<SEU_CAMINHO_DE_MÁQUINA>/emsdk/upstream/emscripten` usando o Nano.
+
+Crie a pasta `build_threads` em `libraries\AlvaAR\src\libs\`.
+
+Execute `./build.sh` para compilar as bibliotecas do AlvaAR.
 
 ## Como Executar
 
