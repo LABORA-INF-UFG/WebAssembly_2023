@@ -34,7 +34,13 @@ sockets.on("connection", (socket) => {
     socket.on("frame", (message) => {
         message.totalClientServerTime = Date.now() - message.startClientServerTime;
         delete message.startClientServerTime;
+        
+        // const time = new Date(Date.now());
+        // console.log(`frame ${message.frameIndex} recebido as ${time.toISOString()}`)
+        
+        // console.log('start receive frame - ' + performance.now().toFixed(2))
         slam.postMessage(message);
+        // console.log('end receive frame - ' + performance.now().toFixed(2))
     });
 
 });

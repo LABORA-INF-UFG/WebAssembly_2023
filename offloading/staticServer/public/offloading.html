@@ -115,99 +115,15 @@
 		import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
 		import { Video, onFrame, getCSV } from "/scripts/utils.js";
 
-		function imageDataToBlob(imageData) {
-			const tmpCanvas = document.createElement('canvas');
-			const ctx = tmpCanvas.getContext('2d');
-			tmpCanvas.width = imageData.width;
-			tmpCanvas.height = imageData.height;
-			ctx.putImageData(imageData, 0, 0);
-
-			return new Promise(resolve => tmpCanvas.toBlob(resolve));
-		}
-
-		function imageDataToDataUrl(imageData) {
-			const tmpCanvas = document.createElement('canvas');
-			const ctx = tmpCanvas.getContext('2d');
-			tmpCanvas.width = imageData.width;
-			tmpCanvas.height = imageData.height;
-			ctx.putImageData(imageData, 0, 0);
-
-			const img = new Image();
-			img.src = tmpCanvas.toDataURL();
-			return img;
-		}
-
-		async function dataUrlToImageData(dataUrl, width, height) {
-			if (dataUrl === undefined || dataUrl === null) {
-				return;
-			}
-
-			const canvas = document.createElement('canvas');
-			canvas.width = width;
-			canvas.height = height;
-			const context = canvas.getContext('2d');
-			const image = new Image();
-
-			return new Promise(resolve => {
-				image.onload = () => {
-					context.drawImage(image, 0, 0, width, height);
-					const imageData = context.getImageData(0, 0, width, height);
-					resolve(imageData);
-				}
-
-				image.src = dataUrl;
-			})
-		}
-
-		function roughSizeOfObject(object) {
-			const objectList = [];
-			const stack = [object];
-			let bytes = 0;
-
-			while (stack.length) {
-				const value = stack.pop();
-
-				switch (typeof value) {
-					case 'boolean':
-						bytes += 4;
-						break;
-					case 'string':
-						bytes += value.length * 2;
-						break;
-					case 'number':
-						bytes += 8;
-						break;
-					case 'object':
-						if (!objectList.includes(value)) {
-							objectList.push(value);
-							for (const prop in value) {
-								if (value.hasOwnProperty(prop)) {
-									stack.push(value[prop]);
-								}
-							}
-						}
-						break;
-				}
-			}
-
-			return bytes;
-		}
-
-		function dataUrlSize(dataUrl) {
-			const base64str = dataUrl.src.substr(22);
-			const decoded = atob(base64str);
-			return decoded.length;
-		}
-
 		const senderUrl = "192.168.10.2:3000";
-		//const senderUrl = "localhost:3000";
+		// const senderUrl= "localhost:3000";
 		const receiverUrl = "192.168.10.2:3001";
-		//const receiverUrl = "localhost:3001";
+		// const receiverUrl =  "localhost:3001";
 
 		const eventStart = new Event("start");
 		const eventEnd = new Event("end");
 
-		const initializeServer = async (senderUrl, receiverUrl, width, height) => {
+		const initializeServer = async (senderUrl, receiverUrl,width, height) => {
 			const socketSender = io(senderUrl, { reconnection: false });
 
 			await new Promise(resolve => {
@@ -234,21 +150,18 @@
 
 			const socketPromise = initializeServer(senderUrl, receiverUrl, media.width, media.height);
 
-			let statistics =
-				[
-					[
-						'slamTime',
-						'networkTime',
-						'renderTime',
-						'segmentationTime',
-						'totalClientServerTime',
-						'totalServerClientTime',
-						'screenTime',
-						'compressionTime',
-						'decompressionTimeServer',
-						'decompressionTimeClient',
-					]
-				];
+			let statistics = 
+			[
+				[ 
+					'slamTime', 
+					'networkTime',
+					'renderTime', 
+					'segmentationTime',
+					'totalClientServerTime',
+					'totalServerClientTime',
+					'screenTime'
+				]
+			];
 
 			const $cam = document.getElementById('renderer-cam');
 			const $map = document.getElementById('renderer-map');
@@ -271,36 +184,34 @@
 			let frameIndex = 0;
 			let fpsTimer = 0;
 
-			const saveFrame = async () => {
-				if (frameIndex === 0) {
+			const saveFrame = () => {
+				if(frameIndex === 0) {
 					fpsTimer = performance.now();
 				}
 
 				const startSegmentationTime = performance.now();
 				const frame = media.getImageData();
-
 				const endSegmentationTime = performance.now();
 
 				const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
 
-				const startCompressionTime = performance.now();
-				const dataUrl = imageDataToDataUrl(frame);
-				const compressionTime = performance.now() - startCompressionTime;
-				// const blob = await imageDataToBlob(frame);
-
 				const startServerTime = performance.now();
 
+				
 				const request = {
-					dataUrl: dataUrl.src,
-					// blob,
+                    width: frame.width,
+					height: frame.height,
+					data: frame.data,
 					frameIndex,
 					startClientServerTime: Date.now(),
-					totalSegmentationTime,
-					compressionTime,
-					startServerTime
+                    totalSegmentationTime,
+                    startServerTime
 				};
 
 				socketSender.emit('frame', request);
+				
+				//const time = new Date(Date.now());
+				//console.log(`frame ${frameIndex} enviado as ${time.toISOString()}`)
 
 				frameIndex++;
 
@@ -310,60 +221,59 @@
 			}
 
 			let addCubeInterval = null;
-			let startScreenTime = performance.now();
+      let startScreenTime = performance.now();
 
-			const receiveFrame = async (message) => {
-
+			const receiveFrame = (message) => {
+				
 				message.totalServerClientTime = Date.now() - message.startServerClientTime;
 				delete message.startServerClientTime;
 
-				const {
-					dataUrl,
-					totalSegmentationTime,
-					startServerTime,
-					frameIndex,
-					slamData,
-					totalSlamTime,
-					totalServerClientTime,
-					totalClientServerTime,
-					compressionTime,
-					decompressionTime
-				} = message;
+				const { 
+                    frame, 
+                    width, 
+                    height, 
+                    totalSegmentationTime, 
+                    startServerTime, 
+                    frameIndex,
+                    data, 
+                    totalSlamTime, 
+                    totalServerClientTime, 
+                    totalClientServerTime
+                } = message;
 
+				//console.log(frameIndex);
+				
 				const endServerTime = performance.now();
 				const totalServerTime = endServerTime - startServerTime;
 				const totalNetworkTime = totalServerClientTime + totalClientServerTime;
-
+				
 				let pose = null;
 				let planePose = null;
 				let dots = [];
 
-				if (slamData) {
-					if (slamData.pose) {
-						pose = new Float32Array(slamData.pose)
+				if (data) {
+					if (data.pose) {
+						pose = new Float32Array(data.pose)
 					}
 
-					if (slamData.planePose) {
-						planePose = new Float32Array(slamData.planePose)
+					if (data.planePose) {
+						planePose = new Float32Array(data.planePose)
 					}
 
-					if (slamData.dots) {
-						dots = slamData.dots
+					if (data.dots) {
+						dots = data.dots
 					}
 				}
 
-
-				const startDecompressionTime2 = performance.now();
-				const frameImageData = await dataUrlToImageData(dataUrl, media.width, media.height);
-				const decompressionTime2 = performance.now() - startDecompressionTime2;
-				// console.log(frameImageData)
+                
+                const frameImageData = new ImageData(new Uint8ClampedArray(frame), width, height);
 
 				const startRenderTime = performance.now();
 
-				const screenTime = performance.now() - startScreenTime;
+        const screenTime = performance.now() - startScreenTime;
 				ctx.clearRect(0, 0, media.width, media.height);
 				ctx.putImageData(frameImageData, 0, 0);
-				startScreenTime = performance.now();
+        startScreenTime = performance.now();
 
 				if (pose) {
 					camRenderer.updateCameraPose(pose);
@@ -381,7 +291,7 @@
 
 				const endRenderTime = performance.now();
 
-				const totalRenderTime = endRenderTime - startRenderTime;
+				const totalRenderTime = endRenderTime - startRenderTime;	
 
 				statistics.push([
 					totalSlamTime,
@@ -390,17 +300,14 @@
 					totalSegmentationTime,
 					totalClientServerTime,
 					totalServerClientTime,
-					screenTime,
-					compressionTime,
-					decompressionTime,
-					decompressionTime2
+					screenTime
 				]);
 
 				//console.log(message.frameIndex);
 
-				if (message.frameIndex === totalFrames - 1 && videoHasEnded) {
+				if(message.frameIndex  === totalFrames - 1 && videoHasEnded){
 					const time = (performance.now() - fpsTimer) / 1000;
-					const fps = (statistics.length - 1) / time;
+					const fps = (statistics.length -  1) / time;
 					statistics[0].push('fps');
 					statistics[1].push(fps);
 					ctx.clearRect(0, 0, media.width, media.height);
@@ -409,18 +316,18 @@
 					window.dispatchEvent(eventEnd);
 				}
 			}
-
+			
 			if (socketReceiver && socketSender) {
 				media.el.play();
 				media.el.loop = false;
-
+				
 				addCubeInterval = setInterval(() => {
 					addCube = true;
 				}, 200);
-
+				
 				media.el.onended = () => {
 					totalFrames = frameIndex;
-					console.log("Ultimo frame: " + totalFrames)
+					console.log("Ultimo frame: "+ totalFrames)
 					videoHasEnded = true;
 				};
 				window.dispatchEvent(eventStart);
