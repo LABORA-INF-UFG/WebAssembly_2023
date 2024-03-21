@@ -137,6 +137,28 @@
 			return img;
 		}
 
+		async function dataUrlToImageData(dataUrl, width, height) {
+			if (dataUrl === undefined || dataUrl === null) {
+				return;
+			}
+
+			const canvas = document.createElement('canvas');
+			canvas.width = width;
+			canvas.height = height;
+			const context = canvas.getContext('2d');
+			const image = new Image();
+
+			return new Promise(resolve => {
+				image.onload = () => {
+					context.drawImage(image, 0, 0, width, height);
+					const imageData = context.getImageData(0, 0, width, height);
+					resolve(imageData);
+				}
+
+				image.src = dataUrl;
+			})
+		}
+
 		function roughSizeOfObject(object) {
 			const objectList = [];
 			const stack = [object];
@@ -177,10 +199,10 @@
 			return decoded.length;
 		}
 
-		const senderUrl = "192.168.10.2:3000";
-		// const senderUrl= "localhost:3000";
-		const receiverUrl = "192.168.10.2:3001";
-		// const receiverUrl =  "localhost:3001";
+		// const senderUrl = "192.168.10.2:3000";
+		const senderUrl = "localhost:3000";
+		// const receiverUrl = "192.168.10.2:3001";
+		const receiverUrl = "localhost:3001";
 
 		const eventStart = new Event("start");
 		const eventEnd = new Event("end");
@@ -248,21 +270,19 @@
 
 			const saveFrame = async () => {
 				if (frameIndex === 0) {
-					fpsTimer = performance.now();	
+					fpsTimer = performance.now();
 				}
 
 				const startSegmentationTime = performance.now();
 				const frame = media.getImageData();
-				
+
 				const endSegmentationTime = performance.now();
 
 				const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
 
 				const dataUrl = imageDataToDataUrl(frame);
+				// console.log(dataUrl)
 				const blob = await imageDataToBlob(frame);
-				//console.log('imageData - ' + roughSizeOfObject(frame))
-				//console.log('dataUrl - ' + dataUrlSize(dataUrl))
-				//console.log('blob - ' + blob.size)
 
 				const startServerTime = performance.now();
 
@@ -270,7 +290,7 @@
 					width: frame.width,
 					height: frame.height,
 					data: frame.data,
-					dataUrl,
+					dataUrl: dataUrl.src,
 					blob,
 					frameIndex,
 					startClientServerTime: Date.now(),
@@ -293,13 +313,13 @@
 			let addCubeInterval = null;
 			let startScreenTime = performance.now();
 
-			const receiveFrame = (message) => {
+			const receiveFrame = async (message) => {
 
 				message.totalServerClientTime = Date.now() - message.startServerClientTime;
 				delete message.startServerClientTime;
 
 				const {
-					frame,
+					dataUrl,
 					width,
 					height,
 					totalSegmentationTime,
@@ -336,7 +356,8 @@
 				}
 
 
-				const frameImageData = new ImageData(new Uint8ClampedArray(frame), width, height);
+				const frameImageData = await dataUrlToImageData(dataUrl, media.width, media.height);
+				// console.log(frameImageData)
 
 				const startRenderTime = performance.now();
 
