@@ -52,7 +52,6 @@ async function blobToImageData(blob) {
 
     return new Promise(resolve => {
         img.onload = () => { // handle async image loading
-            console.log('aqui')
             URL.revokeObjectURL(img.src); // free memory held by Object URL
             context = canvas.getContext("2d")
             context.drawImage(img, 0, 0); // draw image onto canvas (lazy method™)
@@ -62,18 +61,18 @@ async function blobToImageData(blob) {
 
         img.src = url;
     })
-
 }
 
 parentPort.on("message", (message) => makeSLAM(message))
 
 async function makeSLAM(message) {
-    // const blob = new Blob(message.blob, {type: 'image/png'});
-    // const a = await blobToImageData(blob);
-
-    const { dataUrl } = message;
+    
     const startDecompressionTime = performance.now();
-    const imageData = await dataUrlToImageData(dataUrl);
+    // const { dataUrl } = message;
+    // const imageData = await dataUrlToImageData(dataUrl);
+    const blob = new Blob(message.blob, {type: 'image/png'});
+    const imageData = await blobToImageData(blob);
+    console.log(imageData);
     const decompressionTime = performance.now() - startDecompressionTime;
 
     const start = performance.now();
@@ -90,7 +89,8 @@ async function makeSLAM(message) {
     };
 
     sender.postMessage({
-        dataUrl,
+        // dataUrl,
+        blob,
         ...message,
         slamData,
         totalSlamTime: end - start,

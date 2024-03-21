@@ -125,6 +125,26 @@
 			return new Promise(resolve => tmpCanvas.toBlob(resolve));
 		}
 
+		async function blobToImageData(blob, width, height) {
+			const canvas = createCanvas(width, height)
+
+			const url = URL.createObjectURL(blob);         // create an Object URL
+			const img = new Image();                       // create a temp. image object
+			let context = null;
+
+			return new Promise(resolve => {
+				img.onload = () => { // handle async image loading
+					URL.revokeObjectURL(img.src); // free memory held by Object URL
+					context = canvas.getContext("2d")
+					context.drawImage(img, 0, 0); // draw image onto canvas (lazy method™)
+					const imageData = context.getImageData(0, 0, width, height);
+					resolve(imageData);
+				};
+
+				img.src = url;
+			})
+		}
+
 		function imageDataToDataUrl(imageData) {
 			const tmpCanvas = document.createElement('canvas');
 			const ctx = tmpCanvas.getContext('2d');
@@ -283,15 +303,15 @@
 				const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
 
 				const startCompressionTime = performance.now();
-				const dataUrl = imageDataToDataUrl(frame);
+				// const dataUrl = imageDataToDataUrl(frame);
+				const blob = await imageDataToBlob(frame);
 				const compressionTime = performance.now() - startCompressionTime;
-				// const blob = await imageDataToBlob(frame);
 
 				const startServerTime = performance.now();
 
 				const request = {
-					dataUrl: dataUrl.src,
-					// blob,
+					// dataUrl: dataUrl.src,
+					blob,
 					frameIndex,
 					startClientServerTime: Date.now(),
 					totalSegmentationTime,
@@ -317,7 +337,8 @@
 				delete message.startServerClientTime;
 
 				const {
-					dataUrl,
+					// dataUrl,
+					blob,
 					totalSegmentationTime,
 					startServerTime,
 					frameIndex,
@@ -352,8 +373,10 @@
 				}
 
 
-				const frameImageData = await dataUrlToImageData(dataUrl, media.width, media.height);
-				// console.log(frameImageData)
+				// const frameImageData = await dataUrlToImageData(dataUrl, media.width, media.height);
+				console.log(blob)
+				const frameImageData = await blobToImageData(blob, media.width, media.height);
+				console.log(frameImageData)
 
 				const startRenderTime = performance.now();
 
