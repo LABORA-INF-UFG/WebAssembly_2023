@@ -243,7 +243,9 @@
 						'segmentationTime',
 						'totalClientServerTime',
 						'totalServerClientTime',
-						'screenTime'
+						'screenTime',
+						'compressionTime',
+						'decompressionTime',
 					]
 				];
 
@@ -280,28 +282,24 @@
 
 				const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
 
+				const startCompressionTime = performance.now();
 				const dataUrl = imageDataToDataUrl(frame);
-				// console.log(dataUrl)
-				const blob = await imageDataToBlob(frame);
+				const compressionTime = performance.now() - startCompressionTime;
+				// const blob = await imageDataToBlob(frame);
 
 				const startServerTime = performance.now();
 
 				const request = {
-					width: frame.width,
-					height: frame.height,
-					data: frame.data,
 					dataUrl: dataUrl.src,
-					blob,
+					// blob,
 					frameIndex,
 					startClientServerTime: Date.now(),
 					totalSegmentationTime,
+					compressionTime,
 					startServerTime
 				};
 
 				socketSender.emit('frame', request);
-
-				//const time = new Date(Date.now());
-				//console.log(`frame ${frameIndex} enviado as ${time.toISOString()}`)
 
 				frameIndex++;
 
@@ -320,18 +318,16 @@
 
 				const {
 					dataUrl,
-					width,
-					height,
 					totalSegmentationTime,
 					startServerTime,
 					frameIndex,
-					data,
+					slamData,
 					totalSlamTime,
 					totalServerClientTime,
-					totalClientServerTime
+					totalClientServerTime,
+					compressionTime,
+					decompressionTime
 				} = message;
-
-				//console.log(frameIndex);
 
 				const endServerTime = performance.now();
 				const totalServerTime = endServerTime - startServerTime;
@@ -341,17 +337,17 @@
 				let planePose = null;
 				let dots = [];
 
-				if (data) {
-					if (data.pose) {
-						pose = new Float32Array(data.pose)
+				if (slamData) {
+					if (slamData.pose) {
+						pose = new Float32Array(slamData.pose)
 					}
 
-					if (data.planePose) {
-						planePose = new Float32Array(data.planePose)
+					if (slamData.planePose) {
+						planePose = new Float32Array(slamData.planePose)
 					}
 
-					if (data.dots) {
-						dots = data.dots
+					if (slamData.dots) {
+						dots = slamData.dots
 					}
 				}
 
@@ -391,7 +387,9 @@
 					totalSegmentationTime,
 					totalClientServerTime,
 					totalServerClientTime,
-					screenTime
+					screenTime,
+					compressionTime,
+					decompressionTime,
 				]);
 
 				//console.log(message.frameIndex);

@@ -72,28 +72,28 @@ async function makeSLAM(message) {
     // const a = await blobToImageData(blob);
 
     const { dataUrl } = message;
-    const b = await dataUrlToImageData(dataUrl);
+    const startDecompressionTime = performance.now();
+    const imageData = await dataUrlToImageData(dataUrl);
+    const decompressionTime = performance.now() - startDecompressionTime;
 
     const start = performance.now();
-    const pose = alva.findCameraPose(b);
+    const pose = alva.findCameraPose(imageData);
     const planePose = alva.findPlane();
     const dots = alva.getFramePoints();
     const end = performance.now();
 
 
-    const data = {
+    const slamData = {
         pose: pose ? pose : null,
         planePose: planePose ? planePose : null,
         dots: dots,
     };
 
-    const { data: frame } = message;
-
     sender.postMessage({
-        frame,
         dataUrl,
         ...message,
-        data,
+        slamData,
         totalSlamTime: end - start,
+        decompressionTime
     });
 }
