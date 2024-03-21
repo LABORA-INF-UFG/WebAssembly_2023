@@ -13,18 +13,11 @@ const sender = new Worker(__dirname + "/sender.js")
 parentPort.on("message", (message) => makeSLAM(message))
 
 function makeSLAM(message) {
-    // console.log('start make slam - ' + performance.now().toFixed(2))
-
     const start = performance.now();
-    // console.log('start - ' + start)
-
     const pose = alva.findCameraPose(message);
     const planePose = alva.findPlane();
     const dots = alva.getFramePoints();
     const end = performance.now();
-
-    // console.log('end - ' + end)
-
     const data = {
         pose: pose ? pose : null,
         planePose: planePose ? planePose : null,
@@ -39,6 +32,4 @@ function makeSLAM(message) {
         data, 
         totalSlamTime: end - start, 
     });
-    // console.log("processei frame - " + message.frameIndex);
-    // console.log('end make slam - ' + performance.now().toFixed(2))
 }

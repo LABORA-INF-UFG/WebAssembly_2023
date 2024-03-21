@@ -209,9 +209,6 @@
 				};
 
 				socketSender.emit('frame', request);
-				
-				//const time = new Date(Date.now());
-				//console.log(`frame ${frameIndex} enviado as ${time.toISOString()}`)
 
 				frameIndex++;
 
@@ -240,8 +237,6 @@
                     totalServerClientTime, 
                     totalClientServerTime
                 } = message;
-
-				//console.log(frameIndex);
 				
 				const endServerTime = performance.now();
 				const totalServerTime = endServerTime - startServerTime;
@@ -302,8 +297,6 @@
 					totalServerClientTime,
 					screenTime
 				]);
-
-				//console.log(message.frameIndex);
 
 				if(message.frameIndex  === totalFrames - 1 && videoHasEnded){
 					const time = (performance.now() - fpsTimer) / 1000;
