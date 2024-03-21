@@ -13,12 +13,12 @@ else ()
 endif ()
 
 # Set Emscripten toolchain, if not defined
-#Change to your emsdk path!!!!
-
 if (NOT CMAKE_TOOLCHAIN_FILE)
-    message(STATUS "CMAKE_TOOLCHAIN_FILE not set. Using '~/Documents/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake'")
-    set(CMAKE_TOOLCHAIN_FILE "~/Documents/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
+    message(STATUS "CMAKE_TOOLCHAIN_FILE not set. Using '~/Development/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake'")
+    set(CMAKE_TOOLCHAIN_FILE "~/Development/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
 endif (NOT CMAKE_TOOLCHAIN_FILE)
+
+set(CMAKE_BUILD_TYPE Release)
 
 # Set "Release" as build type, if not defined
 if (NOT CMAKE_BUILD_TYPE)
@@ -71,6 +71,10 @@ file(GLOB LIB_OPENGV
 # hide warnings
 set_source_files_properties(${SRC_FILES} PROPERTIES COMPILE_FLAGS "-w")
 
+# Compile flags
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread -s PTHREAD_POOL_SIZE=4 -s WASM_WORKERS=1")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -s PTHREAD_POOL_SIZE=4 -s WASM_WORKERS=1")
+
 # Link third party libraries
 target_link_libraries(${PROJECT_NAME}
         ${LIB_OPENCV}
@@ -84,14 +88,17 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Compile in DEBUG mode")
     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "\
       -s EXPORT_NAME='AlvaARWasm' \
-      -s ENVIRONMENT=web,worker \
+      -s ENVIRONMENT=web,worker,node \
       -s INITIAL_MEMORY=256MB \
+      -s PTHREAD_POOL_SIZE=4  \
+      -s WASM_WORKERS=0 \
+      -pthread \
+      -s BUILD_AS_WORKER=0 \
       -s ALLOW_MEMORY_GROWTH=1 \
       -s ALLOW_TABLE_GROWTH=1 \
-      -s MODULARIZE=1 \
       -s EXPORT_ES6=1 \
       -s EXPORT_ALL=1 \
-      -s SINGLE_FILE=1 \
+      -s SINGLE_FILE=0 \
       -s ASSERTIONS=1 \
       -s DYLINK_DEBUG=1 \
       -s EXPORTED_FUNCTIONS=['_malloc'] \
@@ -111,14 +118,18 @@ else ()
     message(STATUS "Compile in RELEASE mode")
     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "\
       -s EXPORT_NAME='AlvaARWasm' \
-      -s ENVIRONMENT=web,worker \
+      -s ENVIRONMENT=web,worker,node \
       -s INITIAL_MEMORY=256MB \
+      -s PTHREAD_POOL_SIZE=4  \
+      -s WASM_WORKERS=0 \
+      -pthread \
+      -s BUILD_AS_WORKER=0 \
       -s ALLOW_MEMORY_GROWTH=1 \
       -s ALLOW_TABLE_GROWTH=1 \
       -s MODULARIZE=1 \
       -s EXPORT_ES6=1 \
       -s EXPORT_ALL=1 \
-      -s SINGLE_FILE=1 \
+      -s SINGLE_FILE=0 \
       -s ASSERTIONS=0 \
       -s DYLINK_DEBUG=0 \
       -s EXPORTED_FUNCTIONS=['_malloc'] \

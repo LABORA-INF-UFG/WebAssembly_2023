@@ -1,48 +1,40 @@
-import { createServer } from 'node:http';
-import { Server } from 'socket.io';
-import { AlvaAR } from './alva_ar.js';
+import { createServer } from "node:http";
+import { Server } from "socket.io";
+import { Worker } from "worker_threads";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const port = 3000;
 
-const server = createServer()
-  .listen(port, () =>
+const server = createServer().listen(port, () =>
     console.log(`Server running on port ${port}`)
-  );
+);
 
 const sockets = new Server(server, {
-  cors: {
-    origin: "*"
-  },
-  maxHttpBufferSize: 20 * 1024 * 1024
+    cors: {
+        origin: "*",
+    },
+    maxHttpBufferSize: 20 * 1024 * 1024,
 });
 
-sockets.on('connection', (socket) => {
-  let alva;
+sockets.on("connection", (socket) => {
+    let slam;
 
-  socket.on('initialize alva', async (dimensions) => {
-    const { width, height } = dimensions;
-    alva = await AlvaAR.Initialize(width, height);
-  });
+    socket.on("initialize alva", (dimensions, callback) => {
+        const { width, height } = dimensions;
+        slam = new Worker(__dirname + "/slam.js", {
+            workerData: { width, height },
+        });
 
-  socket.on('frame', async (frame, callback) => { 
-    if (!alva) {
-      return callback([undefined, 0]);
-    }
-    
-    const start = performance.now();
-    
-    const pose = alva.findCameraPose(frame);
-    const planePose = alva.findPlane();
-    const dots = alva.getFramePoints();
-    
-    const end = performance.now();
+        setTimeout(() => callback(), 3000);
+    });
 
-    const data = {
-      pose,
-      planePose,
-      dots,
-    };
+    socket.on("frame", (message) => {
+        message.totalClientServerTime = Date.now() - message.startClientServerTime;
+        delete message.startClientServerTime;
+        slam.postMessage(message);
+    });
 
-    callback([data, end - start]);
-  });
 });

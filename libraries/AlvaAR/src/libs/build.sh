@@ -1,11 +1,9 @@
 #!/bin/bash
 
 # The lib directory
-#Place your src/lib directory
-LIB_ROOT="YOUR_PC/AlvaAR/src/libs"
+LIB_ROOT=$PWD
 
 # Ensure this is adjusted to your local emsdk path
-
 EMSCRIPTEN_DIR=~/Documents/emsdk/upstream/emscripten
 
 # Emscripten cmake
@@ -68,7 +66,7 @@ build_OBINDEX2() {
   cd $LIB_ROOT/obindex2/build
   emcmake cmake .. \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_CXX_STANDARD=11 \
+    -DCMAKE_CXX_STANDARD=17 \
     -DCMAKE_TOOLCHAIN_FILE=$EMSCRIPTEN_CMAKE_DIR \
     -DCMAKE_CXX_FLAGS="${BUILD_FLAGS} -s USE_BOOST_HEADERS=1" \
     -DCMAKE_C_FLAGS="${BUILD_FLAGS} -s USE_BOOST_HEADERS=1" \
@@ -86,7 +84,7 @@ build_IBOW_LCD(){
   cd $LIB_ROOT/ibow_lcd/build
   emcmake cmake .. \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_CXX_STANDARD=11 \
+    -DCMAKE_CXX_STANDARD=17 \
     -DCMAKE_TOOLCHAIN_FILE=$EMSCRIPTEN_CMAKE_DIR \
     -DCMAKE_CXX_FLAGS="${BUILD_FLAGS} -s USE_BOOST_HEADERS=1" \
     -DCMAKE_C_FLAGS="${BUILD_FLAGS} -s USE_BOOST_HEADERS=1" \
@@ -174,6 +172,6 @@ build() {
     done
 }
 
-libsToBuild=( "EIGEN" "OPENCV" "OBINDEX2" "IBOW_LCD" "SOPHUS" "CERES" "OPENGV" )
+libsToBuild=(  "OPENGV"  )
 
 build ${libsToBuild[@]}
