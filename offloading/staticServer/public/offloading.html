@@ -199,10 +199,10 @@
 			return decoded.length;
 		}
 
-		// const senderUrl = "192.168.10.2:3000";
-		const senderUrl = "localhost:3000";
-		// const receiverUrl = "192.168.10.2:3001";
-		const receiverUrl = "localhost:3001";
+		const senderUrl = "192.168.10.2:3000";
+		//const senderUrl = "localhost:3000";
+		const receiverUrl = "192.168.10.2:3001";
+		//const receiverUrl = "localhost:3001";
 
 		const eventStart = new Event("start");
 		const eventEnd = new Event("end");
@@ -245,7 +245,8 @@
 						'totalServerClientTime',
 						'screenTime',
 						'compressionTime',
-						'decompressionTime',
+						'decompressionTimeServer',
+						'decompressionTimeClient',
 					]
 				];
 
@@ -352,7 +353,9 @@
 				}
 
 
+				const startDecompressionTime2 = performance.now();
 				const frameImageData = await dataUrlToImageData(dataUrl, media.width, media.height);
+				const decompressionTime2 = performance.now() - startDecompressionTime2;
 				// console.log(frameImageData)
 
 				const startRenderTime = performance.now();
@@ -390,6 +393,7 @@
 					screenTime,
 					compressionTime,
 					decompressionTime,
+					decompressionTime2
 				]);
 
 				//console.log(message.frameIndex);
