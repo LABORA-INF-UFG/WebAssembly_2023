@@ -21,19 +21,19 @@ IMPORTANT: if you're on Windows, you will need to run these configurations in WS
 
 [Install and setup](https://emscripten.org/docs/getting_started/downloads.html) emscripten
 
-Install cmake with `sudo apt install cmake`
-Install make with `sudo apt install make`
+Install cmake with `sudo apt install cmake`<br>
+Install make with `sudo apt install make`<br>
 Install python with `sudo apt install python`
 
-Go to `cd ./libraries/AlvaAR/src/libs`
-Create folder `build_threads` in `./libraries\AlvaAR\src\libs\` 
+Go to `cd ./libraries/AlvaAR/src/libs`<br>
+Create folder `build_threads` in `./libraries/AlvaAR/src/libs` 
 
 Update `EMSCRIPTEN_DIR` variable inside `build.sh` with your emscripten directory
 
 Execute `./build.sh` to build all dependencies
 
-When done compiling a string replace is called on all files in `ceres-solver/install/include`
-to replace `"glog/logging.h"` with `"ceres/internal/miniglog/glog/logging.h"`
+When done compiling, a string replace is called on all files in `ceres-solver/install/include`.
+Therefore, replace all ocurrencies of `"glog/logging.h"` with `"ceres/internal/miniglog/glog/logging.h"`
 
 To build alvaar library go to `cd ./libraries/AlvaAR/src/slam`
 Run:
@@ -52,7 +52,7 @@ Now you have `alva_ar.js` and `alva_ar.worker.mjs` inside build folder
 Run:
 ```
 cd offloading/staticServer
-npm run start
+npm start
 ```
 In the Chrome browser[^2], go to http://localhost:8080/local.html.
 
@@ -63,13 +63,13 @@ In the Chrome browser[^2], go to http://localhost:8080/local.html.
 Run:
 ```
 cd offloading/slamServer
-npm run start
+npm start
 ```
 
 Open a new terminal and run:
 ```
 cd offloading/staticServer
-npm run start
+npm start
 ```
 In Chrome browser, go to http://localhost:8080/offloading.html.
 
