@@ -22,12 +22,29 @@ IMPORTANT: if you're on Windows, you will need to run these configurations in WS
 [Install and setup](https://emscripten.org/docs/getting_started/downloads.html) emscripten
 
 Install cmake with `sudo apt install cmake`
+Install make with `sudo apt install make`
+Install python with `sudo apt install python`
 
-Update `EMSCRIPTEN_DIR` variable with the emscripten scripts folder in your machine `<YOUR_MACHINE_PATH>/emsdk/upstream/emscripten` through Nano
+Go to `cd ./libraries/AlvaAR/src/libs`
+Create folder `build_threads` in `./libraries\AlvaAR\src\libs\` 
 
-Create folder `build_threads` in `libraries\AlvaAR\src\libs\` 
+Update `EMSCRIPTEN_DIR` variable inside `build.sh` with your emscripten directory
 
-Run `./build.sh` to build AlvaAR libraries
+Execute `./build.sh` to build all dependencies
+
+When done compiling a string replace is called on all files in `ceres-solver/install/include`
+to replace `"glog/logging.h"` with `"ceres/internal/miniglog/glog/logging.h"`
+
+To build alvaar library go to `cd ./libraries/AlvaAR/src/slam`
+Run:
+```
+mkdir build
+cd build
+emcmake cmake ..
+emmake make
+```
+
+Now you have `alva_ar.js` and `alva_ar.worker.mjs` inside build folder
 
 ## How to Run
 ### Without Offloading:
