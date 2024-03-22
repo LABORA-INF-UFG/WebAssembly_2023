@@ -4,7 +4,7 @@
 LIB_ROOT=$PWD
 
 # Ensure this is adjusted to your local emsdk path
-EMSCRIPTEN_DIR=~/Documents/emsdk/upstream/emscripten
+EMSCRIPTEN_DIR=/home/gnery/Documents/emsdk/upstream/emscripten
 
 # Emscripten cmake
 EMSCRIPTEN_CMAKE_DIR=$EMSCRIPTEN_DIR/cmake/Modules/Platform/Emscripten.cmake
@@ -55,7 +55,7 @@ build_EIGEN() {
     -DCMAKE_C_FLAGS="${BUILD_FLAGS}" \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR/eigen/ \
     -DBUILD_SHARED_LIBS=OFF
-  emmake make -j install
+  emmake make -j3 install
 }
 
 build_OBINDEX2() {
@@ -172,6 +172,6 @@ build() {
     done
 }
 
-libsToBuild=(  "OPENGV"  )
+libsToBuild=( "EIGEN" "OPENCV" "OBINDEX2" "IBOW_LCD" "SOPHUS" "CERES" "OPENGV" )
 
 build ${libsToBuild[@]}

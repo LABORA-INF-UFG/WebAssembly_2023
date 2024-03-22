@@ -4,6 +4,7 @@ import { Worker } from "worker_threads";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const port = 3000;
@@ -22,30 +23,30 @@ const sockets = new Server(server, {
 sockets.on("connection", (socket) => {
     let worker;
 
-    socket.on("initialize alva", async (dimensions, callback) => {
+    socket.on("initialize alva", (dimensions, callback) => {
         const { width, height } = dimensions;
         worker = new Worker(__dirname + "/worker.js", {
             workerData: { width, height },
         });
-        callback();
+
+        worker.once("message", () => {
+                
+                worker.on("message", (message) => {
+                    
+                    message.startServerClientTime = Date.now();
+
+                    socket.emit("responseFrame", message);
+                })
+                
+                callback();
+            
+        });
     });
 
-    socket.on("frame", async (frame, callback) => {
-        let threadStart;
+    socket.on("frame", (message) => {
+        message.totalClientServerTime = Date.now() - message.startClientServerTime;
+        delete message.startClientServerTime;
 
-        worker.once("message", (message) => {
-            const threadEnd = performance.now();
-
-            const data = message[0];
-            const slamTime = message[1];
-
-            const threadTime = (threadEnd - threadStart - slamTime).toFixed(2);
-            //console.log(threadTime);
-            callback([data, slamTime]);
-        });
-
-        threadStart = performance.now();
-
-        worker.postMessage(frame);
+        worker.postMessage(message);
     });
 });

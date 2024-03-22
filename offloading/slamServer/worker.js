@@ -5,19 +5,33 @@ const { width, height } = workerData;
 
 const alva = await AlvaAR.Initialize(width, height);
 
-parentPort.on("message", async (message) => {
+parentPort.postMessage("alva initialized")
+
+parentPort.on("message", (message) => {
+    
     const start = performance.now();
 
     const pose = alva.findCameraPose(message);
     const planePose = alva.findPlane();
     const dots = alva.getFramePoints();
-    const end = performance.now();
 
+    const end = performance.now();
+    
     const data = {
         pose: pose ? pose : null,
         planePose: planePose ? planePose : null,
         dots: dots,
     };
 
-    parentPort.postMessage([data, end - start]);
+
+    parentPort.postMessage({
+        frame: message.data,
+        width: message.width,
+        height: message.height,
+        totalSegmentationTime: message.totalSegmentationTime,
+        frameIndex: message.frameIndex,
+        totalClientServerTime: message.totalClientServerTime,
+        totalSlamTime: end - start,
+        data
+    });
 });
