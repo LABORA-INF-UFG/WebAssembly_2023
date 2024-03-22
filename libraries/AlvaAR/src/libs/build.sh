@@ -172,6 +172,6 @@ build() {
     done
 }
 
-libsToBuild=(  "OPENGV"  )
+libsToBuild=(  "EIGEN" "OPENCV" "OBINDEX2" "IBOW_LCD" "SOPHUS" "CERES" "OPENGV"  )
 
 build ${libsToBuild[@]}

@@ -72,8 +72,8 @@ file(GLOB LIB_OPENGV
 set_source_files_properties(${SRC_FILES} PROPERTIES COMPILE_FLAGS "-w")
 
 # Compile flags
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread -s PTHREAD_POOL_SIZE=4 -s WASM_WORKERS=1")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -s PTHREAD_POOL_SIZE=4 -s WASM_WORKERS=1")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread -s PTHREAD_POOL_SIZE=4 -s WASM_WORKERS=0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -s PTHREAD_POOL_SIZE=4 -s WASM_WORKERS=0")
 
 # Link third party libraries
 target_link_libraries(${PROJECT_NAME}
@@ -98,7 +98,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
       -s ALLOW_TABLE_GROWTH=1 \
       -s EXPORT_ES6=1 \
       -s EXPORT_ALL=1 \
-      -s SINGLE_FILE=0 \
+      -s SINGLE_FILE=1 \
       -s ASSERTIONS=1 \
       -s DYLINK_DEBUG=1 \
       -s EXPORTED_FUNCTIONS=['_malloc'] \
@@ -129,7 +129,7 @@ else ()
       -s MODULARIZE=1 \
       -s EXPORT_ES6=1 \
       -s EXPORT_ALL=1 \
-      -s SINGLE_FILE=0 \
+      -s SINGLE_FILE=1 \
       -s ASSERTIONS=0 \
       -s DYLINK_DEBUG=0 \
       -s EXPORTED_FUNCTIONS=['_malloc'] \
