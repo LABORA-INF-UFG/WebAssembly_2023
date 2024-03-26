@@ -230,6 +230,8 @@ class Video {
             video.loop = true; // note: if loop is true, ended event will not fire
             video.load();
 
+            
+
             tid = setTimeout(() => {
                 reject(new Error(`Failed to load video: Timed out after ${timeout}ms.`));
             }, timeout);
@@ -274,6 +276,11 @@ class Video {
         this.el = videoElement;
         this.width = videoElement.videoWidth;
         this.height = videoElement.videoHeight;
+
+        this.frameIndex = 0;
+        this.totalFrames = 0;
+        this.hasEnded = false;
+        this.startScreenTime;
 
         this._canvas = createCanvas(this.width, this.height);
         this._ctx = this._canvas.getContext('2d', { willReadFrequently: true });

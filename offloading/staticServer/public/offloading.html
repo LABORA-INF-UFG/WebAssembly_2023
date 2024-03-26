@@ -113,53 +113,18 @@
             </div>
             <div id="renderer-map"></div>
         </div>
-        <script
-            src="https://cdn.socket.io/4.7.4/socket.io.min.js"
-            integrity="sha384-Gr6Lu2Ajx28mzwyVR8CFkULdCU7kMlZ9UthllibdOSo6qAiN+yXNHqtgdTvFXMT4"
-            crossorigin="anonymous"
-        ></script>
         <script type="module">
             import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
             import { Video, onFrame, getCSV } from "/scripts/utils.js";
+            import {initializeServer} from "/scripts/connection.js"
+            import {saveFrame, renderFrame} from "/scripts/frame_handler.js"
 
             //const serverUrl = "192.168.10.2:3000";
             const serverUrl = "localhost:3000";
             const eventStart = new Event("start");
             const eventEnd = new Event("end");
 
-            const initializeServer = async (serverUrl, width, height) => {
-                const socket = io(serverUrl, { reconnection: false });
-
-                await new Promise((resolve) => {
-                    socket.io.on("error", (error) => {
-                        error = new Error("Could not connect to " + serverUrl);
-                        window.alert("Não foi possível conectar ao servidor");
-                        console.error(error);
-                    });
-                    resolve();
-                });
-
-                await new Promise((resolve) =>
-                    socket.on("connect", () => {
-                        socket.emit("initialize alva", { width, height }, () =>
-                            resolve()
-                        );
-                    })
-                );
-
-                return socket;
-            };
-
-            async function main() {
-                const media = await Video.Initialize("/videos/wasm.mp4");
-
-                const socketPromise = initializeServer(
-                    serverUrl,
-                    media.width,
-                    media.height
-                );
-
-                let statistics = [
+            let statistics = [
                     [
                         "slamTime",
                         "renderTime",
@@ -170,11 +135,19 @@
                     ],
                 ];
 
+                
+            async function main() {
+                const media = await Video.Initialize("/videos/wasm.mp4");
+                
+                const socket = await initializeServer(
+                    serverUrl,
+                    media.width,
+                    media.height
+                );
+
                 const $cam = document.getElementById("renderer-cam");
                 const $map = document.getElementById("renderer-map");
-                const ctx = document
-                    .getElementById("renderer-video")
-                    .getContext("2d");
+                const ctx = document.getElementById("renderer-video").getContext("2d");
 
                 ctx.canvas.width = media.width;
                 ctx.canvas.height = media.height;
@@ -193,161 +166,51 @@
                 );
 
                 $cam.parentElement.style.display = "block";
-
-                let videoHasEnded = false;
-                let addCube = false;
-
-                let totalFrames = 0;
-
-                const socket = await socketPromise;
-
-                let frameIndex = 0;
+                document.addCube = false;
+                
                 let fpsTimer = 0;
-
-                const saveFrame = () => {
-                    if (frameIndex === 0) {
-                        fpsTimer = performance.now();
-                    }
-
-                    const startSegmentationTime = performance.now();
-                    const frame = media.getImageData();
-                    const endSegmentationTime = performance.now();
-
-                    const totalSegmentationTime =
-                        endSegmentationTime - startSegmentationTime;
-
-
-                    const request = {
-                        width: frame.width,
-                        height: frame.height,
-                        data: frame.data,
-                        frameIndex,
-                        startClientServerTime: Date.now(),
-                        totalSegmentationTime
-                        
-                    };
-					
-                    socket.emit("frame", request);
-
-                    frameIndex++;
-
-                    if (!videoHasEnded) {
-                        media.el.requestVideoFrameCallback(saveFrame);
-                    }
-                };
-
                 let addCubeInterval = null;
-                let startScreenTime = performance.now();
-
-                const receiveFrame = (message) => {
-                    message.totalServerClientTime =
-                        Date.now() - message.startServerClientTime;
-                    delete message.startServerClientTime;
-
-                    const {
-                        frame,
-                        width,
-                        height,
-                        totalSegmentationTime,
-                        frameIndex,
-                        data,
-                        totalSlamTime,
-                        totalServerClientTime,
-                        totalClientServerTime,
-                    } = message;
-
-                    console.log(message);
-
-                    let pose = null;
-                    let planePose = null;
-                    let dots = [];
-
-                    if (data) {
-                        if (data.pose) {
-                            pose = new Float32Array(data.pose);
-                        }
-
-                        if (data.planePose) {
-                            planePose = new Float32Array(data.planePose);
-                        }
-
-                        if (data.dots) {
-                            dots = data.dots;
-                        }
-                    }
-
-                    const frameImageData = new ImageData(
-                        new Uint8ClampedArray(frame),
-                        width,
-                        height
-                    );
-
-                    const startRenderTime = performance.now();
-
-                    const screenTime = performance.now() - startScreenTime;
-                    ctx.clearRect(0, 0, media.width, media.height);
-                    ctx.putImageData(frameImageData, 0, 0);
-                    startScreenTime = performance.now();
-
-                    if (pose) {
-                        camRenderer.updateCameraPose(pose);
-
-                        if (addCube && planePose) {
-                            camRenderer.createObjectWithPose(planePose);
-                            addCube = false;
-                        }
-                    }
-
-                    for (const dot of dots) {
-                        ctx.fillStyle = "white";
-                        ctx.fillRect(dot.x, dot.y, 2, 2);
-                    }
-
-                    const endRenderTime = performance.now();
-
-                    const totalRenderTime = endRenderTime - startRenderTime;
-
-                    statistics.push([
-                        totalSlamTime,
-                        totalRenderTime,
-                        totalSegmentationTime,
-                        totalClientServerTime,
-                        totalServerClientTime,
-                        screenTime,
-                    ]);
-
-                    //console.log(message.frameIndex);
-
-                    if (frameIndex === totalFrames - 1 && videoHasEnded) {
-                        const time = (performance.now() - fpsTimer) / 1000;
-                        const fps = (statistics.length - 1) / time;
-                        statistics[0].push("fps");
-                        statistics[1].push(fps);
-                        ctx.clearRect(0, 0, media.width, media.height);
-                        addCubeInterval && clearInterval(addCubeInterval);
-                        getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file
-                        window.dispatchEvent(eventEnd);
-                    }
-                };
 
                 if (socket) {
                     media.el.play();
                     media.el.loop = false;
-
+                    
                     addCubeInterval = setInterval(() => {
-                        addCube = true;
+                        document.addCube = true;
                     }, 200);
 
                     media.el.onended = () => {
-                        totalFrames = frameIndex;
-                        console.log("Ultimo frame: " + totalFrames);
-                        videoHasEnded = true;
+                        
+                        console.log("Ultimo frame: " + media.frameIndex);
+                        media.videoHasEnded = true;
+                        media.totalFrames = media.frameIndex;
+
                     };
+
                     window.dispatchEvent(eventStart);
-					
-                    media.el.requestVideoFrameCallback(saveFrame);
-                    socket.on("responseFrame", (message) =>
-                        receiveFrame(message)
+
+                    fpsTimer = performance.now();
+                    media.el.requestVideoFrameCallback(
+                        () => saveFrame(media, socket)
+                    );
+
+                    media.startScreenTime = performance.now();
+                    socket.on("responseFrame", (message) => {
+                            
+                            const statisticsData = renderFrame(message, ctx, camRenderer, media);
+                            statistics.push(statisticsData);
+                            
+                            if (message.frameIndex === media.totalFrames - 1 && media.videoHasEnded) {
+                                const time = (performance.now() - fpsTimer) / 1000;
+                                const fps = (statistics.length - 1) / time;
+                                statistics[0].push("fps");
+                                statistics[1].push(fps);
+                                ctx.clearRect(0, 0, media.width, media.height);
+                                addCubeInterval && clearInterval(addCubeInterval);
+                                getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file
+                                window.dispatchEvent(eventEnd);
+                            }
+                        }
                     );
                 }
             }
