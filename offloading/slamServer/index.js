@@ -4,6 +4,7 @@ import { Worker } from "worker_threads";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const port = 3000;
@@ -28,13 +29,25 @@ sockets.on("connection", (socket) => {
             workerData: { width, height },
         });
 
-        setTimeout(() => callback(), 3000);
+        worker.once("message", () => {
+                
+                worker.on("message", (message) => {
+                    
+                    message.startServerClientTime = Date.now();
+
+                    socket.emit("responseFrame", message);
+                })
+                
+                callback();
+            
+        });
     });
 
     socket.on("frame", (message) => {
         message.totalClientServerTime = Date.now() - message.startClientServerTime;
         delete message.startClientServerTime;
-        slam.postMessage(message);
+
+        worker.postMessage(message);
     });
 
 });
