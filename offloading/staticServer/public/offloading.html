@@ -114,100 +114,36 @@
             <div id="renderer-map"></div>
         </div>
         <script type="module">
-            import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
-            import { Video, onFrame, getCSV } from "/scripts/utils.js";
+            
+            import { Video } from "/scripts/utils.js";
             import {initializeServer} from "/scripts/connection.js"
-            import {saveFrame, renderFrame} from "/scripts/frame_handler.js"
+            import {Application} from "/scripts/Application.js"
 
             //const serverUrl = "192.168.10.2:3000";
             const serverUrl = "localhost:3000";
             const eventStart = new Event("start");
             const eventEnd = new Event("end");
-
-            let statistics = [
-                    [
-                        "slamTime",
-                        "renderTime",
-                        "segmentationTime",
-                        "totalClientServerTime",
-                        "totalServerClientTime",
-                        "screenTime",
-                    ],
-                ];
-
                 
             async function main() {
                 const media = await Video.Initialize("/videos/wasm.mp4");
-                
-                const socket = await initializeServer(
-                    serverUrl,
-                    media.width,
-                    media.height
-                );
-
-                const $cam = document.getElementById("renderer-cam");
-                const $map = document.getElementById("renderer-map");
-                const ctx = document.getElementById("renderer-video").getContext("2d");
-
-                ctx.canvas.width = media.width;
-                ctx.canvas.height = media.height;
-
-                const mapRenderer = new ARSimpleMap(
-                    $map,
-                    media.width,
-                    media.height
-                );
-
-                const camRenderer = new ARSimpleView(
-                    $cam,
-                    media.width,
-                    media.height,
-                    mapRenderer
-                );
-
-                $cam.parentElement.style.display = "block";
-                document.addCube = false;
-                
-                let fpsTimer = null;
-                let addCubeInterval = null;
+                const socket = await initializeServer(serverUrl, media.width,media.height);
 
                 if (socket) {
-                    media.el.play();
                     window.dispatchEvent(eventStart);
-                    media.el.loop = false;
-                    
-                    addCubeInterval = setInterval(() => {
-                        document.addCube = true;
-                    }, 200);
 
+                    media.el.play();
+                    media.el.loop = false;
                     media.el.onended = () => {
                         media.videoHasEnded = true;
                         media.totalFrames = media.frameIndex;
                     };
 
-
-                    fpsTimer = performance.now();
-                    media.el.requestVideoFrameCallback(
-                        () => saveFrame(media, socket)
-                    );
+                    
+                    const app = new Application(media, socket);
+                    media.el.requestVideoFrameCallback(() => app.saveFrame());
 
                     media.startScreenTime = performance.now();
-                    socket.on("responseFrame", (message) => {
-                            const statisticsData = renderFrame(message, ctx, camRenderer, media);
-                            statistics.push(statisticsData);
-                            
-                            if (media.videoHasEnded && message.frameIndex === media.totalFrames - 1) {
-                                const time = (performance.now() - fpsTimer) / 1000;
-                                const fps = (statistics.length - 1) / time;
-                                statistics[0].push("fps");
-                                statistics[1].push(fps);
-                                ctx.clearRect(0, 0, media.width, media.height);
-                                addCubeInterval && clearInterval(addCubeInterval);
-                                getCSV(statistics, "offloading"); // Uncomment to save statistics in CSV file
-                                window.dispatchEvent(eventEnd);
-                            }
-                        }
-                    );
+                    socket.on("responseFrame", (message) =>  app.renderFrame(message));
                 }
             }
 
