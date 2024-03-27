@@ -7,8 +7,9 @@ const alva = await AlvaAR.Initialize(width, height);
 
 parentPort.postMessage("alva initialized")
 
-parentPort.on("message", (message) => {
-    
+parentPort.on("message", (message) =>  makeSlam(message));
+
+function makeSlam(message) {
     const start = performance.now();
 
     const pose = alva.findCameraPose(message);
@@ -34,4 +35,4 @@ parentPort.on("message", (message) => {
         totalSlamTime: end - start,
         data
     });
-});
+}
