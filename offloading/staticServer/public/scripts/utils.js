@@ -280,7 +280,7 @@ class Video {
         this.frameIndex = 0;
         this.totalFrames = 0;
         this.hasEnded = false;
-        this.startScreenTime;
+        
 
         this._canvas = createCanvas(this.width, this.height);
         this._ctx = this._canvas.getContext('2d', { willReadFrequently: true });

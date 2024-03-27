@@ -142,7 +142,6 @@
                     const app = new Application(media, socket);
                     media.el.requestVideoFrameCallback(() => app.saveFrame());
 
-                    media.startScreenTime = performance.now();
                     socket.on("responseFrame", (message) =>  app.renderFrame(message));
                 }
             }

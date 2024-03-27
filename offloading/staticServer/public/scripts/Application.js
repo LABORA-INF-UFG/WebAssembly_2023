@@ -25,6 +25,8 @@ class Application {
         }, 200);
 
         this.fpsTimer = performance.now();
+        this.startScreenTime = performance.now();
+
         this.statistics = [
             [
                 "slamTime",
@@ -105,10 +107,10 @@ class Application {
     
         const startRenderTime = performance.now();
     
-        const screenTime = performance.now() - this.media.startScreenTime;
+        const screenTime = performance.now() - this.startScreenTime;
         this.ctx.clearRect(0, 0, this.media.width, this.media.height);
         this.ctx.putImageData(frameImageData, 0, 0);
-        this.media.startScreenTime = performance.now();
+        this.startScreenTime = performance.now();
     
         if (pose) {
             this.camRenderer.updateCameraPose(pose);
@@ -137,7 +139,12 @@ class Application {
             screenTime,
         ]); 
 
-        if (this.media.videoHasEnded && message.frameIndex === this.media.totalFrames - 1) {
+        this.verifyEndExperiment(message.frameIndex);
+        
+    }
+
+    verifyEndExperiment(frameIndex) {
+        if (this.media.videoHasEnded && frameIndex === this.media.totalFrames - 1) {
             const time = (performance.now() - this.fpsTimer) / 1000;
             const fps = (this.statistics.length - 1) / time;
             this.statistics[0].push("fps");
