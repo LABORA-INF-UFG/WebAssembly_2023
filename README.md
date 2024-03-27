@@ -21,19 +21,19 @@ IMPORTANT: if you're on Windows, you will need to run these configurations in WS
 
 [Install and setup](https://emscripten.org/docs/getting_started/downloads.html) emscripten
 
-Install cmake with `sudo apt install cmake`
-Install make with `sudo apt install make`
+Install cmake with `sudo apt install cmake`<br>
+Install make with `sudo apt install make`<br>
 Install python with `sudo apt install python`
 
-Go to `cd ./libraries/AlvaAR/src/libs`
-Create folder `build_threads` in `./libraries\AlvaAR\src\libs\` 
+Go to `cd ./libraries/AlvaAR/src/libs`<br>
+Create folder `build_threads` in `./libraries/AlvaAR/src/libs` 
 
 Update `EMSCRIPTEN_DIR` variable inside `build.sh` with your emscripten directory
 
 Execute `./build.sh` to build all dependencies
 
-When done compiling a string replace is called on all files in `ceres-solver/install/include`
-to replace `"glog/logging.h"` with `"ceres/internal/miniglog/glog/logging.h"`
+When done compiling, a string replace is called on all files in `ceres-solver/install/include`.
+Therefore, replace all ocurrencies of `"glog/logging.h"` with `"ceres/internal/miniglog/glog/logging.h"`
 
 To build alvaar library go to `cd ./libraries/AlvaAR/src/slam`
 Run:
@@ -43,7 +43,6 @@ cd build
 emcmake cmake ..
 emmake make
 ```
-
 Now you have `alva_ar.js` and `alva_ar.worker.mjs` inside build folder
 
 ## How to Run
@@ -52,7 +51,7 @@ Now you have `alva_ar.js` and `alva_ar.worker.mjs` inside build folder
 Run:
 ```
 cd offloading/staticServer
-npm run start
+npm start
 ```
 In the Chrome browser[^2], go to http://localhost:8080/local.html.
 
@@ -63,13 +62,13 @@ In the Chrome browser[^2], go to http://localhost:8080/local.html.
 Run:
 ```
 cd offloading/slamServer
-npm run start
+npm start
 ```
 
 Open a new terminal and run:
 ```
 cd offloading/staticServer
-npm run start
+npm start
 ```
 In Chrome browser, go to http://localhost:8080/offloading.html.
 
@@ -84,22 +83,44 @@ O `staticServer` pode rodar de duas maneiras: totalmente local ou realizando off
 
 [^3]: Requisitar a um servidor para realizar processamento que demandam muitos recursos (e.g., realizar cálculos matemáticos pesados).
 
-### Configuração e Compilação de Bibliotecas do Servidor de Deslocamento
+## Como Configurar
+### Instalar Dependências
 
-**IMPORTANTE:** Se estiver utilizando o Windows, você precisará executar estas configurações no WSL, pois os passos descritos aqui são destinados a serem executados no Linux.
+[Instalar o Node.js e npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) (Gerenciador de Pacotes do Node)
 
-[Instale e configure](https://emscripten.org/docs/getting_started/downloads.html) o emscripten.
+Execute `npm i` nas pastas **offloading/slamServer** e **offloading/staticServer**.
 
-Instale o cmake com `sudo apt install cmake`.
+### Configurar e Compilar Bibliotecas do Servidor de Offloading
 
-Atualize a variável `EMSCRIPTEN_DIR` com a pasta de scripts do emscripten em sua máquina `<SEU_CAMINHO_DE_MÁQUINA>/emsdk/upstream/emscripten` usando o Nano.
+**IMPORTANTE:** Se você estiver no Windows, será necessário executar essas configurações no WSL, pois os passos descritos aqui devem ser executados no Linux.
 
-Crie a pasta `build_threads` em `libraries\AlvaAR\src\libs\`.
+[Instalar e configurar](https://emscripten.org/docs/getting_started/downloads.html) emscripten
 
-Execute `./build.sh` para compilar as bibliotecas do AlvaAR.
+Instale cmake com `sudo apt install cmake`<br>
+Instale make com `sudo apt install make`<br>
+Instale python com `sudo apt install python`
+
+Vá para `cd ./libraries/AlvaAR/src/libs`
+
+Crie a pasta `build_threads` em `./libraries/AlvaAR/src/libs`
+
+Atualize a variável `EMSCRIPTEN_DIR` dentro de `build.sh` com o diretório do seu emscripten
+
+Execute `./build.sh` para compilar todas as dependências
+
+Quando terminar a compilação, será feita uma substituição de string em todos os arquivos em `ceres-solver/install/include`. Portanto, substitua todas as ocorrências de `"glog/logging.h"` por `"ceres/internal/miniglog/glog/logging.h"`
+
+Para compilar a biblioteca alvaar, vá para `cd ./libraries/AlvaAR/src/slam`
+Execute:
+```
+mkdir build
+cd build
+emcmake cmake ..
+emmake make
+```
+Agora você tem `alva_ar.js` e `alva_ar.worker.mjs` dentro da pasta de compilação.
 
 ## Como Executar
-
 ### Sem offloading:
 
 Execute:
