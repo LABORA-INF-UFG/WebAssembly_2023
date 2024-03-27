@@ -168,11 +168,12 @@
                 $cam.parentElement.style.display = "block";
                 document.addCube = false;
                 
-                let fpsTimer = 0;
+                let fpsTimer = null;
                 let addCubeInterval = null;
 
                 if (socket) {
                     media.el.play();
+                    window.dispatchEvent(eventStart);
                     media.el.loop = false;
                     
                     addCubeInterval = setInterval(() => {
@@ -180,14 +181,10 @@
                     }, 200);
 
                     media.el.onended = () => {
-                        
-                        console.log("Ultimo frame: " + media.frameIndex);
                         media.videoHasEnded = true;
                         media.totalFrames = media.frameIndex;
-
                     };
 
-                    window.dispatchEvent(eventStart);
 
                     fpsTimer = performance.now();
                     media.el.requestVideoFrameCallback(
@@ -196,11 +193,10 @@
 
                     media.startScreenTime = performance.now();
                     socket.on("responseFrame", (message) => {
-                            
                             const statisticsData = renderFrame(message, ctx, camRenderer, media);
                             statistics.push(statisticsData);
                             
-                            if (message.frameIndex === media.totalFrames - 1 && media.videoHasEnded) {
+                            if (media.videoHasEnded && message.frameIndex === media.totalFrames - 1) {
                                 const time = (performance.now() - fpsTimer) / 1000;
                                 const fps = (statistics.length - 1) / time;
                                 statistics[0].push("fps");
