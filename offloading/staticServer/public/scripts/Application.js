@@ -1,11 +1,18 @@
 import { ARSimpleView, ARSimpleMap } from "/scripts/view.js";
-import { getCSV } from "/scripts/utils.js";
+import { getCSV, Queue } from "/scripts/utils.js";
 
 
 class Application {
     constructor(media, socket){
         this.media = media;
         this.socket = socket;
+
+        this.queue = new Queue();
+        this.queueMaxSize = 15;
+
+        this.frameIndex = 0;
+        this.totalFrames = 0;
+        this.hasEnded = false;
 
         const $cam = document.getElementById("renderer-cam");
         const $map = document.getElementById("renderer-map");
@@ -32,8 +39,6 @@ class Application {
                 "slamTime",
                 "renderTime",
                 "segmentationTime",
-                "totalClientServerTime",
-                "totalServerClientTime",
                 "screenTime",
             ],
         ];
@@ -41,46 +46,53 @@ class Application {
     }
     
     saveFrame() {
-        
-        const startSegmentationTime = performance.now();
-        const frame = this.media.getImageData();
-        const endSegmentationTime = performance.now();
+       
+        if(this.queue.size() < this.queueMaxSize){
+            const startSegmentationTime = performance.now();
+            const frame = this.media.getImageData();
+            const endSegmentationTime = performance.now();  
+            const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
     
-        const totalSegmentationTime = endSegmentationTime - startSegmentationTime;
+            const request = {  
+                data: frame.data,
+                networkFrameIndex: this.frameIndex 
+            };
     
-        const request = {
-            width: frame.width,
-            height: frame.height,
-            data: frame.data,
-            frameIndex: this.media.frameIndex,
-            startClientServerTime: Date.now(),
-            totalSegmentationTime,
-        };
-    
-        this.socket.emit("frame", request);
-    
-        this.media.frameIndex++;
-    
-        if (!this.media.videoHasEnded) {
+            this.socket.emit("frame", request);
+
+            this.queue.enqueue({
+                frame: frame.data,
+                queueFrameIndex: this.frameIndex,
+                width: frame.width, 
+                height: frame.height, 
+                totalSegmentationTime 
+            });
+
+            this.frameIndex++;
+     
+        }
+
+        if (!this.videoHasEnded) {
             this.media.el.requestVideoFrameCallback(() => this.saveFrame());
         }
     }
 
     renderFrame(message) {
-        message.totalServerClientTime = Date.now() - message.startServerClientTime;
-        delete message.startServerClientTime;
-    
+
         const {
             frame,
+            queueFrameIndex,
             width,
             height,
-            totalSegmentationTime,
-            data,
-            totalSlamTime,
-            totalServerClientTime,
-            totalClientServerTime,
-        } = message;
+            totalSegmentationTime
+        } = this.queue.dequeue();
     
+        const {
+            networkFrameIndex,
+            totalSlamTime,
+            data
+        } = message;
+       
         let pose = null;
         let planePose = null;
         let dots = [];
@@ -108,7 +120,7 @@ class Application {
         const startRenderTime = performance.now();
     
         const screenTime = performance.now() - this.startScreenTime;
-        this.ctx.clearRect(0, 0, this.media.width, this.media.height);
+        this.ctx.clearRect(0, 0, width, height);
         this.ctx.putImageData(frameImageData, 0, 0);
         this.startScreenTime = performance.now();
     
@@ -134,17 +146,16 @@ class Application {
             totalSlamTime,
             totalRenderTime,
             totalSegmentationTime,
-            totalClientServerTime,
-            totalServerClientTime,
             screenTime,
         ]); 
 
-        this.verifyEndExperiment(message.frameIndex);
+        this.verifyEndExperiment(networkFrameIndex);
         
     }
 
     verifyEndExperiment(frameIndex) {
-        if (this.media.videoHasEnded && frameIndex === this.media.totalFrames - 1) {
+        if (this.videoHasEnded && frameIndex === this.totalFrames - 1) {
+            console.log(this.totalFrames)
             const time = (performance.now() - this.fpsTimer) / 1000;
             const fps = (this.statistics.length - 1) / time;
             this.statistics[0].push("fps");
@@ -152,7 +163,7 @@ class Application {
             this.ctx.clearRect(0, 0, this.media.width, this.media.height);
             this.addCubeInterval && clearInterval(this.addCubeInterval);
             getCSV(this.statistics, "offloading"); // Uncomment to save statistics in CSV file
-            window.dispatchEvent(eventEnd);
+            window.dispatchEvent(new Event("end"));
         }
     }
 }

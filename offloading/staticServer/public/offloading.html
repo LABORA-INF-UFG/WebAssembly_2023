@@ -122,7 +122,7 @@
             //const serverUrl = "192.168.10.2:3000";
             const serverUrl = "localhost:3000";
             const eventStart = new Event("start");
-            const eventEnd = new Event("end");
+            
                 
             async function main() {
                 const media = await Video.Initialize("/videos/wasm.mp4");
@@ -134,8 +134,8 @@
                     media.el.play();
                     media.el.loop = false;
                     media.el.onended = () => {
-                        media.videoHasEnded = true;
-                        media.totalFrames = media.frameIndex;
+                        app.videoHasEnded = true;
+                        app.totalFrames = app.frameIndex;
                     };
 
                     

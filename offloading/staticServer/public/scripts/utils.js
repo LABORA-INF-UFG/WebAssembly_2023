@@ -308,12 +308,7 @@ class Video {
         this.el = videoElement;
         this.width = videoElement.videoWidth;
         this.height = videoElement.videoHeight;
-
-        this.frameIndex = 0;
-        this.totalFrames = 0;
-        this.hasEnded = false;
         
-
         this._canvas = createCanvas(this.width, this.height);
         this._ctx = this._canvas.getContext('2d', { willReadFrequently: true });
 

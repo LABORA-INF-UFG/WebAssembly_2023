@@ -10,13 +10,13 @@ parentPort.postMessage("alva initialized")
 parentPort.on("message", (message) =>  makeSlam(message));
 
 function makeSlam(message) {
-    const start = performance.now();
+    const startSlamTime = performance.now();
 
     const pose = alva.findCameraPose(message);
     const planePose = alva.findPlane();
     const dots = alva.getFramePoints();
 
-    const end = performance.now();
+    const endSlamTime = performance.now();
     
     const data = {
         pose: pose ? pose : null,
@@ -25,14 +25,9 @@ function makeSlam(message) {
     };
 
 
-    parentPort.postMessage({
-        frame: message.data,
-        width: message.width,
-        height: message.height,
-        totalSegmentationTime: message.totalSegmentationTime,
-        frameIndex: message.frameIndex,
-        totalClientServerTime: message.totalClientServerTime,
-        totalSlamTime: end - start,
+    parentPort.postMessage({ 
+        networkFrameIndex: message.networkFrameIndex,
+        totalSlamTime: endSlamTime - startSlamTime,
         data
     });
 }

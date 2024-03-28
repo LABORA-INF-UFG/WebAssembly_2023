@@ -29,21 +29,14 @@ sockets.on("connection", (socket) => {
         });
 
         worker.once("message", () => {
-                worker.on("message", (message) => {
-                    message.startServerClientTime = Date.now();
-
-                    socket.emit("responseFrame", message);
-                })
+                worker.on("message", (message) => 
+                    socket.emit("responseFrame", message)
+                );
                 
                 callback();
         });
     });
 
-    socket.on("frame", (message) => {
-        message.totalClientServerTime = Date.now() - message.startClientServerTime;
-        delete message.startClientServerTime;
-
-        worker.postMessage(message);
-    });
+    socket.on("frame", (message) => worker.postMessage(message));
 
 });
