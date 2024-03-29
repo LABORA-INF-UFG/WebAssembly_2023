@@ -139,7 +139,7 @@
                     };
 
                     
-                    const app = new Application(media, socket);
+                    const app = new Application(media, socket, media.width, media.height);
                     media.el.requestVideoFrameCallback(() => app.saveFrame());
 
                     socket.on("responseFrame", (message) =>  app.renderFrame(message));

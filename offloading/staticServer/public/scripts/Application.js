@@ -3,45 +3,50 @@ import { getCSV, Queue } from "/scripts/utils.js";
 
 
 class Application {
-    constructor(media, socket){
+
+    queueMaxSize = 15;
+    queue = new Queue();
+
+    frameIndex = 0;
+    totalFrames = 0;
+    hasEnded = false;
+
+    ctx = document.getElementById("renderer-video").getContext("2d");
+
+    addCube = false;
+    addCubeInterval = setInterval(() => {
+        this.addCube = true;
+    }, 200);
+
+    statistics = [
+        [
+            "slamTime",
+            "renderTime",
+            "segmentationTime",
+            "screenTime",
+        ],
+    ];
+    
+    constructor(media, socket, width, height){
         this.media = media;
-        this.socket = socket;
+        this.socket = socket;        
 
-        this.queue = new Queue();
-        this.queueMaxSize = 15;
-
-        this.frameIndex = 0;
-        this.totalFrames = 0;
-        this.hasEnded = false;
+        this.width = width;
+        this.height = height;
 
         const $cam = document.getElementById("renderer-cam");
         const $map = document.getElementById("renderer-map");
-        this.ctx = document.getElementById("renderer-video").getContext("2d");
 
-        this.ctx.canvas.width = this.media.width;
-        this.ctx.canvas.height = this.media.height;
+        this.ctx.canvas.width = width;
+        this.ctx.canvas.height = height;
 
-        const mapRenderer = new ARSimpleMap($map, this.media.width, this.media.height);
-        this.camRenderer = new ARSimpleView($cam, this.media.width, this.media.height, mapRenderer);
+        const mapRenderer = new ARSimpleMap($map, width, height);
+        this.camRenderer = new ARSimpleView($cam, width, height, mapRenderer);
 
         $cam.parentElement.style.display = "block";
 
-        this.addCube = false;
-        this.addCubeInterval = setInterval(() => {
-            this.addCube = true;
-        }, 200);
-
         this.fpsTimer = performance.now();
         this.startScreenTime = performance.now();
-
-        this.statistics = [
-            [
-                "slamTime",
-                "renderTime",
-                "segmentationTime",
-                "screenTime",
-            ],
-        ];
 
     }
     
@@ -63,8 +68,6 @@ class Application {
             this.queue.enqueue({
                 frame: frame.data,
                 queueFrameIndex: this.frameIndex,
-                width: frame.width, 
-                height: frame.height, 
                 totalSegmentationTime 
             });
 
@@ -82,8 +85,6 @@ class Application {
         const {
             frame,
             queueFrameIndex,
-            width,
-            height,
             totalSegmentationTime
         } = this.queue.dequeue();
     
@@ -113,14 +114,14 @@ class Application {
     
         const frameImageData = new ImageData(
             new Uint8ClampedArray(frame),
-            width,
-            height
+            this.width,
+            this.height
         );
     
         const startRenderTime = performance.now();
     
         const screenTime = performance.now() - this.startScreenTime;
-        this.ctx.clearRect(0, 0, width, height);
+        this.ctx.clearRect(0, 0, this.width, this.height);
         this.ctx.putImageData(frameImageData, 0, 0);
         this.startScreenTime = performance.now();
     
@@ -160,7 +161,7 @@ class Application {
             const fps = (this.statistics.length - 1) / time;
             this.statistics[0].push("fps");
             this.statistics[1].push(fps);
-            this.ctx.clearRect(0, 0, this.media.width, this.media.height);
+            this.ctx.clearRect(0, 0, this.width, this.height);
             this.addCubeInterval && clearInterval(this.addCubeInterval);
             getCSV(this.statistics, "offloading"); // Uncomment to save statistics in CSV file
             window.dispatchEvent(new Event("end"));
